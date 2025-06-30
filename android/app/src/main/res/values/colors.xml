@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Color for the notification icon background -->
+    <color name="colorAccent">#2196F3</color>
+    
+    <!-- You can add more colors below as needed -->
+</resources>

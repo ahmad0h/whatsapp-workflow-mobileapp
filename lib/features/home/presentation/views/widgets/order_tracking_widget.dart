@@ -1,31 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
 
 class OrderTrackingTimeline extends StatelessWidget {
-  final String updatedAt;
+  final List<OrderLog>? logs;
+  final String currentStatus;
 
-  const OrderTrackingTimeline({super.key, required this.updatedAt});
+  const OrderTrackingTimeline({
+    super.key,
+    required this.logs,
+    this.currentStatus = '',
+  });
+
+  String _getStatusTitle(String status) {
+    final normalizedStatus = status.toLowerCase();
+
+    switch (normalizedStatus) {
+      case 'new order':
+      case 'active':
+        return 'New Order';
+      case 'in_progress':
+      case 'in progress':
+        return 'In Progress';
+      case 'arrived':
+        return 'Arrived';
+      case 'completed':
+        return 'Completed';
+      default:
+        // Handle any other status formats
+        return status
+            .split('_')
+            .map((s) => s.isNotEmpty ? s[0].toUpperCase() + s.substring(1) : '')
+            .join(' ')
+            .trim();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (logs == null || logs!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final filteredLogs =
+        logs!.where((log) {
+          final status = log.orderStatus?.toLowerCase() ?? '';
+          return status != 'active' && status != 'new order';
+        }).toList()..sort(
+          (a, b) => (a.logTimestamp ?? '').compareTo(b.logTimestamp ?? ''),
+        );
+
+    if (filteredLogs.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(height: 25),
-        TimelineItem(
-          title: 'Accepted Order',
-          time: formatTimeWithoutDate(updatedAt),
-          isCompleted: true,
-          isFirst: true,
-        ),
-        TimelineItem(title: 'Arrived', time: '10:55 AM', isCompleted: true),
-        TimelineItem(
-          title: 'Completed',
-          time: '10:57 AM',
-          isCompleted: true,
-          isLast: true,
-        ),
+        const SizedBox(height: 25),
+        ...List.generate(filteredLogs.length, (index) {
+          final log = filteredLogs[index];
+          return TimelineItem(
+            title: _getStatusTitle(log.orderStatus ?? ''),
+            time: log.logTimestamp != null
+                ? formatTimeWithoutDate(log.logTimestamp!)
+                : '--:--',
+            isCompleted: true,
+            isFirst: index == 0,
+            isLast: index == filteredLogs.length - 1,
+            isCompletedStatus: log.orderStatus?.toLowerCase() == 'completed',
+          );
+        }),
       ],
     );
   }
@@ -37,6 +83,7 @@ class TimelineItem extends StatelessWidget {
   final bool isCompleted;
   final bool isFirst;
   final bool isLast;
+  final bool isCompletedStatus;
 
   const TimelineItem({
     super.key,
@@ -45,6 +92,7 @@ class TimelineItem extends StatelessWidget {
     this.isCompleted = false,
     this.isFirst = false,
     this.isLast = false,
+    this.isCompletedStatus = false,
   });
 
   @override
@@ -60,7 +108,9 @@ class TimelineItem extends StatelessWidget {
                 height: 32,
                 decoration: BoxDecoration(
                   color: isCompleted
-                      ? (isLast ? AppColors.statusArrived : AppColors.primary)
+                      ? (isCompletedStatus
+                            ? AppColors.statusArrived
+                            : AppColors.primary)
                       : AppColors.border,
                   shape: BoxShape.circle,
                 ),

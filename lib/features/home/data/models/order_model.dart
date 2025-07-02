@@ -13,6 +13,7 @@ class OrderModel {
   String? orderDate;
   String? updatedAt;
   List<OrderDetails>? orderDetails;
+  List<OrderLog>? logs;
 
   OrderModel({
     this.id,
@@ -29,6 +30,7 @@ class OrderModel {
     this.orderDate,
     this.updatedAt,
     this.orderDetails,
+    this.logs,
   });
 
   OrderModel.fromJson(Map<String, dynamic> json) {
@@ -55,6 +57,12 @@ class OrderModel {
         orderDetails!.add(OrderDetails.fromJson(v));
       });
     }
+    if (json['logs'] != null) {
+      logs = <OrderLog>[];
+      json['logs'].forEach((v) {
+        logs!.add(OrderLog.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -78,6 +86,9 @@ class OrderModel {
     data['updated_at'] = updatedAt;
     if (orderDetails != null) {
       data['orderDetails'] = orderDetails!.map((v) => v.toJson()).toList();
+    }
+    if (logs != null) {
+      data['logs'] = logs!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -201,6 +212,28 @@ class OrderDetails {
     data['product_quantity'] = productQuantity;
     data['product_price'] = productPrice;
     data['total'] = total;
+    return data;
+  }
+}
+
+class OrderLog {
+  String? logId;
+  String? logTimestamp;
+  String? orderStatus;
+
+  OrderLog({this.logId, this.logTimestamp, this.orderStatus});
+
+  OrderLog.fromJson(Map<String, dynamic> json) {
+    logId = json['log_id'];
+    logTimestamp = json['logTimestamp'];
+    orderStatus = json['orderStatus'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['log_id'] = logId;
+    data['logTimestamp'] = logTimestamp;
+    data['orderStatus'] = orderStatus;
     return data;
   }
 }

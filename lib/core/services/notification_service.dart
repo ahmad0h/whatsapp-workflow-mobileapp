@@ -86,8 +86,7 @@ class NotificationService {
     // Get the token for this device
     String? token = await _firebaseMessaging.getToken();
     if (token != null) {
-      debugPrint('FCM Token: $token');
-      // TODO: Send this token to your server
+      // log('FCM Token: $token');
     }
 
     // Handle foreground messages

@@ -36,6 +36,7 @@ class HomeDatasourceImpl implements HomeDatasource {
         if (response.data.containsKey('Status') && !response.data['Status']) {
           throw Exception(response.data['Message'] ?? 'Request failed');
         }
+
         return [OrderModel.fromJson(response.data)];
       }
 
@@ -53,16 +54,13 @@ class HomeDatasourceImpl implements HomeDatasource {
         data: {'status': status},
       );
 
-      // Log the response for debugging
       log('Update status response: ${response.data}');
 
-      // The API returns a success message in the response
       if (response.data is Map && response.data['message'] != null) {
         log('Status updated successfully: ${response.data['message']}');
         return;
       }
 
-      // If we get here, the response format is unexpected
       throw Exception('Unexpected response format: ${response.data}');
     } catch (e) {
       log('Error updating order status: $e');

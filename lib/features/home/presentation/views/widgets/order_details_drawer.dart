@@ -1,6 +1,6 @@
 import 'dart:developer';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_neumorphic_ui/flutter_neumorphic_ui.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:slide_to_act/slide_to_act.dart';
@@ -8,6 +8,7 @@ import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/format_time.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_tracking_widget.dart';
 
@@ -28,14 +29,54 @@ class OrderDetailsDrawer extends StatefulWidget {
 class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   bool _isOrderAccepted = false;
 
+  // Parse ISO 8601 timestamp string to DateTime
+  DateTime? _parseTimestamp(String? timestamp) {
+    if (timestamp == null || timestamp.isEmpty) return null;
+    try {
+      return DateTime.parse(timestamp);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Get the most recent status from logs if available
+  String _getCurrentStatus() {
+    final order = widget.order.orderData;
+    if (order.logs == null || order.logs!.isEmpty) {
+      return order.status?.toLowerCase() ?? '';
+    }
+
+    // Create a copy of logs to avoid modifying the original list
+    final logs = List<OrderLog>.from(order.logs!);
+
+    if (logs.isEmpty) {
+      return order.status?.toLowerCase() ?? '';
+    }
+
+    // Sort logs by timestamp in descending order to get the most recent first
+    logs.sort((a, b) {
+      final aTime = _parseTimestamp(a.logTimestamp) ?? DateTime(0);
+      final bTime = _parseTimestamp(b.logTimestamp) ?? DateTime(0);
+      return bTime.compareTo(aTime);
+    });
+
+    // Return the most recent log's status if available, otherwise fall back to order status
+    final mostRecentStatus = logs.first.orderStatus?.toLowerCase();
+    return mostRecentStatus ?? order.status?.toLowerCase() ?? '';
+  }
+
   @override
   void initState() {
     super.initState();
-    // If order status is 'Preparing', 'In Progress', or 'Arrived', mark as accepted
+    // Get the current status from logs
+    final currentStatus = _getCurrentStatus();
+
+    // If order status is 'in_progress', 'in progress', 'arrived', or 'completed', mark as accepted
     _isOrderAccepted =
-        widget.order.status == 'Preparing' ||
-        widget.order.status == 'In Progress' ||
-        widget.order.status == 'Arrived';
+        currentStatus == 'in_progress' ||
+        currentStatus == 'in progress' ||
+        currentStatus == 'arrived' ||
+        currentStatus == 'completed';
   }
 
   // Colors
@@ -93,6 +134,85 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     fontWeight: FontWeight.w600,
     color: _backgroundColor,
   );
+
+  Future<void> _handleCompleteOrder() async {
+    if (!mounted) return;
+
+    final homeBloc = context.read<HomeBloc>();
+    final orderId = widget.order.orderData.id ?? '';
+
+    try {
+      // Update the order status to completed
+      homeBloc.add(HomeEvent.updateOrderStatus(orderId, 'completed'));
+
+      // Wait for the status update to complete
+      await homeBloc.stream
+          .where((state) => state.updateOrderStatus != ResponseStatus.loading)
+          .first;
+
+      if (!mounted) return;
+
+      // Then refresh the orders list to get the latest data
+      homeBloc.add(const HomeEvent.getOrdersData());
+      await homeBloc.stream
+          .where((state) => state.getOrdersListStatus != ResponseStatus.loading)
+          .first;
+
+      if (!mounted) return;
+
+      // Find the updated order in the state
+      final updatedOrder = homeBloc.state.ordersList?.firstWhere(
+        (order) => order.id == orderId,
+        orElse: () => widget.order.orderData,
+      );
+
+      // Update the local order data with the latest from the server
+      if (updatedOrder != null) {
+        final updatedCardModel = OrderCardModel(
+          orderNumber: updatedOrder.orderNumber ?? widget.order.orderNumber,
+          customerName:
+              updatedOrder.customer?.fullName ?? widget.order.customerName,
+          time: updatedOrder.orderDate != null
+              ? formatTime(updatedOrder.orderDate!)
+              : widget.order.time,
+          status: 'Completed',
+          statusColor: _getStatusColor('completed'),
+          carBrand: updatedOrder.vehicle?.brand ?? widget.order.carBrand,
+          carColor: updatedOrder.vehicle?.color?.toLowerCase() ?? 'grey',
+          plateNumber:
+              updatedOrder.vehicle?.plateNumber ?? widget.order.plateNumber,
+          carDetails:
+              '${updatedOrder.vehicle?.brand ?? ''} ${updatedOrder.vehicle?.model ?? ''} (${updatedOrder.vehicle?.color ?? 'N/A'})',
+          orderData: updatedOrder,
+        );
+
+        // Update the widget's order reference
+        if (mounted) {
+          setState(() {
+            widget.order.status = 'Completed';
+            // Notify parent widget about the update
+            if (widget.onOrderUpdated != null) {
+              widget.onOrderUpdated!(updatedCardModel);
+            }
+          });
+        }
+      }
+
+      if (!mounted) return;
+
+      // Show success message
+      log('Order marked as completed successfully');
+
+      // Close the drawer after a short delay
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          GoRouter.of(context).pop();
+        }
+      });
+    } catch (e) {
+      log('Failed to update order status to completed: $e');
+    }
+  }
 
   Future<void> _handleAcceptOrder() async {
     if (!mounted) return;
@@ -302,46 +422,43 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                       if (_isOrderAccepted) ...[
                         const SizedBox(height: 20),
                         OrderTrackingTimeline(
-                          updatedAt:
-                              widget.order.orderData.updatedAt ??
-                              widget.order.orderData.orderDate ??
-                              DateTime.now().toIso8601String(),
+                          logs: widget.order.orderData.logs,
+                          currentStatus: widget.order.status.toLowerCase(),
                         ),
                       ],
                       if (!_isOrderAccepted) ...[
                         const SizedBox(height: 50),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(28),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.textPrimary.withValues(
-                                  alpha: 0.1,
-                                ),
-                                spreadRadius: 1,
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
+                        SizedBox(
+                          height: 60,
+                          child: NeumorphicButton(
+                            style: NeumorphicStyle(
+                              depth: 50,
+                              surfaceIntensity: 50,
+                              lightSource: LightSource(0, 0),
+                              oppositeShadowLightSource: false,
+                              color: const Color.fromARGB(255, 240, 238, 238),
+                              border: NeumorphicBorder(
+                                color: Colors.black.withValues(alpha: 0.07),
                               ),
-                            ],
-                          ),
-                          child: SlideAction(
-                            text: 'Reject Order',
-                            textColor: AppColors.error,
-                            sliderButtonIcon: const Icon(
-                              Icons.arrow_forward_ios,
-                              color: AppColors.error,
-                              size: 16,
+                              boxShape: NeumorphicBoxShape.roundRect(
+                                BorderRadius.circular(50),
+                              ),
                             ),
-                            elevation: 0,
-                            onSubmit: () async {},
-                            innerColor: const Color(0xFFFFFFFF),
-                            outerColor: const Color.fromARGB(
-                              255,
-                              236,
-                              232,
-                              232,
+                            child: SlideAction(
+                              text: 'Reject Order',
+                              textColor: AppColors.error,
+                              sliderButtonIcon: const Icon(
+                                Icons.arrow_forward_ios,
+                                color: AppColors.error,
+                                size: 15,
+                              ),
+                              elevation: 0.0,
+                              onSubmit: () async {},
+                              sliderButtonYOffset: -8,
+                              innerColor: const Color(0xFFFFFFFF),
+                              outerColor: Colors.transparent,
+                              borderRadius: 50,
                             ),
-                            borderRadius: 28,
                           ),
                         ),
                       ],
@@ -398,25 +515,26 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
 
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             decoration: BoxDecoration(
-              color: widget.order.status == 'Arrived'
-                  ? const Color(0xFF27AE60)
-                  : const Color(0xFFEEB128),
+              color: widget.order.status == 'In Progress'
+                  ? const Color(0xFFEEB128) // Yellow for In Progress
+                  : const Color(
+                      0xFF27AE60,
+                    ), // Green for New Order, Arrived, and Completed
               borderRadius: BorderRadius.circular(25),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.order.status == 'Arrived'
-                      ? 'Completed'
-                      : 'In Progress',
+                  _getStatusDisplayText(),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
                 ),
-                if (widget.order.status != 'Arrived')
+                if (widget.order.status != 'Arrived' &&
+                    widget.order.status != 'Completed')
                   Image.asset(
                     'assets/icons/spinner.png',
                     width: 24,
@@ -485,8 +603,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
               Expanded(
                 child: _buildInfoCard(
                   title: 'Car Details',
-                  value:
-                      '${widget.order.carBrand} - ${widget.order.carDetails}',
+                  value: widget.order.carDetails.split('(')[0],
                 ),
               ),
               const SizedBox(width: _elementSpacing),
@@ -543,6 +660,39 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
 
   Widget _buildDivider() {
     return Container(height: 1, width: double.infinity, color: _dividerColor);
+  }
+
+  // Helper method to get the correct status text for display
+  String _getStatusDisplayText() {
+    // First try to get status from logs
+    final currentStatus = _getCurrentStatus().toLowerCase();
+
+    if (currentStatus.contains('new') || currentStatus == 'active') {
+      return 'New Order';
+    } else if (currentStatus.contains('progress') ||
+        currentStatus == 'in_progress') {
+      return 'In Progress';
+    } else if (currentStatus == 'arrived') {
+      return 'Arrived';
+    } else if (currentStatus == 'completed') {
+      return 'Completed';
+    }
+
+    // Fallback to order status if no match found in logs
+    final orderStatus = widget.order.status.toLowerCase();
+    if (orderStatus.contains('new') || orderStatus == 'active') {
+      return 'New Order';
+    } else if (orderStatus.contains('progress') ||
+        orderStatus == 'in_progress') {
+      return 'In Progress';
+    } else if (orderStatus == 'arrived') {
+      return 'Arrived';
+    } else if (orderStatus == 'completed') {
+      return 'Completed';
+    }
+
+    // Default to the raw status if no match is found
+    return widget.order.status;
   }
 
   Widget _buildTotalAmount() {
@@ -662,27 +812,62 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   }
 
   Widget _buildAcceptButton(BuildContext context) {
+    final currentStatus = _getCurrentStatus().toLowerCase();
+    final isArrived = currentStatus == 'arrived';
+    final isCompleted = currentStatus == 'completed';
+
     if (_isOrderAccepted ||
-        widget.order.status == 'Preparing' ||
-        widget.order.status == 'In Progress' ||
-        widget.order.status == 'Arrived') {
-      return SizedBox(
-        width: double.infinity,
-        height: 56,
-        child: ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFFF2F5F9),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(_buttonBorderRadius),
+        currentStatus == 'preparing' ||
+        currentStatus == 'in progress' ||
+        currentStatus == 'in_progress' ||
+        isArrived ||
+        isCompleted) {
+      return Column(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            height: 60,
+            child: ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFF2F5F9),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(_buttonBorderRadius),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                _getAcceptanceStatusText(),
+                style: TextStyle(fontSize: 20, color: Colors.black),
+              ),
             ),
-            elevation: 0,
           ),
-          child: Text(
-            'Accepted at ${formatTimeWithoutDate(widget.order.orderData.updatedAt ?? DateTime.now().toIso8601String())}',
-            style: TextStyle(fontSize: 20, color: Colors.black),
-          ),
-        ),
+          if (isArrived) ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: _handleCompleteOrder,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.statusCompleted,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(_buttonBorderRadius),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Mark as Completed',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
       );
     }
 
@@ -701,6 +886,21 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
         child: const Text('Accept', style: _buttonTextStyle),
       ),
     );
+  }
+
+  String _getAcceptanceStatusText() {
+    final logs = widget.order.orderData.logs;
+    if (logs == null || logs.isEmpty) {
+      return 'Accepted at ${formatTimeWithoutDate(DateTime.now().toIso8601String())}';
+    }
+
+    // Find the in_progress log
+    final inProgressLog = logs.firstWhere(
+      (log) => log.orderStatus?.toLowerCase() == 'in_progress',
+      orElse: () => logs.first,
+    );
+
+    return 'Accepted at ${formatTimeWithoutDate(inProgressLog.logTimestamp ?? DateTime.now().toIso8601String())}';
   }
 
   Widget _buildOrderItem(String itemName, int quantity, double price) {

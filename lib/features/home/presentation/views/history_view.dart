@@ -1,5 +1,11 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
+import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/home_view.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/option_drawer.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_details_drawer.dart';
@@ -16,9 +22,11 @@ class _HistoryViewState extends State<HistoryView> {
   String selectedTab = 'Today';
   OrderCardModel? _selectedOrder;
 
-  // This is a placeholder list. In a real app, this would come from an API or state management
-  // For now, we'll use an empty list since we can't create OrderModel instances without the full data
-  List<OrderCardModel> orders = [];
+  @override
+  void initState() {
+    super.initState();
+    context.read<HomeBloc>().add(const HomeEvent.getOrdersData());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,183 +36,232 @@ class _HistoryViewState extends State<HistoryView> {
       endDrawer: _selectedOrder != null
           ? OrderDetailsDrawer(order: _selectedOrder!)
           : OptionDrawer(),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            automaticallyImplyLeading: false,
-            leading: const SizedBox.shrink(),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            floating: false,
-            pinned: true,
-            toolbarHeight: kToolbarHeight,
-            expandedHeight: 80,
-            actions: [SizedBox.shrink()],
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [AppColors.primary, AppColors.primaryDark],
-                ),
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 48.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.asset('assets/ryze-logo.png'),
-                      Row(
+      body: BlocConsumer<HomeBloc, HomeState>(
+        listener: (context, state) {
+          if (state.getOrdersListStatus == ResponseStatus.failure) {
+            log(state.getOrdersListFailures?.message ?? '');
+          }
+        },
+        builder: (context, state) {
+          if (state.getOrdersListStatus == ResponseStatus.loading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          bool isToday(String? dateString) {
+            if (dateString == null) return false;
+            try {
+              final date = DateTime.parse(dateString);
+              final now = DateTime.now();
+              return date.year == now.year &&
+                  date.month == now.month &&
+                  date.day == now.day;
+            } catch (e) {
+              return false;
+            }
+          }
+
+          var orders =
+              state.ordersList?.map(mapOrderToCardModel).toList().where((e) {
+                if (e.status != "Completed") return false;
+
+                final completedLog = e.orderData.logs?.firstWhere(
+                  (log) => log.orderStatus?.toLowerCase() == 'completed',
+                  orElse: () => OrderLog(),
+                );
+
+                return isToday(completedLog?.logTimestamp);
+              }).toList() ??
+              [];
+
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                automaticallyImplyLeading: false,
+                leading: const SizedBox.shrink(),
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                floating: false,
+                pinned: true,
+                toolbarHeight: kToolbarHeight,
+                expandedHeight: 80,
+                actions: [SizedBox.shrink()],
+                flexibleSpace: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [AppColors.primary, AppColors.primaryDark],
+                    ),
+                  ),
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 48.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Image.asset('assets/company-logo.png'),
-                          SizedBox(width: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          Image.asset('assets/ryze-logo.png'),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                'Olive Garden',
-                                style: TextStyle(
-                                  color: AppColors.background,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                              Image.asset('assets/company-logo.png'),
+                              SizedBox(width: 8),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Olive Garden',
+                                    style: TextStyle(
+                                      color: AppColors.background,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
 
-                              Text(
-                                'Nasr Road Branch',
-                                style: TextStyle(
-                                  color: AppColors.backgroundLight,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500,
+                                  Text(
+                                    'Nasr Road Branch',
+                                    style: TextStyle(
+                                      color: AppColors.backgroundLight,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: 24),
+                              Container(
+                                height: 33,
+                                color: AppColors.background,
+                                width: 1,
+                              ),
+                              SizedBox(width: 24),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.menu,
+                                  color: Colors.white,
+                                  size: 32,
                                 ),
+                                onPressed: () {
+                                  if (_selectedOrder == null) {
+                                    _scaffoldKey.currentState?.openEndDrawer();
+                                  } else {
+                                    setState(() {
+                                      _selectedOrder = null;
+                                    });
+
+                                    Future.delayed(
+                                      Duration(milliseconds: 100),
+                                      () {
+                                        _scaffoldKey.currentState
+                                            ?.openEndDrawer();
+                                      },
+                                    );
+                                  }
+                                },
                               ),
                             ],
                           ),
-                          SizedBox(width: 24),
-                          Container(
-                            height: 33,
-                            color: AppColors.background,
-                            width: 1,
-                          ),
-                          SizedBox(width: 24),
-                          IconButton(
-                            icon: Icon(
-                              Icons.menu,
-                              color: Colors.white,
-                              size: 32,
-                            ),
-                            onPressed: () {
-                              if (_selectedOrder == null) {
-                                _scaffoldKey.currentState?.openEndDrawer();
-                              } else {
-                                setState(() {
-                                  _selectedOrder = null;
-                                });
-
-                                Future.delayed(Duration(milliseconds: 100), () {
-                                  _scaffoldKey.currentState?.openEndDrawer();
-                                });
-                              }
-                            },
-                          ),
                         ],
                       ),
+                    ),
+                  ),
+                ),
+              ),
+
+              SliverToBoxAdapter(
+                child: Container(
+                  padding: EdgeInsets.only(left: 48, right: 48, top: 40),
+
+                  child: Row(
+                    children: [
+                      Text(
+                        'Orders',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Spacer(),
+                      Container(
+                        alignment: Alignment.center,
+                        height: 50,
+                        width: MediaQuery.of(context).size.width * 0.35,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.textPrimary.withValues(
+                                alpha: 0.15,
+                              ),
+                              blurRadius: 3,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 16,
+                            ),
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.only(bottom: 2),
+                              child: Icon(
+                                Icons.search,
+                                color: AppColors.textHint,
+                                size: 24,
+                              ),
+                            ),
+                            prefixIconConstraints: BoxConstraints(
+                              minWidth: 40,
+                              minHeight: 24,
+                            ),
+                            hintText: 'Search by Order Number',
+                            hintStyle: TextStyle(
+                              color: Color(0xFF9A9E99),
+                              fontSize: 16,
+                            ),
+                            border: InputBorder.none,
+                            isDense: true,
+                          ),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+
+                      _buildTab('Today'),
+                      _buildTab('Custom'),
                     ],
                   ),
                 ),
               ),
-            ),
-          ),
 
-          SliverToBoxAdapter(
-            child: Container(
-              padding: EdgeInsets.only(left: 48, right: 48, top: 40),
-
-              child: Row(
-                children: [
-                  Text(
-                    'Orders',
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.w400),
+              SliverPadding(
+                padding: EdgeInsets.only(left: 48, right: 48, top: 32),
+                sliver: SliverGrid(
+                  delegate: SliverChildBuilderDelegate((_, index) {
+                    return _buildOrderCard(orders[index]);
+                  }, childCount: orders.length),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 24,
+                    mainAxisSpacing: 24,
+                    childAspectRatio:
+                        MediaQuery.of(context).orientation ==
+                            Orientation.portrait
+                        ? 8 / 5
+                        : 8 / 3,
                   ),
-                  Spacer(),
-                  Container(
-                    alignment: Alignment.center,
-                    height: 50,
-                    width: MediaQuery.of(context).size.width * 0.35,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.textPrimary.withOpacity(0.15),
-                          blurRadius: 3,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 12,
-                          horizontal: 16,
-                        ),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.only(bottom: 2),
-                          child: Icon(
-                            Icons.search,
-                            color: AppColors.textHint,
-                            size: 24,
-                          ),
-                        ),
-                        prefixIconConstraints: BoxConstraints(
-                          minWidth: 40,
-                          minHeight: 24,
-                        ),
-                        hintText: 'Search by Order Number',
-                        hintStyle: TextStyle(
-                          color: Color(0xFF9A9E99),
-                          fontSize: 16,
-                        ),
-                        border: InputBorder.none,
-                        isDense: true,
-                      ),
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-
-                  _buildTab('Today'),
-                  _buildTab('Custom'),
-                ],
+                ),
               ),
-            ),
-          ),
-
-          SliverPadding(
-            padding: EdgeInsets.only(left: 48, right: 48, top: 32),
-            sliver: SliverGrid(
-              delegate: SliverChildBuilderDelegate((_, index) {
-                return _buildOrderCard(orders[index]);
-              }, childCount: orders.length),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 24,
-                mainAxisSpacing: 24,
-                childAspectRatio:
-                    MediaQuery.of(context).orientation == Orientation.portrait
-                    ? 8 / 5
-                    : 8 / 3,
-              ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -220,7 +277,7 @@ class _HistoryViewState extends State<HistoryView> {
           border: Border(left: BorderSide(color: model.statusColor, width: 12)),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textHint.withOpacity(0.1),
+              color: AppColors.textHint.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 2,
               offset: Offset(0, 1),
@@ -252,7 +309,7 @@ class _HistoryViewState extends State<HistoryView> {
                       spacing: 8,
                       children: [
                         Text(
-                          'Completed',
+                          model.status,
                           style: TextStyle(
                             color: model.statusColor,
                             fontSize: 12,
@@ -260,7 +317,7 @@ class _HistoryViewState extends State<HistoryView> {
                           ),
                         ),
 
-                        if (model.status == "Arrived")
+                        if (model.status == "Completed")
                           Padding(
                             padding: EdgeInsets.only(right: 4),
                             child: Icon(

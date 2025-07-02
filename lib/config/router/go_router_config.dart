@@ -13,7 +13,7 @@ final GoRouter router = GoRouter(
   routes: [
     GoRoute(
       path: GoRouterConfig.homeView,
-      builder: (context, state) => const DashBoard(),
+      builder: (context, state) => const HomeView(),
     ),
     GoRoute(
       path: GoRouterConfig.historyView,

@@ -3,8 +3,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
+import 'package:whatsapp_workflow_mobileapp/core/utils/formant_status.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/format_time.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
+import 'package:whatsapp_workflow_mobileapp/core/utils/get_current_status.dart';
+import 'package:whatsapp_workflow_mobileapp/core/utils/get_status_color.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
@@ -13,14 +16,14 @@ import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/wid
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-class DashBoard extends StatefulWidget {
-  const DashBoard({super.key});
+class HomeView extends StatefulWidget {
+  const HomeView({super.key});
 
   @override
-  DashboardState createState() => DashboardState();
+  HomeViewState createState() => HomeViewState();
 }
 
-class DashboardState extends State<DashBoard> {
+class HomeViewState extends State<HomeView> {
   StreamSubscription<RemoteMessage>? _messageStreamSubscription;
 
   @override
@@ -37,15 +40,23 @@ class DashboardState extends State<DashBoard> {
   }
 
   void _setupNotificationListener() {
-    // Listen for new order notifications
     _messageStreamSubscription = FirebaseMessaging.onMessage.listen((message) {
-      // Check if this is a new order notification by checking the title
-      if (message.notification?.title?.toLowerCase().contains('new order') ==
-          true) {
-        // Log the message for debugging
-        debugPrint('New order notification received, refreshing orders...');
+      debugPrint('Notification received: ${message.notification?.title}');
+      debugPrint('Notification data: ${message.data}');
 
-        // Refresh the orders list
+      if (message.notification?.title?.toLowerCase().contains('new order') ==
+              true ||
+          message.notification?.title?.toLowerCase().contains(
+                'customer arrived',
+              ) ==
+              true ||
+          message.notification?.title?.toLowerCase().contains('payment') ==
+              true ||
+          message.data['title']?.toLowerCase().contains('payment') == true) {
+        debugPrint(
+          'Refreshing orders list due to order/payment notification...',
+        );
+
         if (mounted) {
           context.read<HomeBloc>().add(const HomeEvent.getOrdersData());
         }
@@ -56,77 +67,35 @@ class DashboardState extends State<DashBoard> {
   bool isAcceptingOrders = true;
   bool hasInternetConnection = true;
   String selectedTab = 'All Orders';
+
+  // Filter orders based on selected tab
+  List<OrderCardModel> _filterOrders(List<OrderCardModel> orders, String tab) {
+    if (tab == 'All Orders') return orders;
+
+    return orders.where((order) {
+      // Normalize the status by trimming and converting to lowercase
+      final status = order.status.trim().toLowerCase();
+
+      // Map the tab names to their corresponding status values
+      switch (tab) {
+        case 'New Orders':
+          return status == 'active' || status == 'new order';
+        case 'In Progress':
+          return status == 'in_progress' || status == 'in progress';
+        case 'Arrived':
+          return status == 'arrived';
+        case 'Completed':
+          return status == 'completed';
+        default:
+          return false; // Don't show any orders for unknown tabs
+      }
+    }).toList();
+  }
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   OrderCardModel? _selectedOrder;
 
   // Function to get status color based on status string
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'active':
-        return AppColors.primary; // Blue for new orders
-      case 'in_progress':
-        return AppColors.statusPreparing; // Yellow for in progress
-      case 'arrived':
-        return AppColors.statusArrived; // Green for arrived
-      case 'completed':
-        return AppColors.statusCompleted; // Green for completed
-      case 'cancelled':
-      case 'rejected':
-        return AppColors.statusRejected; // Red for cancelled/rejected
-      default:
-        return AppColors.textSecondary; // Gray for unknown status
-    }
-  }
-
-  // Map OrderModel to OrderCardModel
-  OrderCardModel _mapOrderToCardModel(OrderModel order) {
-    final carColor = order.vehicle?.color?.toLowerCase() ?? 'grey';
-    final time = order.orderDate != null
-        ? formatTime(order.orderDate!)
-        : '--:--';
-    final formattedStatus = _formatStatus(order.status ?? '');
-    final statusColor = _getStatusColor(order.status ?? '');
-    final customerName = order.customer?.fullName ?? 'Unknown';
-    final carBrand = order.vehicle?.brand ?? 'Unknown';
-    final plateNumber = order.vehicle?.plateNumber ?? '--';
-    final carDetails =
-        '${order.vehicle?.brand ?? ''} ${order.vehicle?.model ?? ''} (${order.vehicle?.color ?? 'N/A'})';
-
-    return OrderCardModel(
-      orderNumber: order.orderNumber ?? '--',
-      customerName: customerName,
-      time: time,
-      status: formattedStatus,
-      statusColor: statusColor,
-      carBrand: carBrand,
-      plateNumber: plateNumber,
-      carDetails: carDetails,
-      carColor: carColor,
-      orderData: order,
-    );
-  }
-
-  String _formatStatus(String status) {
-    switch (status.toLowerCase()) {
-      case 'new_order':
-        return 'New Order';
-      case 'in_progress':
-        return 'In Progress';
-      case 'active':
-        return 'New Order';
-      case 'completed':
-        return 'Completed';
-      case 'cancelled':
-        return 'Cancelled';
-      case 'rejected':
-        return 'Rejected';
-      default:
-        return status
-            .split('_')
-            .map((s) => s[0].toUpperCase() + s.substring(1))
-            .join(' ');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +130,7 @@ class DashboardState extends State<DashBoard> {
         builder: (context, state) {
           final isLoading = state.getOrdersListStatus == ResponseStatus.loading;
           final orders = !isLoading
-              ? state.ordersList?.map(_mapOrderToCardModel).toList() ?? []
+              ? state.ordersList?.map(mapOrderToCardModel).toList() ?? []
               : [];
           return Column(
             children: [
@@ -352,10 +321,31 @@ class DashboardState extends State<DashBoard> {
                               ),
                             ),
                             Spacer(),
-                            _buildTab('All Orders'),
-                            _buildTab('Arrived'),
-                            _buildTab('New Orders'),
-                            _buildTab('In Progress'),
+                            _buildTab(
+                              'All Orders',
+                              isSelected: selectedTab == 'All Orders',
+                              onTap: () =>
+                                  setState(() => selectedTab = 'All Orders'),
+                            ),
+                            _buildTab(
+                              'New Orders',
+                              isSelected: selectedTab == 'New Orders',
+                              onTap: () =>
+                                  setState(() => selectedTab = 'New Orders'),
+                            ),
+
+                            _buildTab(
+                              'In Progress',
+                              isSelected: selectedTab == 'In Progress',
+                              onTap: () =>
+                                  setState(() => selectedTab = 'In Progress'),
+                            ),
+                            _buildTab(
+                              'Arrived',
+                              isSelected: selectedTab == 'Arrived',
+                              onTap: () =>
+                                  setState(() => selectedTab = 'Arrived'),
+                            ),
                           ],
                         ),
                       ),
@@ -373,9 +363,19 @@ class DashboardState extends State<DashBoard> {
                               ),
                             )
                           : SliverGrid(
-                              delegate: SliverChildBuilderDelegate((_, index) {
-                                return _buildOrderCard(orders[index]);
-                              }, childCount: orders.length),
+                              delegate: SliverChildBuilderDelegate(
+                                (_, index) {
+                                  final filteredOrders = _filterOrders(
+                                    orders,
+                                    selectedTab,
+                                  );
+                                  return _buildOrderCard(filteredOrders[index]);
+                                },
+                                childCount: _filterOrders(
+                                  orders as List<OrderCardModel>,
+                                  selectedTab,
+                                ).length,
+                              ),
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
@@ -384,8 +384,8 @@ class DashboardState extends State<DashBoard> {
                                     childAspectRatio:
                                         MediaQuery.of(context).orientation ==
                                             Orientation.portrait
-                                        ? 8 / 5
-                                        : 8 / 3,
+                                        ? 8 / 4.3
+                                        : 8 / 2.6,
                                   ),
                             ),
                     ),
@@ -602,10 +602,13 @@ class DashboardState extends State<DashBoard> {
     );
   }
 
-  Widget _buildTab(String text) {
-    bool isSelected = selectedTab == text;
+  Widget _buildTab(
+    String text, {
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
-      onTap: () => setState(() => selectedTab = text),
+      onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7.5),
         decoration: BoxDecoration(
@@ -650,16 +653,22 @@ class DashboardState extends State<DashBoard> {
   // Handle order updates from the details drawer
   void _handleOrderUpdated(OrderCardModel updatedOrder) {
     final homeBloc = context.read<HomeBloc>();
-    
-    // Refresh the orders list to get the latest data from the server
-    homeBloc.add(const HomeEvent.getOrdersData());
-    
+
     // Update the selected order to reflect the changes immediately
-    if (_selectedOrder != null && _selectedOrder!.orderData.id == updatedOrder.orderData.id) {
+    if (_selectedOrder != null &&
+        _selectedOrder!.orderData.id == updatedOrder.orderData.id) {
       setState(() {
         _selectedOrder = updatedOrder;
       });
     }
+
+    // Refresh the orders list to get the latest data from the server
+    homeBloc.add(const HomeEvent.getOrdersData());
+
+    // Trigger a UI rebuild to ensure the order list is refreshed
+    setState(() {
+      // This will cause the BlocConsumer to rebuild with the latest state
+    });
   }
 
   Widget _buildOrderCard(OrderCardModel model) {
@@ -750,7 +759,7 @@ class DashboardState extends State<DashBoard> {
                 model.customerName,
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 8),
               Container(
                 height: 1,
                 width: double.infinity,
@@ -761,7 +770,7 @@ class DashboardState extends State<DashBoard> {
                 children: [
                   // Car logo
                   Center(child: Image.asset('assets/icons/car-logo.png')),
-                  SizedBox(width: 8),
+                  SizedBox(width: 5),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6.3),
                     decoration: BoxDecoration(
@@ -776,7 +785,7 @@ class DashboardState extends State<DashBoard> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 8),
+                  SizedBox(width: 5),
                   Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 10,
@@ -787,14 +796,14 @@ class DashboardState extends State<DashBoard> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      model.carDetails,
+                      model.carDetails.split('(')[0],
                       style: TextStyle(
                         fontSize: 11.08,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-                  SizedBox(width: 8),
+                  SizedBox(width: 5),
                   Container(
                     width: 29,
                     height: 29,
@@ -815,4 +824,33 @@ class DashboardState extends State<DashBoard> {
       ),
     );
   }
+}
+
+OrderCardModel mapOrderToCardModel(OrderModel order) {
+  final carColor = order.vehicle?.color?.toLowerCase() ?? 'grey';
+  final time = order.orderDate != null ? formatTime(order.orderDate!) : '--:--';
+
+  // Get the most up-to-date status from logs if available
+  final currentStatus = getCurrentStatus(order);
+  final formattedStatus = formatStatus(currentStatus);
+  final statusColor = getStatusColor(currentStatus);
+
+  final customerName = order.customer?.fullName ?? 'Unknown';
+  final carBrand = order.vehicle?.brand ?? 'Unknown';
+  final plateNumber = order.vehicle?.plateNumber ?? '--';
+  final carDetails =
+      '${order.vehicle?.brand ?? ''} ${order.vehicle?.model ?? ''} (${order.vehicle?.color ?? 'N/A'})';
+
+  return OrderCardModel(
+    orderNumber: order.orderNumber ?? '--',
+    customerName: customerName,
+    time: time,
+    status: formattedStatus,
+    statusColor: statusColor,
+    carBrand: carBrand,
+    plateNumber: plateNumber,
+    carDetails: carDetails,
+    carColor: carColor,
+    orderData: order,
+  );
 }

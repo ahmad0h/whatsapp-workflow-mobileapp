@@ -378,7 +378,7 @@ class _HistoryViewState extends State<HistoryView> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      model.carDetails,
+                      model.carDetails.split('(')[0],
                       style: TextStyle(
                         fontSize: 11.08,
                         fontWeight: FontWeight.w500,

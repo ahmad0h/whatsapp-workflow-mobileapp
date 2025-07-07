@@ -32,4 +32,30 @@ class OrderCardModel {
     required this.carColor,
     required this.orderData,
   });
+
+  OrderCardModel copyWith({
+    String? orderNumber,
+    String? customerName,
+    String? time,
+    String? status,
+    Color? statusColor,
+    String? carBrand,
+    String? plateNumber,
+    String? carDetails,
+    String? carColor,
+    OrderModel? orderData,
+  }) {
+    return OrderCardModel(
+      orderNumber: orderNumber ?? this.orderNumber,
+      customerName: customerName ?? this.customerName,
+      time: time ?? this.time,
+      status: status ?? this.status,
+      statusColor: statusColor ?? this.statusColor,
+      carBrand: carBrand ?? this.carBrand,
+      plateNumber: plateNumber ?? this.plateNumber,
+      carDetails: carDetails ?? this.carDetails,
+      carColor: carColor ?? this.carColor,
+      orderData: orderData ?? this.orderData,
+    );
+  }
 }

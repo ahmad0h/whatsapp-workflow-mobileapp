@@ -11,15 +11,18 @@ import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_tracking_widget.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/reject_order_drawer.dart';
 
 class OrderDetailsDrawer extends StatefulWidget {
   final OrderCardModel order;
   final Function(OrderCardModel)? onOrderUpdated;
+  final VoidCallback? onRejectPressed;
 
   const OrderDetailsDrawer({
     super.key,
     required this.order,
     this.onOrderUpdated,
+    this.onRejectPressed,
   });
 
   @override
@@ -134,6 +137,74 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     fontWeight: FontWeight.w600,
     color: _backgroundColor,
   );
+
+  void _showRejectOrderDrawer() {
+    if (widget.onRejectPressed != null) {
+      widget.onRejectPressed!();
+    } else {
+      // Fallback to the old dialog implementation if onRejectPressed is not provided
+      showGeneralDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierLabel: MaterialLocalizations.of(
+          context,
+        ).modalBarrierDismissLabel,
+        barrierColor: Colors.black54,
+        transitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return Align(
+            alignment: Alignment.centerRight,
+            child: Material(
+              color: Colors.transparent,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.5,
+                height: MediaQuery.of(context).size.height,
+                child: RejectOrderDrawer(
+                  orderNumber: widget.order.orderNumber,
+                  orderId: widget.order.orderData.id ?? '',
+                  onOrderRejected: () {
+                    // Refresh the orders list after rejection
+                    final homeBloc = context.read<HomeBloc>();
+                    homeBloc.add(const HomeEvent.getOrdersData());
+
+                    // Notify parent widget if callback is provided
+                    if (widget.onOrderUpdated != null) {
+                      // Create updated order model with rejected status
+                      final rejectedOrder = OrderCardModel(
+                        orderNumber: widget.order.orderNumber,
+                        customerName: widget.order.customerName,
+                        time: widget.order.time,
+                        status: 'Rejected',
+                        statusColor: AppColors.statusRejected,
+                        carBrand: widget.order.carBrand,
+                        carColor: widget.order.carColor,
+                        plateNumber: widget.order.plateNumber,
+                        carDetails: widget.order.carDetails,
+                        orderData: widget.order.orderData,
+                      );
+                      widget.onOrderUpdated!(rejectedOrder);
+                    }
+                  },
+                ),
+              ),
+            ),
+          );
+        },
+        transitionBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position:
+                Tween<Offset>(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                ),
+            child: child,
+          );
+        },
+      );
+    }
+  }
 
   Future<void> _handleCompleteOrder() async {
     if (!mounted) return;
@@ -387,6 +458,10 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final currentStatus = _getCurrentStatus().toLowerCase();
+    final isRejected =
+        currentStatus == 'rejected' || currentStatus == 'cancelled';
+
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.5,
       child: Container(
@@ -419,14 +494,14 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                       _buildDivider(),
                       const SizedBox(height: _sectionSpacing),
                       _buildAcceptButton(context),
-                      if (_isOrderAccepted) ...[
+                      if (_isOrderAccepted && !isRejected) ...[
                         const SizedBox(height: 20),
                         OrderTrackingTimeline(
                           logs: widget.order.orderData.logs,
                           currentStatus: widget.order.status.toLowerCase(),
                         ),
                       ],
-                      if (!_isOrderAccepted) ...[
+                      if (!_isOrderAccepted && !isRejected) ...[
                         const SizedBox(height: 50),
                         SizedBox(
                           height: 60,
@@ -452,8 +527,19 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                                 color: AppColors.error,
                                 size: 15,
                               ),
+                              submittedIcon: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                child: const Icon(
+                                  Icons.check,
+                                  color: AppColors.success,
+                                  size: 15,
+                                ),
+                              ),
                               elevation: 0.0,
-                              onSubmit: () async {},
+                              onSubmit: () {
+                                _showRejectOrderDrawer();
+                                return null;
+                              },
                               sliderButtonYOffset: -8,
                               innerColor: const Color(0xFFFFFFFF),
                               outerColor: Colors.transparent,
@@ -504,29 +590,33 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   }
 
   Widget _buildOrderHeader() {
+    final currentStatus = _getCurrentStatus().toLowerCase();
+    final isRejected =
+        currentStatus == 'rejected' || currentStatus == 'cancelled';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_isOrderAccepted)
+        if (_isOrderAccepted || isRejected)
           Container(
             width: double.infinity,
             alignment: Alignment.center,
             height: 48,
-
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             decoration: BoxDecoration(
-              color: widget.order.status == 'In Progress'
+              color: isRejected
+                  ? AppColors
+                        .error // Red for Rejected/Cancelled
+                  : widget.order.status == 'In Progress'
                   ? const Color(0xFFEEB128) // Yellow for In Progress
-                  : const Color(
-                      0xFF27AE60,
-                    ), // Green for New Order, Arrived, and Completed
+                  : const Color(0xFF27AE60), // Green for other statuses
               borderRadius: BorderRadius.circular(25),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  _getStatusDisplayText(),
+                  isRejected ? 'Rejected' : _getStatusDisplayText(),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -534,7 +624,8 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   ),
                 ),
                 if (widget.order.status != 'Arrived' &&
-                    widget.order.status != 'Completed')
+                    widget.order.status != 'Completed' &&
+                    !isRejected)
                   Image.asset(
                     'assets/icons/spinner.png',
                     width: 24,
@@ -815,6 +906,33 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     final currentStatus = _getCurrentStatus().toLowerCase();
     final isArrived = currentStatus == 'arrived';
     final isCompleted = currentStatus == 'completed';
+    final isRejected =
+        currentStatus == 'rejected' || currentStatus == 'cancelled';
+
+    if (isRejected) {
+      return SizedBox(
+        width: double.infinity,
+        height: 60,
+        child: ElevatedButton(
+          onPressed: null, // Disable the button
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey[300],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_buttonBorderRadius),
+            ),
+            elevation: 0,
+          ),
+          child: const Text(
+            'Order Rejected',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      );
+    }
 
     if (_isOrderAccepted ||
         currentStatus == 'preparing' ||

@@ -8,5 +8,7 @@ abstract class HomeState with _$HomeState {
     List<OrderModel>? ordersList,
     @Default(ResponseStatus.init) ResponseStatus updateOrderStatus,
     Failures? updateOrderStatusFailures,
+    @Default(ResponseStatus.init) ResponseStatus rejectOrderStatus,
+    Failures? rejectOrderFailures,
   }) = _HomeState;
 }

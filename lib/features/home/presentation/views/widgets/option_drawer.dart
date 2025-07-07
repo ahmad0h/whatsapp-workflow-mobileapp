@@ -10,6 +10,7 @@ class OptionDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      width: MediaQuery.of(context).size.width * 0.5,
       backgroundColor: AppColors.background,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 54, horizontal: 24),
@@ -22,7 +23,10 @@ class OptionDrawer extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25),
-                    border: Border.all(color: AppColors.textPrimary, width: 2.5),
+                    border: Border.all(
+                      color: AppColors.textPrimary,
+                      width: 2.5,
+                    ),
                   ),
                   child: Icon(Icons.close, size: 24, weight: 2.5),
                 ),

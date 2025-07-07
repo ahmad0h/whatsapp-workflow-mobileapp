@@ -8,4 +8,8 @@ abstract class HomeRepo {
     String orderId,
     String status,
   );
+  Future<Either<Failures, void>> rejectOrder({
+    required String orderId,
+    required String reason,
+  });
 }

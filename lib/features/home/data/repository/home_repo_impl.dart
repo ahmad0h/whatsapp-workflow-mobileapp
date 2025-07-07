@@ -35,4 +35,18 @@ class HomeRepoImpl implements HomeRepo {
       return Left(RemoteFailures(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failures, void>> rejectOrder({
+    required String orderId,
+    required String reason,
+  }) async {
+    try {
+      final result = await homeDS.rejectOrder(orderId: orderId, reason: reason);
+      return Right(result);
+    } catch (e) {
+      log(e.toString());
+      return Left(RemoteFailures(e.toString()));
+    }
+  }
 }

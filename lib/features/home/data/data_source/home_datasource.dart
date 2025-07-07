@@ -3,4 +3,5 @@ import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_mode
 abstract class HomeDatasource {
   Future<List<OrderModel>> getOrdersData();
   Future<void> updateOrderStatus(String orderId, String status);
+  Future<void> rejectOrder({required String orderId, required String reason});
 }

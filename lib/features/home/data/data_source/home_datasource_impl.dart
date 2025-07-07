@@ -67,4 +67,42 @@ class HomeDatasourceImpl implements HomeDatasource {
       rethrow;
     }
   }
+
+  @override
+  Future<void> rejectOrder({
+    required String orderId,
+    required String reason,
+  }) async {
+    try {
+      final response = await DioHelper.postData(
+        url: '${ApiConstants.baseUrl}${ApiConstants.order}/$orderId/reject',
+        data: {'notes': reason},
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      log('Reject order response: ${response.data}');
+
+      // Check if response contains the updated order with rejected status
+      if (response.data is Map) {
+        final data = response.data as Map<String, dynamic>;
+
+        // If response has a message field, use it
+        if (data['message'] != null) {
+          log('Order rejected successfully: ${data['message']}');
+          return;
+        }
+
+        // If response contains order data with rejected status, consider it successful
+        if (data['status'] == 'rejected' || data['id'] != null) {
+          log('Order rejected successfully - status updated to rejected');
+          return;
+        }
+      }
+
+      throw Exception('Unexpected response format: ${response.data}');
+    } catch (e) {
+      log('Error rejecting order: $e');
+      rethrow;
+    }
+  }
 }

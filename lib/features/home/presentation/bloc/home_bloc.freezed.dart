@@ -175,9 +175,77 @@ as String,
 }
 
 /// @nodoc
+
+
+class _RejectOrder implements HomeEvent {
+  const _RejectOrder({required this.orderId, required this.reason});
+  
+
+ final  String orderId;
+ final  String reason;
+
+/// Create a copy of HomeEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$RejectOrderCopyWith<_RejectOrder> get copyWith => __$RejectOrderCopyWithImpl<_RejectOrder>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RejectOrder&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.reason, reason) || other.reason == reason));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,orderId,reason);
+
+@override
+String toString() {
+  return 'HomeEvent.rejectOrder(orderId: $orderId, reason: $reason)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$RejectOrderCopyWith<$Res> implements $HomeEventCopyWith<$Res> {
+  factory _$RejectOrderCopyWith(_RejectOrder value, $Res Function(_RejectOrder) _then) = __$RejectOrderCopyWithImpl;
+@useResult
+$Res call({
+ String orderId, String reason
+});
+
+
+
+
+}
+/// @nodoc
+class __$RejectOrderCopyWithImpl<$Res>
+    implements _$RejectOrderCopyWith<$Res> {
+  __$RejectOrderCopyWithImpl(this._self, this._then);
+
+  final _RejectOrder _self;
+  final $Res Function(_RejectOrder) _then;
+
+/// Create a copy of HomeEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? orderId = null,Object? reason = null,}) {
+  return _then(_RejectOrder(
+orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
+as String,reason: null == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$HomeState {
 
- ResponseStatus get getOrdersListStatus; Failures? get getOrdersListFailures; List<OrderModel>? get ordersList; ResponseStatus get updateOrderStatus; Failures? get updateOrderStatusFailures;
+ ResponseStatus get getOrdersListStatus; Failures? get getOrdersListFailures; List<OrderModel>? get ordersList; ResponseStatus get updateOrderStatus; Failures? get updateOrderStatusFailures; ResponseStatus get rejectOrderStatus; Failures? get rejectOrderFailures;
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -188,16 +256,16 @@ $HomeStateCopyWith<HomeState> get copyWith => _$HomeStateCopyWithImpl<HomeState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.getOrdersListStatus, getOrdersListStatus) || other.getOrdersListStatus == getOrdersListStatus)&&(identical(other.getOrdersListFailures, getOrdersListFailures) || other.getOrdersListFailures == getOrdersListFailures)&&const DeepCollectionEquality().equals(other.ordersList, ordersList)&&(identical(other.updateOrderStatus, updateOrderStatus) || other.updateOrderStatus == updateOrderStatus)&&(identical(other.updateOrderStatusFailures, updateOrderStatusFailures) || other.updateOrderStatusFailures == updateOrderStatusFailures));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.getOrdersListStatus, getOrdersListStatus) || other.getOrdersListStatus == getOrdersListStatus)&&(identical(other.getOrdersListFailures, getOrdersListFailures) || other.getOrdersListFailures == getOrdersListFailures)&&const DeepCollectionEquality().equals(other.ordersList, ordersList)&&(identical(other.updateOrderStatus, updateOrderStatus) || other.updateOrderStatus == updateOrderStatus)&&(identical(other.updateOrderStatusFailures, updateOrderStatusFailures) || other.updateOrderStatusFailures == updateOrderStatusFailures)&&(identical(other.rejectOrderStatus, rejectOrderStatus) || other.rejectOrderStatus == rejectOrderStatus)&&(identical(other.rejectOrderFailures, rejectOrderFailures) || other.rejectOrderFailures == rejectOrderFailures));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,getOrdersListStatus,getOrdersListFailures,const DeepCollectionEquality().hash(ordersList),updateOrderStatus,updateOrderStatusFailures);
+int get hashCode => Object.hash(runtimeType,getOrdersListStatus,getOrdersListFailures,const DeepCollectionEquality().hash(ordersList),updateOrderStatus,updateOrderStatusFailures,rejectOrderStatus,rejectOrderFailures);
 
 @override
 String toString() {
-  return 'HomeState(getOrdersListStatus: $getOrdersListStatus, getOrdersListFailures: $getOrdersListFailures, ordersList: $ordersList, updateOrderStatus: $updateOrderStatus, updateOrderStatusFailures: $updateOrderStatusFailures)';
+  return 'HomeState(getOrdersListStatus: $getOrdersListStatus, getOrdersListFailures: $getOrdersListFailures, ordersList: $ordersList, updateOrderStatus: $updateOrderStatus, updateOrderStatusFailures: $updateOrderStatusFailures, rejectOrderStatus: $rejectOrderStatus, rejectOrderFailures: $rejectOrderFailures)';
 }
 
 
@@ -208,7 +276,7 @@ abstract mixin class $HomeStateCopyWith<$Res>  {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) _then) = _$HomeStateCopyWithImpl;
 @useResult
 $Res call({
- ResponseStatus getOrdersListStatus, Failures? getOrdersListFailures, List<OrderModel>? ordersList, ResponseStatus updateOrderStatus, Failures? updateOrderStatusFailures
+ ResponseStatus getOrdersListStatus, Failures? getOrdersListFailures, List<OrderModel>? ordersList, ResponseStatus updateOrderStatus, Failures? updateOrderStatusFailures, ResponseStatus rejectOrderStatus, Failures? rejectOrderFailures
 });
 
 
@@ -225,13 +293,15 @@ class _$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? getOrdersListStatus = null,Object? getOrdersListFailures = freezed,Object? ordersList = freezed,Object? updateOrderStatus = null,Object? updateOrderStatusFailures = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? getOrdersListStatus = null,Object? getOrdersListFailures = freezed,Object? ordersList = freezed,Object? updateOrderStatus = null,Object? updateOrderStatusFailures = freezed,Object? rejectOrderStatus = null,Object? rejectOrderFailures = freezed,}) {
   return _then(_self.copyWith(
 getOrdersListStatus: null == getOrdersListStatus ? _self.getOrdersListStatus : getOrdersListStatus // ignore: cast_nullable_to_non_nullable
 as ResponseStatus,getOrdersListFailures: freezed == getOrdersListFailures ? _self.getOrdersListFailures : getOrdersListFailures // ignore: cast_nullable_to_non_nullable
 as Failures?,ordersList: freezed == ordersList ? _self.ordersList : ordersList // ignore: cast_nullable_to_non_nullable
 as List<OrderModel>?,updateOrderStatus: null == updateOrderStatus ? _self.updateOrderStatus : updateOrderStatus // ignore: cast_nullable_to_non_nullable
 as ResponseStatus,updateOrderStatusFailures: freezed == updateOrderStatusFailures ? _self.updateOrderStatusFailures : updateOrderStatusFailures // ignore: cast_nullable_to_non_nullable
+as Failures?,rejectOrderStatus: null == rejectOrderStatus ? _self.rejectOrderStatus : rejectOrderStatus // ignore: cast_nullable_to_non_nullable
+as ResponseStatus,rejectOrderFailures: freezed == rejectOrderFailures ? _self.rejectOrderFailures : rejectOrderFailures // ignore: cast_nullable_to_non_nullable
 as Failures?,
   ));
 }
@@ -243,7 +313,7 @@ as Failures?,
 
 
 class _HomeState implements HomeState {
-  const _HomeState({this.getOrdersListStatus = ResponseStatus.init, this.getOrdersListFailures, final  List<OrderModel>? ordersList, this.updateOrderStatus = ResponseStatus.init, this.updateOrderStatusFailures}): _ordersList = ordersList;
+  const _HomeState({this.getOrdersListStatus = ResponseStatus.init, this.getOrdersListFailures, final  List<OrderModel>? ordersList, this.updateOrderStatus = ResponseStatus.init, this.updateOrderStatusFailures, this.rejectOrderStatus = ResponseStatus.init, this.rejectOrderFailures}): _ordersList = ordersList;
   
 
 @override@JsonKey() final  ResponseStatus getOrdersListStatus;
@@ -259,6 +329,8 @@ class _HomeState implements HomeState {
 
 @override@JsonKey() final  ResponseStatus updateOrderStatus;
 @override final  Failures? updateOrderStatusFailures;
+@override@JsonKey() final  ResponseStatus rejectOrderStatus;
+@override final  Failures? rejectOrderFailures;
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
@@ -270,16 +342,16 @@ _$HomeStateCopyWith<_HomeState> get copyWith => __$HomeStateCopyWithImpl<_HomeSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.getOrdersListStatus, getOrdersListStatus) || other.getOrdersListStatus == getOrdersListStatus)&&(identical(other.getOrdersListFailures, getOrdersListFailures) || other.getOrdersListFailures == getOrdersListFailures)&&const DeepCollectionEquality().equals(other._ordersList, _ordersList)&&(identical(other.updateOrderStatus, updateOrderStatus) || other.updateOrderStatus == updateOrderStatus)&&(identical(other.updateOrderStatusFailures, updateOrderStatusFailures) || other.updateOrderStatusFailures == updateOrderStatusFailures));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.getOrdersListStatus, getOrdersListStatus) || other.getOrdersListStatus == getOrdersListStatus)&&(identical(other.getOrdersListFailures, getOrdersListFailures) || other.getOrdersListFailures == getOrdersListFailures)&&const DeepCollectionEquality().equals(other._ordersList, _ordersList)&&(identical(other.updateOrderStatus, updateOrderStatus) || other.updateOrderStatus == updateOrderStatus)&&(identical(other.updateOrderStatusFailures, updateOrderStatusFailures) || other.updateOrderStatusFailures == updateOrderStatusFailures)&&(identical(other.rejectOrderStatus, rejectOrderStatus) || other.rejectOrderStatus == rejectOrderStatus)&&(identical(other.rejectOrderFailures, rejectOrderFailures) || other.rejectOrderFailures == rejectOrderFailures));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,getOrdersListStatus,getOrdersListFailures,const DeepCollectionEquality().hash(_ordersList),updateOrderStatus,updateOrderStatusFailures);
+int get hashCode => Object.hash(runtimeType,getOrdersListStatus,getOrdersListFailures,const DeepCollectionEquality().hash(_ordersList),updateOrderStatus,updateOrderStatusFailures,rejectOrderStatus,rejectOrderFailures);
 
 @override
 String toString() {
-  return 'HomeState(getOrdersListStatus: $getOrdersListStatus, getOrdersListFailures: $getOrdersListFailures, ordersList: $ordersList, updateOrderStatus: $updateOrderStatus, updateOrderStatusFailures: $updateOrderStatusFailures)';
+  return 'HomeState(getOrdersListStatus: $getOrdersListStatus, getOrdersListFailures: $getOrdersListFailures, ordersList: $ordersList, updateOrderStatus: $updateOrderStatus, updateOrderStatusFailures: $updateOrderStatusFailures, rejectOrderStatus: $rejectOrderStatus, rejectOrderFailures: $rejectOrderFailures)';
 }
 
 
@@ -290,7 +362,7 @@ abstract mixin class _$HomeStateCopyWith<$Res> implements $HomeStateCopyWith<$Re
   factory _$HomeStateCopyWith(_HomeState value, $Res Function(_HomeState) _then) = __$HomeStateCopyWithImpl;
 @override @useResult
 $Res call({
- ResponseStatus getOrdersListStatus, Failures? getOrdersListFailures, List<OrderModel>? ordersList, ResponseStatus updateOrderStatus, Failures? updateOrderStatusFailures
+ ResponseStatus getOrdersListStatus, Failures? getOrdersListFailures, List<OrderModel>? ordersList, ResponseStatus updateOrderStatus, Failures? updateOrderStatusFailures, ResponseStatus rejectOrderStatus, Failures? rejectOrderFailures
 });
 
 
@@ -307,13 +379,15 @@ class __$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? getOrdersListStatus = null,Object? getOrdersListFailures = freezed,Object? ordersList = freezed,Object? updateOrderStatus = null,Object? updateOrderStatusFailures = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? getOrdersListStatus = null,Object? getOrdersListFailures = freezed,Object? ordersList = freezed,Object? updateOrderStatus = null,Object? updateOrderStatusFailures = freezed,Object? rejectOrderStatus = null,Object? rejectOrderFailures = freezed,}) {
   return _then(_HomeState(
 getOrdersListStatus: null == getOrdersListStatus ? _self.getOrdersListStatus : getOrdersListStatus // ignore: cast_nullable_to_non_nullable
 as ResponseStatus,getOrdersListFailures: freezed == getOrdersListFailures ? _self.getOrdersListFailures : getOrdersListFailures // ignore: cast_nullable_to_non_nullable
 as Failures?,ordersList: freezed == ordersList ? _self._ordersList : ordersList // ignore: cast_nullable_to_non_nullable
 as List<OrderModel>?,updateOrderStatus: null == updateOrderStatus ? _self.updateOrderStatus : updateOrderStatus // ignore: cast_nullable_to_non_nullable
 as ResponseStatus,updateOrderStatusFailures: freezed == updateOrderStatusFailures ? _self.updateOrderStatusFailures : updateOrderStatusFailures // ignore: cast_nullable_to_non_nullable
+as Failures?,rejectOrderStatus: null == rejectOrderStatus ? _self.rejectOrderStatus : rejectOrderStatus // ignore: cast_nullable_to_non_nullable
+as ResponseStatus,rejectOrderFailures: freezed == rejectOrderFailures ? _self.rejectOrderFailures : rejectOrderFailures // ignore: cast_nullable_to_non_nullable
 as Failures?,
   ));
 }

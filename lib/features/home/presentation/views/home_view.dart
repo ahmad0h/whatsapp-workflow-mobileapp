@@ -13,6 +13,7 @@ import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_details_drawer.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/option_drawer.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/reject_order_drawer.dart';
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -94,6 +95,7 @@ class HomeViewState extends State<HomeView> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   OrderCardModel? _selectedOrder;
+  bool _showRejectDrawer = false;
 
   // Function to get status color based on status string
 
@@ -101,16 +103,53 @@ class HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      endDrawer: _selectedOrder != null
-          ? OrderDetailsDrawer(
-              order: _selectedOrder!,
-              onOrderUpdated: _handleOrderUpdated,
+      endDrawer: _showRejectDrawer && _selectedOrder != null
+          ? RejectOrderDrawer(
+              orderNumber: _selectedOrder!.orderNumber,
+              orderId: _selectedOrder!.orderData.id ?? '',
+              order: _selectedOrder,
+              onOrderUpdated: (updatedOrder) {
+                // Update the selected order with the rejected status
+                setState(() {
+                  _selectedOrder = updatedOrder;
+                });
+                // Let the drawer close itself after the update
+              },
+              onOrderRejected: () {
+                // Close the drawer first
+                if (_scaffoldKey.currentState?.isEndDrawerOpen ?? false) {
+                  Navigator.of(context).pop();
+                }
+                
+                // Then update the state
+                setState(() {
+                  _showRejectDrawer = false;
+                  _selectedOrder = null;
+                });
+                
+                // Refresh orders list
+                context.read<HomeBloc>().add(const HomeEvent.getOrdersData());
+              },
             )
-          : OptionDrawer(),
+          : _selectedOrder != null
+              ? OrderDetailsDrawer(
+                  order: _selectedOrder!,
+                  onOrderUpdated: _handleOrderUpdated,
+                  onRejectPressed: () {
+                    setState(() {
+                      _showRejectDrawer = true;
+                    });
+                    _scaffoldKey.currentState?.openEndDrawer();
+                  },
+                )
+              : const OptionDrawer(),
       onEndDrawerChanged: (isOpen) {
         if (!isOpen) {
           setState(() {
-            _selectedOrder = null;
+            if (!_showRejectDrawer) {
+              _selectedOrder = null;
+            }
+            _showRejectDrawer = false;
           });
         }
       },

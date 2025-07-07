@@ -787,27 +787,6 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   }
 
   Widget _buildTotalAmount() {
-    final orderDetails = widget.order.orderData.orderDetails ?? [];
-    double totalAmount = 0;
-
-    // Calculate total from order details
-    if (orderDetails.isNotEmpty) {
-      totalAmount = orderDetails.fold(0, (sum, item) {
-        final price = double.tryParse(item.productPrice ?? '0') ?? 0;
-        final quantity = item.productQuantity ?? 0;
-        return sum + (price * quantity);
-      });
-    } else {
-      // Fallback to net_amount if available
-      totalAmount =
-          double.tryParse(widget.order.orderData.netAmount ?? '0') ?? 0;
-    }
-
-    // Add VAT if available
-    final vatAmount =
-        double.tryParse(widget.order.orderData.vatAmount ?? '0') ?? 0;
-    totalAmount += vatAmount;
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
       decoration: BoxDecoration(
@@ -832,14 +811,14 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    (totalAmount - vatAmount).toStringAsFixed(2),
+                    widget.order.orderData.netAmount ?? '0',
                     style: const TextStyle(fontSize: 16, color: _textColor),
                   ),
                 ],
               ),
             ],
           ),
-          if (vatAmount > 0) ...[
+          if (double.parse(widget.order.orderData.vatAmount ?? '0') > 0) ...[
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -857,7 +836,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      vatAmount.toStringAsFixed(2),
+                      widget.order.orderData.vatAmount ?? '0',
                       style: const TextStyle(fontSize: 16, color: _textColor),
                     ),
                   ],
@@ -886,7 +865,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    totalAmount.toStringAsFixed(2),
+                    widget.order.orderData.netAmount ?? '0',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,

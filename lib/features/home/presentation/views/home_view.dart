@@ -120,29 +120,29 @@ class HomeViewState extends State<HomeView> {
                 if (_scaffoldKey.currentState?.isEndDrawerOpen ?? false) {
                   Navigator.of(context).pop();
                 }
-                
+
                 // Then update the state
                 setState(() {
                   _showRejectDrawer = false;
                   _selectedOrder = null;
                 });
-                
+
                 // Refresh orders list
                 context.read<HomeBloc>().add(const HomeEvent.getOrdersData());
               },
             )
           : _selectedOrder != null
-              ? OrderDetailsDrawer(
-                  order: _selectedOrder!,
-                  onOrderUpdated: _handleOrderUpdated,
-                  onRejectPressed: () {
-                    setState(() {
-                      _showRejectDrawer = true;
-                    });
-                    _scaffoldKey.currentState?.openEndDrawer();
-                  },
-                )
-              : const OptionDrawer(),
+          ? OrderDetailsDrawer(
+              order: _selectedOrder!,
+              onOrderUpdated: _handleOrderUpdated,
+              onRejectPressed: () {
+                setState(() {
+                  _showRejectDrawer = true;
+                });
+                _scaffoldKey.currentState?.openEndDrawer();
+              },
+            )
+          : const OptionDrawer(),
       onEndDrawerChanged: (isOpen) {
         if (!isOpen) {
           setState(() {

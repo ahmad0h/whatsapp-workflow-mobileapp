@@ -161,17 +161,31 @@ class TimelineItem extends StatelessWidget {
 
 String formatTimeWithoutDate(String dateTimeString) {
   try {
-    // Parse the date string as UTC
-    final dateTime = DateTime.parse(dateTimeString);
-    // Convert to local timezone
-    final localTime = dateTime.toLocal();
+    debugPrint('Raw timestamp: $dateTimeString');
 
-    final hour = localTime.hour % 12 == 0 ? 12 : localTime.hour % 12;
+    // Parse the date string
+    final parsed = DateTime.parse(dateTimeString);
+    debugPrint('Parsed as UTC: ${parsed.toIso8601String()}');
+
+    // Convert to local time
+    final localTime = parsed.toLocal();
+    debugPrint('Converted to local: ${localTime.toIso8601String()}');
+
+    // Format the time in 12-hour format with AM/PM
+    final hour = localTime.hour > 12
+        ? localTime.hour - 12
+        : localTime.hour == 0
+        ? 12
+        : localTime.hour;
     final minute = localTime.minute.toString().padLeft(2, '0');
-    final period = localTime.hour < 12 ? 'AM' : 'PM';
-    return '$hour:$minute $period';
+    final period = localTime.hour >= 12 ? 'PM' : 'AM';
+
+    final result = '$hour:$minute $period';
+    debugPrint('Formatted time: $result');
+
+    return result;
   } catch (e) {
-    debugPrint('Error parsing date: $e');
+    debugPrint('Error parsing date "$dateTimeString": $e');
     return '--:--';
   }
 }

@@ -126,10 +126,14 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
           showWhen: true,
+          playSound: false,  // Disable sound for Android
+          sound: null,       // Explicitly set sound to null
         );
 
     final DarwinNotificationDetails iosPlatformChannelSpecifics =
-        DarwinNotificationDetails();
+        DarwinNotificationDetails(
+          presentSound: false, // Disable sound for iOS
+        );
 
     final NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
@@ -179,10 +183,14 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
           showWhen: true,
+          playSound: false,  // Disable sound for Android
+          sound: null,       // Explicitly set sound to null
         );
 
     const DarwinNotificationDetails iosPlatformChannelSpecifics =
-        DarwinNotificationDetails();
+        DarwinNotificationDetails(
+          presentSound: false, // Disable sound for iOS
+        );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,

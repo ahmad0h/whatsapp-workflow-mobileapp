@@ -16,6 +16,7 @@ import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/wid
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/reject_order_drawer.dart';
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -25,7 +26,9 @@ class HomeView extends StatefulWidget {
 }
 
 class HomeViewState extends State<HomeView> {
+  final AudioPlayer _audioPlayer = AudioPlayer();
   StreamSubscription<RemoteMessage>? _messageStreamSubscription;
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -37,26 +40,46 @@ class HomeViewState extends State<HomeView> {
   @override
   void dispose() {
     _messageStreamSubscription?.cancel();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
+  Future<void> _playSound(String soundFile) async {
+    try {
+      if (!_isInitialized) {
+        await _audioPlayer.setReleaseMode(ReleaseMode.release);
+        _isInitialized = true;
+      }
+      await _audioPlayer.play(AssetSource('sounds/$soundFile'));
+    } catch (e) {
+      debugPrint('Error playing sound: $e');
+    }
+  }
+
   void _setupNotificationListener() {
-    _messageStreamSubscription = FirebaseMessaging.onMessage.listen((message) {
+    _messageStreamSubscription = FirebaseMessaging.onMessage.listen((
+      message,
+    ) async {
       debugPrint('Notification received: ${message.notification?.title}');
       debugPrint('Notification data: ${message.data}');
 
-      if (message.notification?.title?.toLowerCase().contains('new order') ==
-              true ||
-          message.notification?.title?.toLowerCase().contains(
-                'customer arrived',
-              ) ==
-              true ||
-          message.notification?.title?.toLowerCase().contains('payment') ==
-              true ||
-          message.data['title']?.toLowerCase().contains('payment') == true) {
-        debugPrint(
-          'Refreshing orders list due to order/payment notification...',
-        );
+      final title = message.notification?.title?.toLowerCase() ?? '';
+      final dataTitle = message.data['title']?.toString().toLowerCase() ?? '';
+
+      // Play sound based on notification type
+      if (title.contains('new order') || dataTitle.contains('new order')) {
+        await _playSound('received.mp3');
+      } else if (title.contains('arrived') || dataTitle.contains('arrived')) {
+        await _playSound('arrived.mp3');
+      }
+
+      // Refresh orders for relevant notifications
+      if (title.contains('new order') ||
+          title.contains('customer arrived') ||
+          title.contains('arrived') ||
+          title.contains('payment') ||
+          dataTitle.contains('payment')) {
+        debugPrint('Refreshing orders list due to notification...');
 
         if (mounted) {
           context.read<HomeBloc>().add(const HomeEvent.getOrdersData());

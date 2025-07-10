@@ -38,7 +38,7 @@ class NotificationService {
             carPlay: false,
             criticalAlert: false,
             provisional: false,
-            sound: true,
+            sound: false,
           );
       return settings.authorizationStatus == AuthorizationStatus.authorized;
     }

@@ -988,7 +988,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   String _getAcceptanceStatusText() {
     final logs = widget.order.orderData.logs;
     if (logs == null || logs.isEmpty) {
-      return 'Accepted at ${formatTimeWithoutDate(DateTime.now().toIso8601String())}';
+      return 'Accepted at ${formatTime(DateTime.now().toIso8601String())}';
     }
 
     // Find the in_progress log
@@ -997,7 +997,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       orElse: () => logs.first,
     );
 
-    return 'Accepted at ${formatTimeWithoutDate(inProgressLog.logTimestamp ?? DateTime.now().toIso8601String())}';
+    return 'Accepted at ${formatTime(inProgressLog.logTimestamp ?? DateTime.now().toIso8601String())}';
   }
 
   Widget _buildOrderItem(String itemName, int quantity, double price) {

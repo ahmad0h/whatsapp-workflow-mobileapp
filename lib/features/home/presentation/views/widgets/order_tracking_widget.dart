@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
+import 'package:whatsapp_workflow_mobileapp/core/utils/format_time.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
 
 class OrderTrackingTimeline extends StatelessWidget {
@@ -64,7 +65,9 @@ class OrderTrackingTimeline extends StatelessWidget {
           return TimelineItem(
             title: _getStatusTitle(log.orderStatus ?? ''),
             time: log.logTimestamp != null
-                ? formatTimeWithoutDate(log.logTimestamp!)
+                ? formatTime(
+                    log.logTimestamp!,
+                  ).split(' - ')[0] // Get just the time part from formatTime
                 : '--:--',
             isCompleted: true,
             isFirst: index == 0,
@@ -156,36 +159,5 @@ class TimelineItem extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-String formatTimeWithoutDate(String dateTimeString) {
-  try {
-    debugPrint('Raw timestamp: $dateTimeString');
-
-    // Parse the date string
-    final parsed = DateTime.parse(dateTimeString);
-    debugPrint('Parsed as UTC: ${parsed.toIso8601String()}');
-
-    // Convert to local time
-    final localTime = parsed.toLocal();
-    debugPrint('Converted to local: ${localTime.toIso8601String()}');
-
-    // Format the time in 12-hour format with AM/PM
-    final hour = localTime.hour > 12
-        ? localTime.hour - 12
-        : localTime.hour == 0
-        ? 12
-        : localTime.hour;
-    final minute = localTime.minute.toString().padLeft(2, '0');
-    final period = localTime.hour >= 12 ? 'PM' : 'AM';
-
-    final result = '$hour:$minute $period';
-    debugPrint('Formatted time: $result');
-
-    return result;
-  } catch (e) {
-    debugPrint('Error parsing date "$dateTimeString": $e');
-    return '--:--';
   }
 }

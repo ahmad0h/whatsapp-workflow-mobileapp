@@ -1,6 +1,7 @@
 String formatTime(String isoTime) {
   try {
     final dateTime = DateTime.parse(isoTime).toLocal();
+
     final hour = dateTime.hour > 12
         ? dateTime.hour - 12
         : dateTime.hour == 0

@@ -13,6 +13,10 @@ class HomeDatasourceImpl implements HomeDatasource {
   Future<List<OrderModel>> getOrdersData() async {
     var response = await DioHelper.getData(
       url: '${ApiConstants.baseUrl}${ApiConstants.order}',
+      headers: {
+        'Authorization':
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3JfMTIzNDU2Nzg5MCIsImVtYWlsIjoib3duZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoiYnVzaW5lc3Nfb3duZXIiLCJpYXQiOjE3NTI0Nzk4NTksImV4cCI6MTc1MjU2NjI1OX0.LArx4C7AhN6VFONYFahqjmk4_SJw6SjTsddah6sRt7A',
+      },
     );
 
     try {
@@ -52,6 +56,10 @@ class HomeDatasourceImpl implements HomeDatasource {
       final response = await DioHelper.postData(
         url: '${ApiConstants.baseUrl}${ApiConstants.order}/$orderId/status',
         data: {'status': status},
+        headers: {
+          'Authorization':
+              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3JfMTIzNDU2Nzg5MCIsImVtYWlsIjoib3duZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoiYnVzaW5lc3Nfb3duZXIiLCJpYXQiOjE3NTI0Nzk4NTksImV4cCI6MTc1MjU2NjI1OX0.LArx4C7AhN6VFONYFahqjmk4_SJw6SjTsddah6sRt7A',
+        },
       );
 
       log('Update status response: ${response.data}');
@@ -77,7 +85,11 @@ class HomeDatasourceImpl implements HomeDatasource {
       final response = await DioHelper.postData(
         url: '${ApiConstants.baseUrl}${ApiConstants.order}/$orderId/reject',
         data: {'notes': reason},
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3JfMTIzNDU2Nzg5MCIsImVtYWlsIjoib3duZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoiYnVzaW5lc3Nfb3duZXIiLCJpYXQiOjE3NTI0Nzk4NTksImV4cCI6MTc1MjU2NjI1OX0.LArx4C7AhN6VFONYFahqjmk4_SJw6SjTsddah6sRt7A',
+        },
       );
 
       log('Reject order response: ${response.data}');

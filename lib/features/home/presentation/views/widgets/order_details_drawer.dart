@@ -181,6 +181,8 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                         plateNumber: widget.order.plateNumber,
                         carDetails: widget.order.carDetails,
                         orderData: widget.order.orderData,
+                        orderType: widget.order.orderType,
+                        customerAddress: widget.order.customerAddress,
                       );
                       widget.onOrderUpdated!(rejectedOrder);
                     }
@@ -229,6 +231,11 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           .where((state) => state.getOrdersListStatus != ResponseStatus.loading)
           .first;
 
+      homeBloc.add(const HomeEvent.getOrderStats());
+      await homeBloc.stream
+          .where((state) => state.getOrderStatsStatus != ResponseStatus.loading)
+          .first;
+
       if (!mounted) return;
 
       // Find the updated order in the state
@@ -255,6 +262,8 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           carDetails:
               '${updatedOrder.vehicle?.brand ?? ''} ${updatedOrder.vehicle?.model ?? ''} (${updatedOrder.vehicle?.color ?? 'N/A'})',
           orderData: updatedOrder,
+          orderType: updatedOrder.type ?? '',
+          customerAddress: updatedOrder.customerAddress ?? '',
         );
 
         // Update the widget's order reference
@@ -285,6 +294,87 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     }
   }
 
+  Future<void> _handleFinishOrder() async {
+    if (!mounted) return;
+
+    final homeBloc = context.read<HomeBloc>();
+    final orderId = widget.order.orderData.id ?? '';
+
+    try {
+      // Send the status update to the server
+      homeBloc.add(HomeEvent.updateOrderStatus(orderId, 'is_finished'));
+
+      // Wait for the status update to complete
+      await homeBloc.stream
+          .where((state) => state.updateOrderStatus != ResponseStatus.loading)
+          .first;
+
+      if (!mounted) return;
+
+      // Refresh the orders list to get the latest data
+      homeBloc.add(const HomeEvent.getOrdersData());
+      await homeBloc.stream
+          .where((state) => state.getOrdersListStatus != ResponseStatus.loading)
+          .first;
+
+      homeBloc.add(const HomeEvent.getOrderStats());
+      await homeBloc.stream
+          .where((state) => state.getOrderStatsStatus != ResponseStatus.loading)
+          .first;
+
+      if (!mounted) return;
+
+      // Find the updated order in the state
+      final updatedOrder = homeBloc.state.ordersList?.firstWhere(
+        (order) => order.id == orderId,
+        orElse: () => widget.order.orderData,
+      );
+
+      // Create an updated order card model with the new status
+      if (updatedOrder != null) {
+        final updatedCardModel = OrderCardModel(
+          orderNumber: updatedOrder.orderNumber ?? widget.order.orderNumber,
+          customerName:
+              updatedOrder.customer?.fullName ?? widget.order.customerName,
+          time: updatedOrder.orderDate != null
+              ? formatTime(updatedOrder.orderDate!)
+              : widget.order.time,
+          status: 'Finished',
+          statusColor: _getStatusColor('is_finished'),
+          carBrand: updatedOrder.vehicle?.brand ?? widget.order.carBrand,
+          carColor: updatedOrder.vehicle?.color?.toLowerCase() ?? 'grey',
+          plateNumber:
+              updatedOrder.vehicle?.plateNumber ?? widget.order.plateNumber,
+          carDetails:
+              '${updatedOrder.vehicle?.brand ?? ''} ${updatedOrder.vehicle?.model ?? ''} (${updatedOrder.vehicle?.color ?? 'N/A'})',
+          orderData: updatedOrder,
+          orderType: updatedOrder.type ?? '',
+          customerAddress: updatedOrder.customerAddress ?? '',
+        );
+
+        // Notify parent widget about the update
+        if (mounted && widget.onOrderUpdated != null) {
+          widget.onOrderUpdated!(updatedCardModel);
+        }
+      }
+
+      // Show success message
+      log('Order marked as finished successfully');
+
+      // Close the drawer
+      if (mounted) {
+        GoRouter.of(context).pop();
+      }
+    } catch (e) {
+      log('Failed to update order status to finished: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to finish order: $e')));
+      }
+    }
+  }
+
   Future<void> _handleAcceptOrder() async {
     if (!mounted) return;
 
@@ -311,6 +401,11 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       homeBloc.add(const HomeEvent.getOrdersData());
       await homeBloc.stream
           .where((state) => state.getOrdersListStatus != ResponseStatus.loading)
+          .first;
+
+      homeBloc.add(const HomeEvent.getOrderStats());
+      await homeBloc.stream
+          .where((state) => state.getOrderStatsStatus != ResponseStatus.loading)
           .first;
 
       if (!mounted) return;
@@ -352,6 +447,8 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           carDetails:
               '${updatedOrder.vehicle?.brand ?? ''} ${updatedOrder.vehicle?.model ?? ''} (${updatedOrder.vehicle?.color ?? 'N/A'})',
           orderData: updatedOrder,
+          orderType: updatedOrder.type ?? '',
+          customerAddress: updatedOrder.customerAddress ?? '',
         );
 
         // Update the widget's order reference
@@ -501,7 +598,9 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                           currentStatus: widget.order.status.toLowerCase(),
                         ),
                       ],
-                      if (!_isOrderAccepted && !isRejected) ...[
+                      if (!_isOrderAccepted &&
+                          !isRejected &&
+                          currentStatus != 'is_finished') ...[
                         const SizedBox(height: 50),
                         SizedBox(
                           height: 60,
@@ -763,6 +862,9 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     } else if (currentStatus.contains('progress') ||
         currentStatus == 'in_progress') {
       return 'In Progress';
+    } else if (currentStatus.contains('is_finished') ||
+        currentStatus == 'is_finished') {
+      return 'Finished';
     } else if (currentStatus == 'arrived') {
       return 'Arrived';
     } else if (currentStatus == 'completed') {
@@ -776,6 +878,9 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     } else if (orderStatus.contains('progress') ||
         orderStatus == 'in_progress') {
       return 'In Progress';
+    } else if (orderStatus.contains('is_finished') ||
+        orderStatus == 'is_finished') {
+      return 'Finished';
     } else if (orderStatus == 'arrived') {
       return 'Arrived';
     } else if (orderStatus == 'completed') {
@@ -888,6 +993,20 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     final isRejected =
         currentStatus == 'rejected' || currentStatus == 'cancelled';
 
+    // Safely get the finished log if it exists
+    final logs = widget.order.orderData.logs ?? [];
+    OrderLog? finishedLog;
+    String? finishedTime;
+
+    try {
+      finishedLog = logs.firstWhere(
+        (log) => log.orderStatus?.toLowerCase() == 'is_finished',
+      );
+      finishedTime = finishedLog.logTimestamp;
+    } catch (e) {
+      // No finished log found, which is fine
+    }
+
     if (isRejected) {
       return SizedBox(
         width: double.infinity,
@@ -918,6 +1037,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
         currentStatus == 'in progress' ||
         currentStatus == 'in_progress' ||
         isArrived ||
+        currentStatus == 'is_finished' ||
         isCompleted) {
       return Column(
         children: [
@@ -934,11 +1054,61 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                 elevation: 0,
               ),
               child: Text(
-                _getAcceptanceStatusText(),
+                _getAcceptanceStatusText().split('-').join('\n'),
                 style: TextStyle(fontSize: 20, color: Colors.black),
               ),
             ),
           ),
+          if (currentStatus == 'in_progress' ||
+              currentStatus == 'in progress' ||
+              currentStatus == 'is_finished' ||
+              currentStatus == 'completed' ||
+              currentStatus == 'arrived') ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: ElevatedButton(
+                onPressed:
+                    (currentStatus == 'is_finished' ||
+                        currentStatus == 'completed' ||
+                        currentStatus == 'arrived')
+                    ? null
+                    : _handleFinishOrder,
+                style: ElevatedButton.styleFrom(
+                  disabledBackgroundColor: Colors.green.withValues(alpha: 0.1),
+                  backgroundColor:
+                      (currentStatus == 'is_finished' ||
+                          currentStatus == 'completed' ||
+                          currentStatus == 'arrived')
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(_buttonBorderRadius),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  textAlign: TextAlign.center,
+                  currentStatus == 'is_finished' ||
+                          currentStatus == 'completed' ||
+                          currentStatus == 'arrived'
+                      ? 'Order Marked as Finished${finishedTime != null ? ' at ${formatTime(finishedTime)}' : ''}'
+                      : 'Order is finished?',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color:
+                        currentStatus == 'is_finished' ||
+                            currentStatus == 'completed' ||
+                            currentStatus == 'arrived'
+                        ? Colors.black54
+                        : Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
           if (isArrived) ...[
             const SizedBox(height: 16),
             SizedBox(

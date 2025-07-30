@@ -1,9 +1,10 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart' show DateFormat;
+import 'package:lottie/lottie.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
-import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/home_view.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/option_drawer.dart';
@@ -21,18 +22,62 @@ class _HistoryViewState extends State<HistoryView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String selectedTab = 'Today';
   OrderCardModel? _selectedOrder;
+  DateTime? _selectedDate;
+  final TextEditingController _dateController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    context.read<HomeBloc>().add(const HomeEvent.getOrdersData());
+    _selectedDate = DateTime.now();
+    _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
+    _loadOrdersForSelectedTab();
+  }
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+        _dateController.text = DateFormat('yyyy-MM-dd').format(picked);
+        selectedTab = 'Custom'; // Set the selected tab to Custom
+      });
+      _loadOrdersForSelectedTab();
+    }
+  }
+
+  void _loadOrdersForSelectedTab() {
+    if (selectedTab == 'Today') {
+      _selectedDate = DateTime.now();
+      _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
+    }
+
+    final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate!);
+    context.read<HomeBloc>().add(
+      HomeEvent.getOrdersDataByBranchIdAndDate(dateStr),
+    );
+
+    // Force a rebuild to update the UI
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: AppColors.backgroundLight,
+
       endDrawer: _selectedOrder != null
           ? OrderDetailsDrawer(order: _selectedOrder!)
           : OptionDrawer(),
@@ -44,32 +89,51 @@ class _HistoryViewState extends State<HistoryView> {
         },
         builder: (context, state) {
           if (state.getOrdersListStatus == ResponseStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: Lottie.asset('assets/loading.json', width: 150),
+            );
           }
 
-          bool isToday(String? dateString) {
+          bool isDateMatch(String? dateString, DateTime targetDate) {
             if (dateString == null) return false;
             try {
+              // Parse the date string and create a DateTime object with just the date part
               final date = DateTime.parse(dateString);
-              final now = DateTime.now();
-              return date.year == now.year &&
-                  date.month == now.month &&
-                  date.day == now.day;
+              final dateOnly = DateTime(date.year, date.month, date.day);
+              final targetDateOnly = DateTime(
+                targetDate.year,
+                targetDate.month,
+                targetDate.day,
+              );
+
+              // Compare just the date parts
+              return dateOnly.isAtSameMomentAs(targetDateOnly);
             } catch (e) {
+              log('Error parsing date: $e');
               return false;
             }
           }
 
+          // Show all orders that match the selected date
           var orders =
               state.ordersList?.map(mapOrderToCardModel).toList().where((e) {
-                if (e.status != "Completed") return false;
+                // First check the order date
+                if (isDateMatch(e.orderData.orderDate, _selectedDate!)) {
+                  return true;
+                }
 
-                final completedLog = e.orderData.logs?.firstWhere(
-                  (log) => log.orderStatus?.toLowerCase() == 'completed',
-                  orElse: () => OrderLog(),
-                );
+                // If no date match, check logs for any timestamp
+                if (e.orderData.logs != null && e.orderData.logs!.isNotEmpty) {
+                  // Check all logs for a matching timestamp
+                  for (var log in e.orderData.logs!) {
+                    if (log.logTimestamp != null &&
+                        isDateMatch(log.logTimestamp, _selectedDate!)) {
+                      return true;
+                    }
+                  }
+                }
 
-                return isToday(completedLog?.logTimestamp);
+                return false;
               }).toList() ??
               [];
 
@@ -259,6 +323,8 @@ class _HistoryViewState extends State<HistoryView> {
                   ),
                 ),
               ),
+
+              SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
           );
         },
@@ -406,7 +472,16 @@ class _HistoryViewState extends State<HistoryView> {
   Widget _buildTab(String text) {
     bool isSelected = selectedTab == text;
     return GestureDetector(
-      onTap: () => setState(() => selectedTab = text),
+      onTap: () {
+        setState(() {
+          selectedTab = text;
+        });
+        if (text == 'Custom') {
+          _selectDate(context);
+        } else {
+          _loadOrdersForSelectedTab();
+        }
+      },
       child: Container(
         alignment: Alignment.center,
         height: 50,
@@ -425,13 +500,32 @@ class _HistoryViewState extends State<HistoryView> {
           ],
         ),
         margin: EdgeInsets.only(left: 16),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: 17.5,
-            color: isSelected ? Colors.black : Color(0xFF09090B),
-          ),
-        ),
+        child: text == 'Custom'
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    isSelected
+                        ? DateFormat('MMM d').format(_selectedDate!)
+                        : 'Custom',
+                    style: TextStyle(
+                      fontSize: 17.5,
+                      color: isSelected ? Colors.black : Color(0xFF09090B),
+                    ),
+                  ),
+                  if (isSelected) ...[
+                    SizedBox(width: 8),
+                    Icon(Icons.calendar_today, size: 16, color: Colors.black),
+                  ],
+                ],
+              )
+            : Text(
+                text,
+                style: TextStyle(
+                  fontSize: 17.5,
+                  color: isSelected ? Colors.black : Color(0xFF09090B),
+                ),
+              ),
       ),
     );
   }

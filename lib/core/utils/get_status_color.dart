@@ -11,6 +11,8 @@ Color getStatusColor(String status) {
       return AppColors.statusArrived; // Green for arrived
     case 'completed':
       return AppColors.statusCompleted; // Green for completed
+    case 'is_finished':
+      return Color(0xFFDDB78A); // Orange for is_finished
     case 'cancelled':
     case 'rejected':
       return AppColors.statusRejected; // Red for cancelled/rejected

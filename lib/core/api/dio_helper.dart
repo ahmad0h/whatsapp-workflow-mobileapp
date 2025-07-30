@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 
 class DioHelper {
   static var dio = Dio();
-  static init() {
+  static void init() {
     dio = Dio(
       BaseOptions(
         baseUrl: '', //'${Constant.API_baseUrl}IPC_Mobile/',

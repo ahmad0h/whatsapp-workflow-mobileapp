@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/formant_status.dart';
@@ -17,6 +18,7 @@ import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/wid
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -33,8 +35,18 @@ class HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    context.read<HomeBloc>().add(HomeEvent.started());
     _setupNotificationListener();
+
+    // Check if we have a valid token before making API calls
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final tokenManager = TokenManager();
+      if (tokenManager.accessToken != null &&
+          tokenManager.accessToken!.isNotEmpty) {
+        context.read<HomeBloc>().add(HomeEvent.started());
+        context.read<HomeBloc>().add(const HomeEvent.getOrderStats());
+        context.read<HomeBloc>().add(HomeEvent.getBranchData());
+      }
+    });
   }
 
   @override
@@ -176,24 +188,32 @@ class HomeViewState extends State<HomeView> {
           });
         }
       },
-      backgroundColor: AppColors.backgroundLight,
+
       body: BlocConsumer<HomeBloc, HomeState>(
         listener: (context, state) {
           if (state.getOrdersListStatus == ResponseStatus.failure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.getOrdersListFailures?.message ?? 'An error occurred',
-                ),
-              ),
-            );
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(
+            //     content: Text(
+            //       state.getOrdersListFailures?.message ?? 'An error occurred',
+            //     ),
+            //   ),
+            // );
           }
         },
         builder: (context, state) {
           final isLoading = state.getOrdersListStatus == ResponseStatus.loading;
-          final orders = !isLoading
-              ? state.ordersList?.map(mapOrderToCardModel).toList() ?? []
-              : [];
+          List<OrderCardModel> orders = [];
+
+          if (!isLoading && state.ordersList != null) {
+            // Map to OrderCardModel and sort by orderDate in descending order (newest first)
+            orders = state.ordersList!.map(mapOrderToCardModel).toList()
+              ..sort(
+                (a, b) => (b.orderData.orderDate ?? '').compareTo(
+                  a.orderData.orderDate ?? '',
+                ),
+              );
+          }
           return Column(
             children: [
               Expanded(
@@ -228,69 +248,95 @@ class HomeViewState extends State<HomeView> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Image.asset('assets/ryze-logo.png'),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Image.asset('assets/company-logo.png'),
-                                    SizedBox(width: 8),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                BlocConsumer<HomeBloc, HomeState>(
+                                  listener: (context, state) {
+                                    if (state.getBranchesDataStatus ==
+                                        ResponseStatus.success) {}
+
+                                    if (state.getBranchesDataStatus ==
+                                        ResponseStatus.failure) {}
+                                  },
+                                  builder: (context, state) {
+                                    // if (state.getBranchesDataStatus ==
+                                    //     ResponseStatus.loading) {
+                                    //   return Center(
+                                    //     child: Lottie.asset(
+                                    //       'assets/animations/loading.json',
+                                    //       width: 10,
+                                    //     ),
+                                    //   );
+                                    // }
+
+                                    var branchData = state.getBranchesData;
+                                    return Row(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text(
-                                          'Olive Garden',
-                                          style: TextStyle(
+                                        Image.asset('assets/company-logo.png'),
+                                        SizedBox(width: 8),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              branchData
+                                                      ?.business
+                                                      ?.businessName ??
+                                                  '',
+                                              style: TextStyle(
+                                                color: AppColors.background,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+
+                                            Text(
+                                              branchData?.branchName ?? '',
+                                              style: TextStyle(
+                                                color:
+                                                    AppColors.backgroundLight,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(width: 24),
+                                        Container(
+                                          height: 33,
+                                          color: Colors.white,
+                                          width: 1,
+                                        ),
+                                        SizedBox(width: 24),
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.menu,
                                             color: AppColors.background,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
+                                            size: 32,
                                           ),
-                                        ),
-
-                                        Text(
-                                          'Nasr Road Branch',
-                                          style: TextStyle(
-                                            color: AppColors.backgroundLight,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(width: 24),
-                                    Container(
-                                      height: 33,
-                                      color: Colors.white,
-                                      width: 1,
-                                    ),
-                                    SizedBox(width: 24),
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.menu,
-                                        color: AppColors.background,
-                                        size: 32,
-                                      ),
-                                      onPressed: () {
-                                        if (_selectedOrder == null) {
-                                          _scaffoldKey.currentState
-                                              ?.openEndDrawer();
-                                        } else {
-                                          setState(() {
-                                            _selectedOrder = null;
-                                          });
-
-                                          Future.delayed(
-                                            Duration(milliseconds: 100),
-                                            () {
+                                          onPressed: () {
+                                            if (_selectedOrder == null) {
                                               _scaffoldKey.currentState
                                                   ?.openEndDrawer();
-                                            },
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ],
+                                            } else {
+                                              setState(() {
+                                                _selectedOrder = null;
+                                              });
+
+                                              Future.delayed(
+                                                Duration(milliseconds: 100),
+                                                () {
+                                                  _scaffoldKey.currentState
+                                                      ?.openEndDrawer();
+                                                },
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 ),
                               ],
                             ),
@@ -302,7 +348,7 @@ class HomeViewState extends State<HomeView> {
                     // Status toggles section
                     SliverToBoxAdapter(
                       child: Container(
-                        padding: EdgeInsets.only(left: 48, right: 48, top: 40),
+                        padding: EdgeInsets.only(left: 48, right: 48, top: 32),
                         child: Column(
                           children: [
                             _buildStatusToggle(
@@ -338,40 +384,73 @@ class HomeViewState extends State<HomeView> {
                     ),
 
                     // Stats cards section
-                    SliverToBoxAdapter(
-                      child: Container(
-                        padding: EdgeInsets.only(left: 48, right: 48, top: 40),
-                        child: Row(
-                          children: [
-                            _buildStatCard(
-                              'Arrived Customers',
-                              '5',
-                              AppColors.statusArrived,
-                              'assets/icons/car.svg',
+                    BlocConsumer<HomeBloc, HomeState>(
+                      listener: (context, state) {
+                        if (state.getOrderStatsStatus ==
+                            ResponseStatus.failure) {
+                          // ScaffoldMessenger.of(context).showSnackBar(
+                          //   SnackBar(
+                          //     content: Text(
+                          //       state.getOrderStatsFailures?.message ??
+                          //           'An error occurred',
+                          //     ),
+                          //   ),
+                          // );
+                        }
+                      },
+                      builder: (context, state) {
+                        if (state.getOrderStatsStatus ==
+                            ResponseStatus.loading) {
+                          return SliverToBoxAdapter(
+                            child: Center(
+                              child: Lottie.asset(
+                                'assets/loading.json',
+                                width: 150,
+                              ),
                             ),
-                            SizedBox(width: 12),
-                            _buildStatCard(
-                              'New Orders',
-                              '324',
-                              AppColors.primary,
-                              'assets/icons/user.svg',
+                          );
+                        }
+                        var stats = state.orderStats;
+                        return SliverToBoxAdapter(
+                          child: Container(
+                            padding: EdgeInsets.only(
+                              left: 48,
+                              right: 48,
+                              top: 32,
                             ),
-                            SizedBox(width: 12),
-                            _buildStatCard(
-                              'Preparing',
-                              '45',
-                              AppColors.statusPreparing,
-                              'assets/icons/pot.svg',
+                            child: Row(
+                              children: [
+                                _buildStatCard(
+                                  'Arrived Customers',
+                                  stats?.arrivedCustomers.toString() ?? '0',
+                                  AppColors.statusArrived,
+                                  'assets/icons/car.svg',
+                                ),
+                                SizedBox(width: 12),
+                                _buildStatCard(
+                                  'New Orders',
+                                  stats?.newOrders.toString() ?? '0',
+                                  AppColors.primary,
+                                  'assets/icons/user.svg',
+                                ),
+                                SizedBox(width: 12),
+                                _buildStatCard(
+                                  'Preparing',
+                                  stats?.preparingOrders.toString() ?? '0',
+                                  AppColors.statusPreparing,
+                                  'assets/icons/pot.svg',
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     ),
 
                     // Orders header section
                     SliverToBoxAdapter(
                       child: Container(
-                        padding: EdgeInsets.only(left: 48, right: 48, top: 40),
+                        padding: EdgeInsets.only(left: 48, right: 48, top: 32),
 
                         child: Row(
                           children: [
@@ -379,7 +458,7 @@ class HomeViewState extends State<HomeView> {
                               'Orders',
                               style: TextStyle(
                                 fontSize: 32,
-                                fontWeight: FontWeight.w400,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                             Spacer(),
@@ -420,7 +499,10 @@ class HomeViewState extends State<HomeView> {
                               child: Center(
                                 child: Padding(
                                   padding: const EdgeInsets.all(32.0),
-                                  child: CircularProgressIndicator(),
+                                  child: Lottie.asset(
+                                    'assets/loading.json',
+                                    width: 150,
+                                  ),
                                 ),
                               ),
                             )
@@ -434,7 +516,7 @@ class HomeViewState extends State<HomeView> {
                                   return _buildOrderCard(filteredOrders[index]);
                                 },
                                 childCount: _filterOrders(
-                                  orders as List<OrderCardModel>,
+                                  orders,
                                   selectedTab,
                                 ).length,
                               ),
@@ -497,6 +579,14 @@ class HomeViewState extends State<HomeView> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Color(0xFFE4E4E7)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x0F000000),
+            offset: Offset(1, 3),
+            blurRadius: 1,
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -625,7 +715,7 @@ class HomeViewState extends State<HomeView> {
                       style: TextStyle(
                         fontSize: 16,
                         color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     Spacer(),
@@ -637,7 +727,7 @@ class HomeViewState extends State<HomeView> {
                   count,
                   style: TextStyle(
                     fontSize: 32,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w900,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -758,14 +848,37 @@ class HomeViewState extends State<HomeView> {
             children: [
               Row(
                 children: [
-                  Text(
-                    "#${model.orderNumber}",
-                    style: TextStyle(
-                      fontSize: 25.33,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  Row(
+                    spacing: 8,
+                    children: [
+                      Text(
+                        "#${model.orderNumber}",
+                        style: TextStyle(
+                          fontSize: 25.33,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.backgroundDark,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          model.orderType.capitalize(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   Spacer(),
+
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
@@ -776,7 +889,9 @@ class HomeViewState extends State<HomeView> {
                       spacing: 8,
                       children: [
                         Text(
-                          model.status,
+                          model.status == "Is Finished"
+                              ? "Finished"
+                              : model.status,
                           style: TextStyle(
                             color: model.statusColor,
                             fontSize: 12,
@@ -828,58 +943,72 @@ class HomeViewState extends State<HomeView> {
                 color: AppColors.borderLight,
               ),
               SizedBox(height: 16),
-              Row(
-                children: [
-                  // Car logo
-                  Center(child: Image.asset('assets/icons/car-logo.png')),
-                  SizedBox(width: 5),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6.3),
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundDark,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      model.plateNumber,
-                      style: TextStyle(
-                        fontSize: 11.08,
-                        fontWeight: FontWeight.w500,
+              if (model.orderType == 'curbside')
+                Row(
+                  children: [
+                    // Car logo
+                    Center(child: Image.asset('assets/icons/car-logo.png')),
+                    SizedBox(width: 5),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 6.3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.backgroundDark,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        model.plateNumber,
+                        style: TextStyle(
+                          fontSize: 11.08,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 5),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6.3,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundDark,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      model.carDetails.split('(')[0],
-                      style: TextStyle(
-                        fontSize: 11.08,
-                        fontWeight: FontWeight.w500,
+                    SizedBox(width: 5),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6.3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.backgroundDark,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        model.carDetails.split('(')[0],
+                        style: TextStyle(
+                          fontSize: 11.08,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 5),
-                  Container(
-                    width: 29,
-                    height: 29,
-                    decoration: BoxDecoration(
-                      color: getColorFromString(model.carColor),
-                      border: Border.all(
-                        color: Colors.grey.shade300,
-                        width: 0.5,
+                    SizedBox(width: 5),
+                    Container(
+                      width: 29,
+                      height: 29,
+                      decoration: BoxDecoration(
+                        color: getColorFromString(model.carColor),
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                          width: 0.5,
+                        ),
+                        borderRadius: BorderRadius.circular(3.17),
                       ),
-                      borderRadius: BorderRadius.circular(3.17),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              if (model.orderType == 'delivery')
+                Text(
+                  'Delivery Address: ${model.customerAddress}',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                ),
+              if (model.orderType == 'branch')
+                Text(
+                  'PICK UP FROM THE BRANCH.',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                ),
             ],
           ),
         ),
@@ -914,5 +1043,7 @@ OrderCardModel mapOrderToCardModel(OrderModel order) {
     carDetails: carDetails,
     carColor: carColor,
     orderData: order,
+    orderType: order.type ?? '',
+    customerAddress: order.customerAddress ?? '',
   );
 }

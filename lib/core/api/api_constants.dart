@@ -1,4 +1,17 @@
+import 'dart:developer';
+
+import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
+
 class ApiConstants {
-  static const String baseUrl = 'https://b07cb83dd427.ngrok-free.app';
+  static const String baseUrl = 'https://ea09d14b6afe.ngrok-free.app';
   static const String order = '/order';
+
+  static String get token {
+    final accessToken = TokenManager().accessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      return '';
+    }
+    log('Access token: $accessToken');
+    return 'Bearer $accessToken';
+  }
 }

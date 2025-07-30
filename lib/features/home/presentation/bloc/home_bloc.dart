@@ -4,8 +4,17 @@ import 'package:injectable/injectable.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
 import 'package:whatsapp_workflow_mobileapp/core/error/failures.dart'
     show Failures;
+import 'package:whatsapp_workflow_mobileapp/features/home/data/models/device_init_response_model.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/data/models/get_branch_response_model.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/data/models/is_linked_response_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_stats_response_mode.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/get_branch_data_usecase.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/get_order_by_branchid_date_usecase.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/get_order_stats_usecase.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/get_order_usecase.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/init_device_usecase.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/is_linked_usecase.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/reject_order_usecase.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/update_status_usecase.dart';
 
@@ -18,10 +27,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetOrdersUseCase getOrdersUseCase;
   final UpdateStatusUseCase updateStatusUseCase;
   final RejectOrderUsecase rejectOrderUsecase;
+  final GetOrderStatsUseCase getOrderStatsUseCase;
+  final InitDeviceUsecase initDeviceUsecase;
+  final IsLinkedUsecase isLinkedUsecase;
+  final GetOrdersDataByBranchIdAndDateUsecase
+  getOrdersDataByBranchIdAndDateUsecase;
+  final GetBranchDataUsecase getBranchDataUsecase;
   HomeBloc(
     this.getOrdersUseCase,
     this.updateStatusUseCase,
     this.rejectOrderUsecase,
+    this.getOrderStatsUseCase,
+    this.initDeviceUsecase,
+    this.isLinkedUsecase,
+    this.getOrdersDataByBranchIdAndDateUsecase,
+    this.getBranchDataUsecase,
   ) : super(const HomeState()) {
     on<HomeEvent>((event, emit) async {
       emit(state.copyWith(getOrdersListStatus: ResponseStatus.loading));
@@ -65,7 +85,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<_RejectOrder>((event, emit) async {
       emit(state.copyWith(rejectOrderStatus: ResponseStatus.loading));
       var result = await rejectOrderUsecase(event.orderId, event.reason);
-      
+
       await result.fold(
         (failure) async {
           emit(
@@ -83,11 +103,127 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         (success) async {
           // First emit success
           emit(state.copyWith(rejectOrderStatus: ResponseStatus.success));
-          
+
           // Then reset status and refresh orders
           await Future.delayed(const Duration(milliseconds: 500));
           add(const HomeEvent.getOrdersData());
           emit(state.copyWith(rejectOrderStatus: ResponseStatus.init));
+        },
+      );
+    });
+
+    on<_GetOrderStats>((event, emit) async {
+      emit(state.copyWith(getOrderStatsStatus: ResponseStatus.loading));
+      var result = await getOrderStatsUseCase();
+      result.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              getOrderStatsStatus: ResponseStatus.failure,
+              getOrderStatsFailures: failure,
+            ),
+          );
+        },
+        (orderStats) {
+          emit(
+            state.copyWith(
+              getOrderStatsStatus: ResponseStatus.success,
+              orderStats: orderStats,
+            ),
+          );
+        },
+      );
+    });
+    on<_InitDevice>((event, emit) async {
+      emit(state.copyWith(initDeviceStatus: ResponseStatus.loading));
+      var result = await initDeviceUsecase(event.deviceId, event.deviceToken);
+      result.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              initDeviceStatus: ResponseStatus.failure,
+              initDeviceFailures: failure,
+            ),
+          );
+        },
+        (deviceInit) {
+          emit(
+            state.copyWith(
+              initDeviceStatus: ResponseStatus.success,
+              deviceInit: deviceInit,
+            ),
+          );
+        },
+      );
+    });
+    on<_IsLinked>((event, emit) async {
+      emit(state.copyWith(isLinkedStatus: ResponseStatus.loading));
+      var result = await isLinkedUsecase(event.deviceId);
+      result.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              isLinkedStatus: ResponseStatus.failure,
+              isLinkedFailures: failure,
+            ),
+          );
+        },
+        (isLinked) {
+          emit(
+            state.copyWith(
+              isLinkedStatus: ResponseStatus.success,
+              isLinked: isLinked,
+            ),
+          );
+        },
+      );
+    });
+    on<_GetOrdersDataByBranchIdAndDate>((event, emit) async {
+      emit(
+        state.copyWith(
+          getOrdersDataByBranchIdAndDateStatus: ResponseStatus.loading,
+        ),
+      );
+      var result = await getOrdersDataByBranchIdAndDateUsecase(event.date);
+      result.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              getOrdersDataByBranchIdAndDateStatus: ResponseStatus.failure,
+              getOrdersDataByBranchIdAndDateFailures: failure,
+            ),
+          );
+        },
+        (orders) {
+          emit(
+            state.copyWith(
+              getOrdersDataByBranchIdAndDateStatus: ResponseStatus.success,
+              getOrdersDataByBranchIdAndDate: orders,
+            ),
+          );
+        },
+      );
+    });
+
+    on<_GetBranchData>((event, emit) async {
+      emit(state.copyWith(getBranchesDataStatus: ResponseStatus.loading));
+      var result = await getBranchDataUsecase();
+      result.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              getBranchesDataStatus: ResponseStatus.failure,
+              getBranchesDataFailures: failure,
+            ),
+          );
+        },
+        (branches) {
+          emit(
+            state.copyWith(
+              getBranchesDataStatus: ResponseStatus.success,
+              getBranchesData: branches,
+            ),
+          );
         },
       );
     });

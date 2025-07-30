@@ -19,6 +19,8 @@ class OrderCardModel {
   final String carDetails;
   final String carColor;
   final OrderModel orderData;
+  final String orderType;
+  final String customerAddress;
 
   OrderCardModel({
     required this.orderNumber,
@@ -31,6 +33,8 @@ class OrderCardModel {
     required this.carDetails,
     required this.carColor,
     required this.orderData,
+    required this.orderType,
+    required this.customerAddress,
   });
 
   OrderCardModel copyWith({
@@ -56,6 +60,8 @@ class OrderCardModel {
       carDetails: carDetails ?? this.carDetails,
       carColor: carColor ?? this.carColor,
       orderData: orderData ?? this.orderData,
+      orderType: orderType,
+      customerAddress: customerAddress,
     );
   }
 }

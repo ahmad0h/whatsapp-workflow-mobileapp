@@ -22,11 +22,13 @@ class OrderTrackingTimeline extends StatelessWidget {
         return 'New Order';
       case 'in_progress':
       case 'in progress':
-        return 'In Progress';
+        return 'Order In Progress';
       case 'arrived':
-        return 'Arrived';
+        return 'Customer Arrived';
+      case 'is_finished':
+        return 'Order Finished';
       case 'completed':
-        return 'Completed';
+        return 'Order Completed';
       default:
         // Handle any other status formats
         return status

@@ -9,6 +9,7 @@ import 'package:whatsapp_workflow_mobileapp/features/home/data/models/get_branch
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/is_linked_response_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_stats_response_mode.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/data/models/update_branch_ordering_status_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/get_branch_data_usecase.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/get_order_by_branchid_date_usecase.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/get_order_stats_usecase.dart';
@@ -16,6 +17,7 @@ import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/get_or
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/init_device_usecase.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/is_linked_usecase.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/reject_order_usecase.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/update_branch_ordering_status_usecase.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/update_status_usecase.dart';
 
 part 'home_event.dart';
@@ -33,6 +35,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetOrdersDataByBranchIdAndDateUsecase
   getOrdersDataByBranchIdAndDateUsecase;
   final GetBranchDataUsecase getBranchDataUsecase;
+  final UpdateBranchOrderingStatusUsecase updateBranchOrderingStatusUsecase;
   HomeBloc(
     this.getOrdersUseCase,
     this.updateStatusUseCase,
@@ -42,6 +45,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     this.isLinkedUsecase,
     this.getOrdersDataByBranchIdAndDateUsecase,
     this.getBranchDataUsecase,
+    this.updateBranchOrderingStatusUsecase,
   ) : super(const HomeState()) {
     on<HomeEvent>((event, emit) async {
       emit(state.copyWith(getOrdersListStatus: ResponseStatus.loading));
@@ -222,6 +226,66 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             state.copyWith(
               getBranchesDataStatus: ResponseStatus.success,
               getBranchesData: branches,
+            ),
+          );
+        },
+      );
+    });
+
+    on<_UpdateBranchOrderingStatus>((event, emit) async {
+      // Update local state immediately for instant UI feedback
+      final currentBranch = state.getBranchesData;
+      if (currentBranch != null) {
+        final updatedBranch = currentBranch.copyWith(
+          orderingStatus: event.status,
+        );
+        emit(
+          state.copyWith(
+            getBranchesData: updatedBranch,
+            updateBranchOrderingStatusStatus: ResponseStatus.loading,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            updateBranchOrderingStatusStatus: ResponseStatus.loading,
+          ),
+        );
+      }
+
+      // Make the API call
+      final result = await updateBranchOrderingStatusUsecase(
+        event.branchId,
+        event.status,
+      );
+
+      // Handle the API response
+      result.fold(
+        (failure) {
+          // If there's an error, revert the local state
+          if (currentBranch != null) {
+            emit(
+              state.copyWith(
+                getBranchesData: currentBranch,
+                updateBranchOrderingStatusStatus: ResponseStatus.failure,
+                updateBranchOrderingStatusFailures: failure,
+              ),
+            );
+          } else {
+            emit(
+              state.copyWith(
+                updateBranchOrderingStatusStatus: ResponseStatus.failure,
+                updateBranchOrderingStatusFailures: failure,
+              ),
+            );
+          }
+        },
+        (updateBranchOrderingStatus) {
+          // On success, just update the status, keeping the optimistic update
+          emit(
+            state.copyWith(
+              updateBranchOrderingStatusStatus: ResponseStatus.success,
+              updateBranchOrderingStatus: updateBranchOrderingStatus,
             ),
           );
         },

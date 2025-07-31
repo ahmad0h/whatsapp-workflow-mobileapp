@@ -12,6 +12,7 @@ import 'package:whatsapp_workflow_mobileapp/features/home/data/models/get_branch
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/is_linked_response_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_stats_response_mode.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/data/models/update_branch_ordering_status_model.dart';
 
 @Injectable(as: HomeDatasource)
 class HomeDatasourceImpl implements HomeDatasource {
@@ -19,7 +20,7 @@ class HomeDatasourceImpl implements HomeDatasource {
   Future<List<OrderModel>> getOrdersData() async {
     var response = await DioHelper.getData(
       url:
-          '${ApiConstants.baseUrl}${ApiConstants.order}/${TokenManager().branchId}',
+          '${ApiConstants.baseUrl}${ApiConstants.order}/branch/${TokenManager().branchId}',
       headers: {'Authorization': ApiConstants.token},
     );
 
@@ -272,6 +273,24 @@ class HomeDatasourceImpl implements HomeDatasource {
       );
       log('Branch data response: ${response.data}');
       return GetBranchResponseModel.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Failed to process response: $e');
+    }
+  }
+
+  @override
+  Future<UpdateBranchOrderingStatusResponseModel> updateBranchOrderingStatus(
+    String branchId,
+    String status,
+  ) async {
+    try {
+      final response = await DioHelper.patchData(
+        url: '${ApiConstants.baseUrl}/branch/update-ordering-status',
+        data: {'branchId': branchId, 'status': status},
+        headers: {'Authorization': ApiConstants.token},
+      );
+      log('Branch ordering status response: ${response.data}');
+      return UpdateBranchOrderingStatusResponseModel.fromJson(response.data);
     } catch (e) {
       throw Exception('Failed to process response: $e');
     }

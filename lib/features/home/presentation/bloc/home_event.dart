@@ -17,4 +17,8 @@ class HomeEvent with _$HomeEvent {
   const factory HomeEvent.getOrdersDataByBranchIdAndDate(String date) =
       _GetOrdersDataByBranchIdAndDate;
   const factory HomeEvent.getBranchData() = _GetBranchData;
+  const factory HomeEvent.updateBranchOrderingStatus(
+    String branchId,
+    String status,
+  ) = _UpdateBranchOrderingStatus;
 }

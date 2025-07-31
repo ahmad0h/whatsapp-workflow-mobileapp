@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -100,7 +102,6 @@ class HomeViewState extends State<HomeView> {
     });
   }
 
-  bool isAcceptingOrders = true;
   bool hasInternetConnection = true;
   String selectedTab = 'All Orders';
 
@@ -351,13 +352,38 @@ class HomeViewState extends State<HomeView> {
                         padding: EdgeInsets.only(left: 48, right: 48, top: 32),
                         child: Column(
                           children: [
-                            _buildStatusToggle(
-                              'OPEN',
-                              'You are currently accepting all orders',
-                              isAcceptingOrders,
-                              AppColors.primary,
-                              (value) =>
-                                  setState(() => isAcceptingOrders = value),
+                            BlocBuilder<HomeBloc, HomeState>(
+                              builder: (context, state) {
+                                final isEnabled =
+                                    state.getBranchesData?.orderingStatus
+                                        ?.toLowerCase() !=
+                                    'disabled';
+                                final isLoading =
+                                    state.updateBranchOrderingStatusStatus ==
+                                    ResponseStatus.loading;
+                                return _buildStatusToggle(
+                                  'OPEN',
+                                  isEnabled
+                                      ? 'You are currently accepting all orders'
+                                      : 'You are not accepting orders',
+                                  isEnabled,
+                                  isEnabled
+                                      ? AppColors.primary
+                                      : AppColors.error,
+                                  (value) {
+                                    log(
+                                      'value: ${state.getBranchesData?.branchId}',
+                                    );
+                                    context.read<HomeBloc>().add(
+                                      HomeEvent.updateBranchOrderingStatus(
+                                        state.getBranchesData?.branchId ?? '',
+                                        value ? 'enabled' : 'disabled',
+                                      ),
+                                    );
+                                  },
+                                  isLoading: isLoading,
+                                );
+                              },
                             ),
                             // SizedBox(height: 12),
                             // _buildStatusToggle(
@@ -572,7 +598,9 @@ class HomeViewState extends State<HomeView> {
     Function(bool)? onChanged, {
     String? imagePath,
     bool isInactive = false,
+    bool isLoading = false,
   }) {
+    final isEnabled = onChanged != null && !isLoading && !isInactive;
     return Container(
       padding: EdgeInsets.all(12.5),
       decoration: BoxDecoration(
@@ -630,56 +658,77 @@ class HomeViewState extends State<HomeView> {
               ),
             ),
           ),
-          Transform.scale(
-            scale: 1.2,
-            child: GestureDetector(
-              onTap: isInactive ? null : () => onChanged?.call(!value),
-              child: Container(
-                width: 52,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: value
-                      ? AppColors.success
-                      : AppColors.textHint.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Stack(
-                  children: [
-                    AnimatedPositioned(
-                      duration: Duration(milliseconds: 200),
-                      left: value ? 22 : 2,
-                      top: 2,
-                      child: Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.textPrimary.withValues(
-                                alpha: 0.06,
-                              ),
-                              offset: Offset(0, 3),
-                              blurRadius: 1,
-                              spreadRadius: 0,
-                            ),
-                            BoxShadow(
-                              color: AppColors.textPrimary.withValues(
-                                alpha: 0.15,
-                              ),
-                              offset: Offset(0, 3),
-                              blurRadius: 8,
-                              spreadRadius: 0,
-                            ),
-                          ],
-                        ),
-                      ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Transform.scale(
+                scale: 1.2,
+                child: GestureDetector(
+                  onTap: isEnabled ? () => onChanged.call(!value) : null,
+                  child: Container(
+                    width: 52,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: value
+                          ? AppColors.success
+                          : AppColors.textHint.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ],
+                    child: Stack(
+                      children: [
+                        AnimatedPositioned(
+                          duration: Duration(milliseconds: 200),
+                          left: value ? 22 : 2,
+                          top: 2,
+                          child: Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: AppColors.background,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.textPrimary.withValues(
+                                    alpha: 0.06,
+                                  ),
+                                  offset: Offset(0, 3),
+                                  blurRadius: 1,
+                                  spreadRadius: 0,
+                                ),
+                                BoxShadow(
+                                  color: AppColors.textPrimary.withValues(
+                                    alpha: 0.15,
+                                  ),
+                                  offset: Offset(0, 3),
+                                  blurRadius: 8,
+                                  spreadRadius: 0,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
+              // if (isLoading)
+              //   Positioned.fill(
+              //     child: Container(
+              //       color: Colors.transparent,
+              //       child: Center(
+              //         child: SizedBox(
+              //           width: 20,
+              //           height: 20,
+              //           child: CircularProgressIndicator(
+              //             strokeWidth: 2,
+              //             valueColor: AlwaysStoppedAnimation<Color>(color),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+            ],
           ),
         ],
       ),
@@ -1002,12 +1051,12 @@ class HomeViewState extends State<HomeView> {
               if (model.orderType == 'delivery')
                 Text(
                   'Delivery Address: ${model.customerAddress}',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                 ),
               if (model.orderType == 'branch')
                 Text(
-                  'PICK UP FROM THE BRANCH.',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                  'PICK UP FROM THIS BRANCH.',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                 ),
             ],
           ),

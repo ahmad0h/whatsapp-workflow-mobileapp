@@ -507,9 +507,77 @@ String toString() {
 
 
 /// @nodoc
+
+
+class _UpdateBranchOrderingStatus implements HomeEvent {
+  const _UpdateBranchOrderingStatus(this.branchId, this.status);
+  
+
+ final  String branchId;
+ final  String status;
+
+/// Create a copy of HomeEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UpdateBranchOrderingStatusCopyWith<_UpdateBranchOrderingStatus> get copyWith => __$UpdateBranchOrderingStatusCopyWithImpl<_UpdateBranchOrderingStatus>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateBranchOrderingStatus&&(identical(other.branchId, branchId) || other.branchId == branchId)&&(identical(other.status, status) || other.status == status));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,branchId,status);
+
+@override
+String toString() {
+  return 'HomeEvent.updateBranchOrderingStatus(branchId: $branchId, status: $status)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UpdateBranchOrderingStatusCopyWith<$Res> implements $HomeEventCopyWith<$Res> {
+  factory _$UpdateBranchOrderingStatusCopyWith(_UpdateBranchOrderingStatus value, $Res Function(_UpdateBranchOrderingStatus) _then) = __$UpdateBranchOrderingStatusCopyWithImpl;
+@useResult
+$Res call({
+ String branchId, String status
+});
+
+
+
+
+}
+/// @nodoc
+class __$UpdateBranchOrderingStatusCopyWithImpl<$Res>
+    implements _$UpdateBranchOrderingStatusCopyWith<$Res> {
+  __$UpdateBranchOrderingStatusCopyWithImpl(this._self, this._then);
+
+  final _UpdateBranchOrderingStatus _self;
+  final $Res Function(_UpdateBranchOrderingStatus) _then;
+
+/// Create a copy of HomeEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? branchId = null,Object? status = null,}) {
+  return _then(_UpdateBranchOrderingStatus(
+null == branchId ? _self.branchId : branchId // ignore: cast_nullable_to_non_nullable
+as String,null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$HomeState {
 
- ResponseStatus get getOrdersListStatus; Failures? get getOrdersListFailures; List<OrderModel>? get ordersList; ResponseStatus get updateOrderStatus; Failures? get updateOrderStatusFailures; ResponseStatus get rejectOrderStatus; Failures? get rejectOrderFailures; ResponseStatus get getOrderStatsStatus; Failures? get getOrderStatsFailures; OrderStatsReponseModel? get orderStats; ResponseStatus get initDeviceStatus; Failures? get initDeviceFailures; DeviceInitReponseModel? get deviceInit; ResponseStatus get isLinkedStatus; Failures? get isLinkedFailures; IsLinkedReponseModel? get isLinked; ResponseStatus get getOrdersDataByBranchIdAndDateStatus; Failures? get getOrdersDataByBranchIdAndDateFailures; List<OrderModel>? get getOrdersDataByBranchIdAndDate; ResponseStatus get getBranchesDataStatus; Failures? get getBranchesDataFailures; GetBranchResponseModel? get getBranchesData;
+ ResponseStatus get getOrdersListStatus; Failures? get getOrdersListFailures; List<OrderModel>? get ordersList; ResponseStatus get updateOrderStatus; Failures? get updateOrderStatusFailures; ResponseStatus get rejectOrderStatus; Failures? get rejectOrderFailures; ResponseStatus get getOrderStatsStatus; Failures? get getOrderStatsFailures; OrderStatsReponseModel? get orderStats; ResponseStatus get initDeviceStatus; Failures? get initDeviceFailures; DeviceInitReponseModel? get deviceInit; ResponseStatus get isLinkedStatus; Failures? get isLinkedFailures; IsLinkedReponseModel? get isLinked; ResponseStatus get getOrdersDataByBranchIdAndDateStatus; Failures? get getOrdersDataByBranchIdAndDateFailures; List<OrderModel>? get getOrdersDataByBranchIdAndDate; ResponseStatus get getBranchesDataStatus; Failures? get getBranchesDataFailures; GetBranchResponseModel? get getBranchesData; ResponseStatus get updateBranchOrderingStatusStatus; Failures? get updateBranchOrderingStatusFailures; UpdateBranchOrderingStatusResponseModel? get updateBranchOrderingStatus;
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -520,16 +588,16 @@ $HomeStateCopyWith<HomeState> get copyWith => _$HomeStateCopyWithImpl<HomeState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.getOrdersListStatus, getOrdersListStatus) || other.getOrdersListStatus == getOrdersListStatus)&&(identical(other.getOrdersListFailures, getOrdersListFailures) || other.getOrdersListFailures == getOrdersListFailures)&&const DeepCollectionEquality().equals(other.ordersList, ordersList)&&(identical(other.updateOrderStatus, updateOrderStatus) || other.updateOrderStatus == updateOrderStatus)&&(identical(other.updateOrderStatusFailures, updateOrderStatusFailures) || other.updateOrderStatusFailures == updateOrderStatusFailures)&&(identical(other.rejectOrderStatus, rejectOrderStatus) || other.rejectOrderStatus == rejectOrderStatus)&&(identical(other.rejectOrderFailures, rejectOrderFailures) || other.rejectOrderFailures == rejectOrderFailures)&&(identical(other.getOrderStatsStatus, getOrderStatsStatus) || other.getOrderStatsStatus == getOrderStatsStatus)&&(identical(other.getOrderStatsFailures, getOrderStatsFailures) || other.getOrderStatsFailures == getOrderStatsFailures)&&(identical(other.orderStats, orderStats) || other.orderStats == orderStats)&&(identical(other.initDeviceStatus, initDeviceStatus) || other.initDeviceStatus == initDeviceStatus)&&(identical(other.initDeviceFailures, initDeviceFailures) || other.initDeviceFailures == initDeviceFailures)&&(identical(other.deviceInit, deviceInit) || other.deviceInit == deviceInit)&&(identical(other.isLinkedStatus, isLinkedStatus) || other.isLinkedStatus == isLinkedStatus)&&(identical(other.isLinkedFailures, isLinkedFailures) || other.isLinkedFailures == isLinkedFailures)&&(identical(other.isLinked, isLinked) || other.isLinked == isLinked)&&(identical(other.getOrdersDataByBranchIdAndDateStatus, getOrdersDataByBranchIdAndDateStatus) || other.getOrdersDataByBranchIdAndDateStatus == getOrdersDataByBranchIdAndDateStatus)&&(identical(other.getOrdersDataByBranchIdAndDateFailures, getOrdersDataByBranchIdAndDateFailures) || other.getOrdersDataByBranchIdAndDateFailures == getOrdersDataByBranchIdAndDateFailures)&&const DeepCollectionEquality().equals(other.getOrdersDataByBranchIdAndDate, getOrdersDataByBranchIdAndDate)&&(identical(other.getBranchesDataStatus, getBranchesDataStatus) || other.getBranchesDataStatus == getBranchesDataStatus)&&(identical(other.getBranchesDataFailures, getBranchesDataFailures) || other.getBranchesDataFailures == getBranchesDataFailures)&&(identical(other.getBranchesData, getBranchesData) || other.getBranchesData == getBranchesData));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.getOrdersListStatus, getOrdersListStatus) || other.getOrdersListStatus == getOrdersListStatus)&&(identical(other.getOrdersListFailures, getOrdersListFailures) || other.getOrdersListFailures == getOrdersListFailures)&&const DeepCollectionEquality().equals(other.ordersList, ordersList)&&(identical(other.updateOrderStatus, updateOrderStatus) || other.updateOrderStatus == updateOrderStatus)&&(identical(other.updateOrderStatusFailures, updateOrderStatusFailures) || other.updateOrderStatusFailures == updateOrderStatusFailures)&&(identical(other.rejectOrderStatus, rejectOrderStatus) || other.rejectOrderStatus == rejectOrderStatus)&&(identical(other.rejectOrderFailures, rejectOrderFailures) || other.rejectOrderFailures == rejectOrderFailures)&&(identical(other.getOrderStatsStatus, getOrderStatsStatus) || other.getOrderStatsStatus == getOrderStatsStatus)&&(identical(other.getOrderStatsFailures, getOrderStatsFailures) || other.getOrderStatsFailures == getOrderStatsFailures)&&(identical(other.orderStats, orderStats) || other.orderStats == orderStats)&&(identical(other.initDeviceStatus, initDeviceStatus) || other.initDeviceStatus == initDeviceStatus)&&(identical(other.initDeviceFailures, initDeviceFailures) || other.initDeviceFailures == initDeviceFailures)&&(identical(other.deviceInit, deviceInit) || other.deviceInit == deviceInit)&&(identical(other.isLinkedStatus, isLinkedStatus) || other.isLinkedStatus == isLinkedStatus)&&(identical(other.isLinkedFailures, isLinkedFailures) || other.isLinkedFailures == isLinkedFailures)&&(identical(other.isLinked, isLinked) || other.isLinked == isLinked)&&(identical(other.getOrdersDataByBranchIdAndDateStatus, getOrdersDataByBranchIdAndDateStatus) || other.getOrdersDataByBranchIdAndDateStatus == getOrdersDataByBranchIdAndDateStatus)&&(identical(other.getOrdersDataByBranchIdAndDateFailures, getOrdersDataByBranchIdAndDateFailures) || other.getOrdersDataByBranchIdAndDateFailures == getOrdersDataByBranchIdAndDateFailures)&&const DeepCollectionEquality().equals(other.getOrdersDataByBranchIdAndDate, getOrdersDataByBranchIdAndDate)&&(identical(other.getBranchesDataStatus, getBranchesDataStatus) || other.getBranchesDataStatus == getBranchesDataStatus)&&(identical(other.getBranchesDataFailures, getBranchesDataFailures) || other.getBranchesDataFailures == getBranchesDataFailures)&&(identical(other.getBranchesData, getBranchesData) || other.getBranchesData == getBranchesData)&&(identical(other.updateBranchOrderingStatusStatus, updateBranchOrderingStatusStatus) || other.updateBranchOrderingStatusStatus == updateBranchOrderingStatusStatus)&&(identical(other.updateBranchOrderingStatusFailures, updateBranchOrderingStatusFailures) || other.updateBranchOrderingStatusFailures == updateBranchOrderingStatusFailures)&&(identical(other.updateBranchOrderingStatus, updateBranchOrderingStatus) || other.updateBranchOrderingStatus == updateBranchOrderingStatus));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,getOrdersListStatus,getOrdersListFailures,const DeepCollectionEquality().hash(ordersList),updateOrderStatus,updateOrderStatusFailures,rejectOrderStatus,rejectOrderFailures,getOrderStatsStatus,getOrderStatsFailures,orderStats,initDeviceStatus,initDeviceFailures,deviceInit,isLinkedStatus,isLinkedFailures,isLinked,getOrdersDataByBranchIdAndDateStatus,getOrdersDataByBranchIdAndDateFailures,const DeepCollectionEquality().hash(getOrdersDataByBranchIdAndDate),getBranchesDataStatus,getBranchesDataFailures,getBranchesData]);
+int get hashCode => Object.hashAll([runtimeType,getOrdersListStatus,getOrdersListFailures,const DeepCollectionEquality().hash(ordersList),updateOrderStatus,updateOrderStatusFailures,rejectOrderStatus,rejectOrderFailures,getOrderStatsStatus,getOrderStatsFailures,orderStats,initDeviceStatus,initDeviceFailures,deviceInit,isLinkedStatus,isLinkedFailures,isLinked,getOrdersDataByBranchIdAndDateStatus,getOrdersDataByBranchIdAndDateFailures,const DeepCollectionEquality().hash(getOrdersDataByBranchIdAndDate),getBranchesDataStatus,getBranchesDataFailures,getBranchesData,updateBranchOrderingStatusStatus,updateBranchOrderingStatusFailures,updateBranchOrderingStatus]);
 
 @override
 String toString() {
-  return 'HomeState(getOrdersListStatus: $getOrdersListStatus, getOrdersListFailures: $getOrdersListFailures, ordersList: $ordersList, updateOrderStatus: $updateOrderStatus, updateOrderStatusFailures: $updateOrderStatusFailures, rejectOrderStatus: $rejectOrderStatus, rejectOrderFailures: $rejectOrderFailures, getOrderStatsStatus: $getOrderStatsStatus, getOrderStatsFailures: $getOrderStatsFailures, orderStats: $orderStats, initDeviceStatus: $initDeviceStatus, initDeviceFailures: $initDeviceFailures, deviceInit: $deviceInit, isLinkedStatus: $isLinkedStatus, isLinkedFailures: $isLinkedFailures, isLinked: $isLinked, getOrdersDataByBranchIdAndDateStatus: $getOrdersDataByBranchIdAndDateStatus, getOrdersDataByBranchIdAndDateFailures: $getOrdersDataByBranchIdAndDateFailures, getOrdersDataByBranchIdAndDate: $getOrdersDataByBranchIdAndDate, getBranchesDataStatus: $getBranchesDataStatus, getBranchesDataFailures: $getBranchesDataFailures, getBranchesData: $getBranchesData)';
+  return 'HomeState(getOrdersListStatus: $getOrdersListStatus, getOrdersListFailures: $getOrdersListFailures, ordersList: $ordersList, updateOrderStatus: $updateOrderStatus, updateOrderStatusFailures: $updateOrderStatusFailures, rejectOrderStatus: $rejectOrderStatus, rejectOrderFailures: $rejectOrderFailures, getOrderStatsStatus: $getOrderStatsStatus, getOrderStatsFailures: $getOrderStatsFailures, orderStats: $orderStats, initDeviceStatus: $initDeviceStatus, initDeviceFailures: $initDeviceFailures, deviceInit: $deviceInit, isLinkedStatus: $isLinkedStatus, isLinkedFailures: $isLinkedFailures, isLinked: $isLinked, getOrdersDataByBranchIdAndDateStatus: $getOrdersDataByBranchIdAndDateStatus, getOrdersDataByBranchIdAndDateFailures: $getOrdersDataByBranchIdAndDateFailures, getOrdersDataByBranchIdAndDate: $getOrdersDataByBranchIdAndDate, getBranchesDataStatus: $getBranchesDataStatus, getBranchesDataFailures: $getBranchesDataFailures, getBranchesData: $getBranchesData, updateBranchOrderingStatusStatus: $updateBranchOrderingStatusStatus, updateBranchOrderingStatusFailures: $updateBranchOrderingStatusFailures, updateBranchOrderingStatus: $updateBranchOrderingStatus)';
 }
 
 
@@ -540,7 +608,7 @@ abstract mixin class $HomeStateCopyWith<$Res>  {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) _then) = _$HomeStateCopyWithImpl;
 @useResult
 $Res call({
- ResponseStatus getOrdersListStatus, Failures? getOrdersListFailures, List<OrderModel>? ordersList, ResponseStatus updateOrderStatus, Failures? updateOrderStatusFailures, ResponseStatus rejectOrderStatus, Failures? rejectOrderFailures, ResponseStatus getOrderStatsStatus, Failures? getOrderStatsFailures, OrderStatsReponseModel? orderStats, ResponseStatus initDeviceStatus, Failures? initDeviceFailures, DeviceInitReponseModel? deviceInit, ResponseStatus isLinkedStatus, Failures? isLinkedFailures, IsLinkedReponseModel? isLinked, ResponseStatus getOrdersDataByBranchIdAndDateStatus, Failures? getOrdersDataByBranchIdAndDateFailures, List<OrderModel>? getOrdersDataByBranchIdAndDate, ResponseStatus getBranchesDataStatus, Failures? getBranchesDataFailures, GetBranchResponseModel? getBranchesData
+ ResponseStatus getOrdersListStatus, Failures? getOrdersListFailures, List<OrderModel>? ordersList, ResponseStatus updateOrderStatus, Failures? updateOrderStatusFailures, ResponseStatus rejectOrderStatus, Failures? rejectOrderFailures, ResponseStatus getOrderStatsStatus, Failures? getOrderStatsFailures, OrderStatsReponseModel? orderStats, ResponseStatus initDeviceStatus, Failures? initDeviceFailures, DeviceInitReponseModel? deviceInit, ResponseStatus isLinkedStatus, Failures? isLinkedFailures, IsLinkedReponseModel? isLinked, ResponseStatus getOrdersDataByBranchIdAndDateStatus, Failures? getOrdersDataByBranchIdAndDateFailures, List<OrderModel>? getOrdersDataByBranchIdAndDate, ResponseStatus getBranchesDataStatus, Failures? getBranchesDataFailures, GetBranchResponseModel? getBranchesData, ResponseStatus updateBranchOrderingStatusStatus, Failures? updateBranchOrderingStatusFailures, UpdateBranchOrderingStatusResponseModel? updateBranchOrderingStatus
 });
 
 
@@ -557,7 +625,7 @@ class _$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? getOrdersListStatus = null,Object? getOrdersListFailures = freezed,Object? ordersList = freezed,Object? updateOrderStatus = null,Object? updateOrderStatusFailures = freezed,Object? rejectOrderStatus = null,Object? rejectOrderFailures = freezed,Object? getOrderStatsStatus = null,Object? getOrderStatsFailures = freezed,Object? orderStats = freezed,Object? initDeviceStatus = null,Object? initDeviceFailures = freezed,Object? deviceInit = freezed,Object? isLinkedStatus = null,Object? isLinkedFailures = freezed,Object? isLinked = freezed,Object? getOrdersDataByBranchIdAndDateStatus = null,Object? getOrdersDataByBranchIdAndDateFailures = freezed,Object? getOrdersDataByBranchIdAndDate = freezed,Object? getBranchesDataStatus = null,Object? getBranchesDataFailures = freezed,Object? getBranchesData = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? getOrdersListStatus = null,Object? getOrdersListFailures = freezed,Object? ordersList = freezed,Object? updateOrderStatus = null,Object? updateOrderStatusFailures = freezed,Object? rejectOrderStatus = null,Object? rejectOrderFailures = freezed,Object? getOrderStatsStatus = null,Object? getOrderStatsFailures = freezed,Object? orderStats = freezed,Object? initDeviceStatus = null,Object? initDeviceFailures = freezed,Object? deviceInit = freezed,Object? isLinkedStatus = null,Object? isLinkedFailures = freezed,Object? isLinked = freezed,Object? getOrdersDataByBranchIdAndDateStatus = null,Object? getOrdersDataByBranchIdAndDateFailures = freezed,Object? getOrdersDataByBranchIdAndDate = freezed,Object? getBranchesDataStatus = null,Object? getBranchesDataFailures = freezed,Object? getBranchesData = freezed,Object? updateBranchOrderingStatusStatus = null,Object? updateBranchOrderingStatusFailures = freezed,Object? updateBranchOrderingStatus = freezed,}) {
   return _then(_self.copyWith(
 getOrdersListStatus: null == getOrdersListStatus ? _self.getOrdersListStatus : getOrdersListStatus // ignore: cast_nullable_to_non_nullable
 as ResponseStatus,getOrdersListFailures: freezed == getOrdersListFailures ? _self.getOrdersListFailures : getOrdersListFailures // ignore: cast_nullable_to_non_nullable
@@ -581,7 +649,10 @@ as Failures?,getOrdersDataByBranchIdAndDate: freezed == getOrdersDataByBranchIdA
 as List<OrderModel>?,getBranchesDataStatus: null == getBranchesDataStatus ? _self.getBranchesDataStatus : getBranchesDataStatus // ignore: cast_nullable_to_non_nullable
 as ResponseStatus,getBranchesDataFailures: freezed == getBranchesDataFailures ? _self.getBranchesDataFailures : getBranchesDataFailures // ignore: cast_nullable_to_non_nullable
 as Failures?,getBranchesData: freezed == getBranchesData ? _self.getBranchesData : getBranchesData // ignore: cast_nullable_to_non_nullable
-as GetBranchResponseModel?,
+as GetBranchResponseModel?,updateBranchOrderingStatusStatus: null == updateBranchOrderingStatusStatus ? _self.updateBranchOrderingStatusStatus : updateBranchOrderingStatusStatus // ignore: cast_nullable_to_non_nullable
+as ResponseStatus,updateBranchOrderingStatusFailures: freezed == updateBranchOrderingStatusFailures ? _self.updateBranchOrderingStatusFailures : updateBranchOrderingStatusFailures // ignore: cast_nullable_to_non_nullable
+as Failures?,updateBranchOrderingStatus: freezed == updateBranchOrderingStatus ? _self.updateBranchOrderingStatus : updateBranchOrderingStatus // ignore: cast_nullable_to_non_nullable
+as UpdateBranchOrderingStatusResponseModel?,
   ));
 }
 
@@ -592,7 +663,7 @@ as GetBranchResponseModel?,
 
 
 class _HomeState implements HomeState {
-  const _HomeState({this.getOrdersListStatus = ResponseStatus.init, this.getOrdersListFailures, final  List<OrderModel>? ordersList, this.updateOrderStatus = ResponseStatus.init, this.updateOrderStatusFailures, this.rejectOrderStatus = ResponseStatus.init, this.rejectOrderFailures, this.getOrderStatsStatus = ResponseStatus.init, this.getOrderStatsFailures, this.orderStats, this.initDeviceStatus = ResponseStatus.init, this.initDeviceFailures, this.deviceInit, this.isLinkedStatus = ResponseStatus.init, this.isLinkedFailures, this.isLinked, this.getOrdersDataByBranchIdAndDateStatus = ResponseStatus.init, this.getOrdersDataByBranchIdAndDateFailures, final  List<OrderModel>? getOrdersDataByBranchIdAndDate, this.getBranchesDataStatus = ResponseStatus.init, this.getBranchesDataFailures, this.getBranchesData}): _ordersList = ordersList,_getOrdersDataByBranchIdAndDate = getOrdersDataByBranchIdAndDate;
+  const _HomeState({this.getOrdersListStatus = ResponseStatus.init, this.getOrdersListFailures, final  List<OrderModel>? ordersList, this.updateOrderStatus = ResponseStatus.init, this.updateOrderStatusFailures, this.rejectOrderStatus = ResponseStatus.init, this.rejectOrderFailures, this.getOrderStatsStatus = ResponseStatus.init, this.getOrderStatsFailures, this.orderStats, this.initDeviceStatus = ResponseStatus.init, this.initDeviceFailures, this.deviceInit, this.isLinkedStatus = ResponseStatus.init, this.isLinkedFailures, this.isLinked, this.getOrdersDataByBranchIdAndDateStatus = ResponseStatus.init, this.getOrdersDataByBranchIdAndDateFailures, final  List<OrderModel>? getOrdersDataByBranchIdAndDate, this.getBranchesDataStatus = ResponseStatus.init, this.getBranchesDataFailures, this.getBranchesData, this.updateBranchOrderingStatusStatus = ResponseStatus.init, this.updateBranchOrderingStatusFailures, this.updateBranchOrderingStatus}): _ordersList = ordersList,_getOrdersDataByBranchIdAndDate = getOrdersDataByBranchIdAndDate;
   
 
 @override@JsonKey() final  ResponseStatus getOrdersListStatus;
@@ -633,6 +704,9 @@ class _HomeState implements HomeState {
 @override@JsonKey() final  ResponseStatus getBranchesDataStatus;
 @override final  Failures? getBranchesDataFailures;
 @override final  GetBranchResponseModel? getBranchesData;
+@override@JsonKey() final  ResponseStatus updateBranchOrderingStatusStatus;
+@override final  Failures? updateBranchOrderingStatusFailures;
+@override final  UpdateBranchOrderingStatusResponseModel? updateBranchOrderingStatus;
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
@@ -644,16 +718,16 @@ _$HomeStateCopyWith<_HomeState> get copyWith => __$HomeStateCopyWithImpl<_HomeSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.getOrdersListStatus, getOrdersListStatus) || other.getOrdersListStatus == getOrdersListStatus)&&(identical(other.getOrdersListFailures, getOrdersListFailures) || other.getOrdersListFailures == getOrdersListFailures)&&const DeepCollectionEquality().equals(other._ordersList, _ordersList)&&(identical(other.updateOrderStatus, updateOrderStatus) || other.updateOrderStatus == updateOrderStatus)&&(identical(other.updateOrderStatusFailures, updateOrderStatusFailures) || other.updateOrderStatusFailures == updateOrderStatusFailures)&&(identical(other.rejectOrderStatus, rejectOrderStatus) || other.rejectOrderStatus == rejectOrderStatus)&&(identical(other.rejectOrderFailures, rejectOrderFailures) || other.rejectOrderFailures == rejectOrderFailures)&&(identical(other.getOrderStatsStatus, getOrderStatsStatus) || other.getOrderStatsStatus == getOrderStatsStatus)&&(identical(other.getOrderStatsFailures, getOrderStatsFailures) || other.getOrderStatsFailures == getOrderStatsFailures)&&(identical(other.orderStats, orderStats) || other.orderStats == orderStats)&&(identical(other.initDeviceStatus, initDeviceStatus) || other.initDeviceStatus == initDeviceStatus)&&(identical(other.initDeviceFailures, initDeviceFailures) || other.initDeviceFailures == initDeviceFailures)&&(identical(other.deviceInit, deviceInit) || other.deviceInit == deviceInit)&&(identical(other.isLinkedStatus, isLinkedStatus) || other.isLinkedStatus == isLinkedStatus)&&(identical(other.isLinkedFailures, isLinkedFailures) || other.isLinkedFailures == isLinkedFailures)&&(identical(other.isLinked, isLinked) || other.isLinked == isLinked)&&(identical(other.getOrdersDataByBranchIdAndDateStatus, getOrdersDataByBranchIdAndDateStatus) || other.getOrdersDataByBranchIdAndDateStatus == getOrdersDataByBranchIdAndDateStatus)&&(identical(other.getOrdersDataByBranchIdAndDateFailures, getOrdersDataByBranchIdAndDateFailures) || other.getOrdersDataByBranchIdAndDateFailures == getOrdersDataByBranchIdAndDateFailures)&&const DeepCollectionEquality().equals(other._getOrdersDataByBranchIdAndDate, _getOrdersDataByBranchIdAndDate)&&(identical(other.getBranchesDataStatus, getBranchesDataStatus) || other.getBranchesDataStatus == getBranchesDataStatus)&&(identical(other.getBranchesDataFailures, getBranchesDataFailures) || other.getBranchesDataFailures == getBranchesDataFailures)&&(identical(other.getBranchesData, getBranchesData) || other.getBranchesData == getBranchesData));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.getOrdersListStatus, getOrdersListStatus) || other.getOrdersListStatus == getOrdersListStatus)&&(identical(other.getOrdersListFailures, getOrdersListFailures) || other.getOrdersListFailures == getOrdersListFailures)&&const DeepCollectionEquality().equals(other._ordersList, _ordersList)&&(identical(other.updateOrderStatus, updateOrderStatus) || other.updateOrderStatus == updateOrderStatus)&&(identical(other.updateOrderStatusFailures, updateOrderStatusFailures) || other.updateOrderStatusFailures == updateOrderStatusFailures)&&(identical(other.rejectOrderStatus, rejectOrderStatus) || other.rejectOrderStatus == rejectOrderStatus)&&(identical(other.rejectOrderFailures, rejectOrderFailures) || other.rejectOrderFailures == rejectOrderFailures)&&(identical(other.getOrderStatsStatus, getOrderStatsStatus) || other.getOrderStatsStatus == getOrderStatsStatus)&&(identical(other.getOrderStatsFailures, getOrderStatsFailures) || other.getOrderStatsFailures == getOrderStatsFailures)&&(identical(other.orderStats, orderStats) || other.orderStats == orderStats)&&(identical(other.initDeviceStatus, initDeviceStatus) || other.initDeviceStatus == initDeviceStatus)&&(identical(other.initDeviceFailures, initDeviceFailures) || other.initDeviceFailures == initDeviceFailures)&&(identical(other.deviceInit, deviceInit) || other.deviceInit == deviceInit)&&(identical(other.isLinkedStatus, isLinkedStatus) || other.isLinkedStatus == isLinkedStatus)&&(identical(other.isLinkedFailures, isLinkedFailures) || other.isLinkedFailures == isLinkedFailures)&&(identical(other.isLinked, isLinked) || other.isLinked == isLinked)&&(identical(other.getOrdersDataByBranchIdAndDateStatus, getOrdersDataByBranchIdAndDateStatus) || other.getOrdersDataByBranchIdAndDateStatus == getOrdersDataByBranchIdAndDateStatus)&&(identical(other.getOrdersDataByBranchIdAndDateFailures, getOrdersDataByBranchIdAndDateFailures) || other.getOrdersDataByBranchIdAndDateFailures == getOrdersDataByBranchIdAndDateFailures)&&const DeepCollectionEquality().equals(other._getOrdersDataByBranchIdAndDate, _getOrdersDataByBranchIdAndDate)&&(identical(other.getBranchesDataStatus, getBranchesDataStatus) || other.getBranchesDataStatus == getBranchesDataStatus)&&(identical(other.getBranchesDataFailures, getBranchesDataFailures) || other.getBranchesDataFailures == getBranchesDataFailures)&&(identical(other.getBranchesData, getBranchesData) || other.getBranchesData == getBranchesData)&&(identical(other.updateBranchOrderingStatusStatus, updateBranchOrderingStatusStatus) || other.updateBranchOrderingStatusStatus == updateBranchOrderingStatusStatus)&&(identical(other.updateBranchOrderingStatusFailures, updateBranchOrderingStatusFailures) || other.updateBranchOrderingStatusFailures == updateBranchOrderingStatusFailures)&&(identical(other.updateBranchOrderingStatus, updateBranchOrderingStatus) || other.updateBranchOrderingStatus == updateBranchOrderingStatus));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,getOrdersListStatus,getOrdersListFailures,const DeepCollectionEquality().hash(_ordersList),updateOrderStatus,updateOrderStatusFailures,rejectOrderStatus,rejectOrderFailures,getOrderStatsStatus,getOrderStatsFailures,orderStats,initDeviceStatus,initDeviceFailures,deviceInit,isLinkedStatus,isLinkedFailures,isLinked,getOrdersDataByBranchIdAndDateStatus,getOrdersDataByBranchIdAndDateFailures,const DeepCollectionEquality().hash(_getOrdersDataByBranchIdAndDate),getBranchesDataStatus,getBranchesDataFailures,getBranchesData]);
+int get hashCode => Object.hashAll([runtimeType,getOrdersListStatus,getOrdersListFailures,const DeepCollectionEquality().hash(_ordersList),updateOrderStatus,updateOrderStatusFailures,rejectOrderStatus,rejectOrderFailures,getOrderStatsStatus,getOrderStatsFailures,orderStats,initDeviceStatus,initDeviceFailures,deviceInit,isLinkedStatus,isLinkedFailures,isLinked,getOrdersDataByBranchIdAndDateStatus,getOrdersDataByBranchIdAndDateFailures,const DeepCollectionEquality().hash(_getOrdersDataByBranchIdAndDate),getBranchesDataStatus,getBranchesDataFailures,getBranchesData,updateBranchOrderingStatusStatus,updateBranchOrderingStatusFailures,updateBranchOrderingStatus]);
 
 @override
 String toString() {
-  return 'HomeState(getOrdersListStatus: $getOrdersListStatus, getOrdersListFailures: $getOrdersListFailures, ordersList: $ordersList, updateOrderStatus: $updateOrderStatus, updateOrderStatusFailures: $updateOrderStatusFailures, rejectOrderStatus: $rejectOrderStatus, rejectOrderFailures: $rejectOrderFailures, getOrderStatsStatus: $getOrderStatsStatus, getOrderStatsFailures: $getOrderStatsFailures, orderStats: $orderStats, initDeviceStatus: $initDeviceStatus, initDeviceFailures: $initDeviceFailures, deviceInit: $deviceInit, isLinkedStatus: $isLinkedStatus, isLinkedFailures: $isLinkedFailures, isLinked: $isLinked, getOrdersDataByBranchIdAndDateStatus: $getOrdersDataByBranchIdAndDateStatus, getOrdersDataByBranchIdAndDateFailures: $getOrdersDataByBranchIdAndDateFailures, getOrdersDataByBranchIdAndDate: $getOrdersDataByBranchIdAndDate, getBranchesDataStatus: $getBranchesDataStatus, getBranchesDataFailures: $getBranchesDataFailures, getBranchesData: $getBranchesData)';
+  return 'HomeState(getOrdersListStatus: $getOrdersListStatus, getOrdersListFailures: $getOrdersListFailures, ordersList: $ordersList, updateOrderStatus: $updateOrderStatus, updateOrderStatusFailures: $updateOrderStatusFailures, rejectOrderStatus: $rejectOrderStatus, rejectOrderFailures: $rejectOrderFailures, getOrderStatsStatus: $getOrderStatsStatus, getOrderStatsFailures: $getOrderStatsFailures, orderStats: $orderStats, initDeviceStatus: $initDeviceStatus, initDeviceFailures: $initDeviceFailures, deviceInit: $deviceInit, isLinkedStatus: $isLinkedStatus, isLinkedFailures: $isLinkedFailures, isLinked: $isLinked, getOrdersDataByBranchIdAndDateStatus: $getOrdersDataByBranchIdAndDateStatus, getOrdersDataByBranchIdAndDateFailures: $getOrdersDataByBranchIdAndDateFailures, getOrdersDataByBranchIdAndDate: $getOrdersDataByBranchIdAndDate, getBranchesDataStatus: $getBranchesDataStatus, getBranchesDataFailures: $getBranchesDataFailures, getBranchesData: $getBranchesData, updateBranchOrderingStatusStatus: $updateBranchOrderingStatusStatus, updateBranchOrderingStatusFailures: $updateBranchOrderingStatusFailures, updateBranchOrderingStatus: $updateBranchOrderingStatus)';
 }
 
 
@@ -664,7 +738,7 @@ abstract mixin class _$HomeStateCopyWith<$Res> implements $HomeStateCopyWith<$Re
   factory _$HomeStateCopyWith(_HomeState value, $Res Function(_HomeState) _then) = __$HomeStateCopyWithImpl;
 @override @useResult
 $Res call({
- ResponseStatus getOrdersListStatus, Failures? getOrdersListFailures, List<OrderModel>? ordersList, ResponseStatus updateOrderStatus, Failures? updateOrderStatusFailures, ResponseStatus rejectOrderStatus, Failures? rejectOrderFailures, ResponseStatus getOrderStatsStatus, Failures? getOrderStatsFailures, OrderStatsReponseModel? orderStats, ResponseStatus initDeviceStatus, Failures? initDeviceFailures, DeviceInitReponseModel? deviceInit, ResponseStatus isLinkedStatus, Failures? isLinkedFailures, IsLinkedReponseModel? isLinked, ResponseStatus getOrdersDataByBranchIdAndDateStatus, Failures? getOrdersDataByBranchIdAndDateFailures, List<OrderModel>? getOrdersDataByBranchIdAndDate, ResponseStatus getBranchesDataStatus, Failures? getBranchesDataFailures, GetBranchResponseModel? getBranchesData
+ ResponseStatus getOrdersListStatus, Failures? getOrdersListFailures, List<OrderModel>? ordersList, ResponseStatus updateOrderStatus, Failures? updateOrderStatusFailures, ResponseStatus rejectOrderStatus, Failures? rejectOrderFailures, ResponseStatus getOrderStatsStatus, Failures? getOrderStatsFailures, OrderStatsReponseModel? orderStats, ResponseStatus initDeviceStatus, Failures? initDeviceFailures, DeviceInitReponseModel? deviceInit, ResponseStatus isLinkedStatus, Failures? isLinkedFailures, IsLinkedReponseModel? isLinked, ResponseStatus getOrdersDataByBranchIdAndDateStatus, Failures? getOrdersDataByBranchIdAndDateFailures, List<OrderModel>? getOrdersDataByBranchIdAndDate, ResponseStatus getBranchesDataStatus, Failures? getBranchesDataFailures, GetBranchResponseModel? getBranchesData, ResponseStatus updateBranchOrderingStatusStatus, Failures? updateBranchOrderingStatusFailures, UpdateBranchOrderingStatusResponseModel? updateBranchOrderingStatus
 });
 
 
@@ -681,7 +755,7 @@ class __$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? getOrdersListStatus = null,Object? getOrdersListFailures = freezed,Object? ordersList = freezed,Object? updateOrderStatus = null,Object? updateOrderStatusFailures = freezed,Object? rejectOrderStatus = null,Object? rejectOrderFailures = freezed,Object? getOrderStatsStatus = null,Object? getOrderStatsFailures = freezed,Object? orderStats = freezed,Object? initDeviceStatus = null,Object? initDeviceFailures = freezed,Object? deviceInit = freezed,Object? isLinkedStatus = null,Object? isLinkedFailures = freezed,Object? isLinked = freezed,Object? getOrdersDataByBranchIdAndDateStatus = null,Object? getOrdersDataByBranchIdAndDateFailures = freezed,Object? getOrdersDataByBranchIdAndDate = freezed,Object? getBranchesDataStatus = null,Object? getBranchesDataFailures = freezed,Object? getBranchesData = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? getOrdersListStatus = null,Object? getOrdersListFailures = freezed,Object? ordersList = freezed,Object? updateOrderStatus = null,Object? updateOrderStatusFailures = freezed,Object? rejectOrderStatus = null,Object? rejectOrderFailures = freezed,Object? getOrderStatsStatus = null,Object? getOrderStatsFailures = freezed,Object? orderStats = freezed,Object? initDeviceStatus = null,Object? initDeviceFailures = freezed,Object? deviceInit = freezed,Object? isLinkedStatus = null,Object? isLinkedFailures = freezed,Object? isLinked = freezed,Object? getOrdersDataByBranchIdAndDateStatus = null,Object? getOrdersDataByBranchIdAndDateFailures = freezed,Object? getOrdersDataByBranchIdAndDate = freezed,Object? getBranchesDataStatus = null,Object? getBranchesDataFailures = freezed,Object? getBranchesData = freezed,Object? updateBranchOrderingStatusStatus = null,Object? updateBranchOrderingStatusFailures = freezed,Object? updateBranchOrderingStatus = freezed,}) {
   return _then(_HomeState(
 getOrdersListStatus: null == getOrdersListStatus ? _self.getOrdersListStatus : getOrdersListStatus // ignore: cast_nullable_to_non_nullable
 as ResponseStatus,getOrdersListFailures: freezed == getOrdersListFailures ? _self.getOrdersListFailures : getOrdersListFailures // ignore: cast_nullable_to_non_nullable
@@ -705,7 +779,10 @@ as Failures?,getOrdersDataByBranchIdAndDate: freezed == getOrdersDataByBranchIdA
 as List<OrderModel>?,getBranchesDataStatus: null == getBranchesDataStatus ? _self.getBranchesDataStatus : getBranchesDataStatus // ignore: cast_nullable_to_non_nullable
 as ResponseStatus,getBranchesDataFailures: freezed == getBranchesDataFailures ? _self.getBranchesDataFailures : getBranchesDataFailures // ignore: cast_nullable_to_non_nullable
 as Failures?,getBranchesData: freezed == getBranchesData ? _self.getBranchesData : getBranchesData // ignore: cast_nullable_to_non_nullable
-as GetBranchResponseModel?,
+as GetBranchResponseModel?,updateBranchOrderingStatusStatus: null == updateBranchOrderingStatusStatus ? _self.updateBranchOrderingStatusStatus : updateBranchOrderingStatusStatus // ignore: cast_nullable_to_non_nullable
+as ResponseStatus,updateBranchOrderingStatusFailures: freezed == updateBranchOrderingStatusFailures ? _self.updateBranchOrderingStatusFailures : updateBranchOrderingStatusFailures // ignore: cast_nullable_to_non_nullable
+as Failures?,updateBranchOrderingStatus: freezed == updateBranchOrderingStatus ? _self.updateBranchOrderingStatus : updateBranchOrderingStatus // ignore: cast_nullable_to_non_nullable
+as UpdateBranchOrderingStatusResponseModel?,
   ));
 }
 

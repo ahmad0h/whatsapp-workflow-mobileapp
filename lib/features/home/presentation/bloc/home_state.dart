@@ -26,5 +26,9 @@ abstract class HomeState with _$HomeState {
     @Default(ResponseStatus.init) ResponseStatus getBranchesDataStatus,
     Failures? getBranchesDataFailures,
     GetBranchResponseModel? getBranchesData,
+    @Default(ResponseStatus.init)
+    ResponseStatus updateBranchOrderingStatusStatus,
+    Failures? updateBranchOrderingStatusFailures,
+    UpdateBranchOrderingStatusResponseModel? updateBranchOrderingStatus,
   }) = _HomeState;
 }

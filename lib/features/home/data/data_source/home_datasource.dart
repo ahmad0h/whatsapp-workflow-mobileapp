@@ -3,6 +3,7 @@ import 'package:whatsapp_workflow_mobileapp/features/home/data/models/get_branch
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/is_linked_response_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_stats_response_mode.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/data/models/update_branch_ordering_status_model.dart';
 
 abstract class HomeDatasource {
   Future<List<OrderModel>> getOrdersData();
@@ -18,4 +19,8 @@ abstract class HomeDatasource {
     required String date,
   });
   Future<GetBranchResponseModel> getBranchesData();
+  Future<UpdateBranchOrderingStatusResponseModel> updateBranchOrderingStatus(
+    String branchId,
+    String status,
+  );
 }

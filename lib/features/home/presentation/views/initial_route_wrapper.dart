@@ -46,6 +46,7 @@ class _InitialRouteWrapperState extends State<InitialRouteWrapper> {
               state.isLinked?.accessToken != null) {
             // Navigate to home if linked
             WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.read<HomeBloc>().add(HomeEvent.getOrdersData());
               if (mounted) {
                 GoRouter.of(context).go(GoRouterConfig.homeView);
               }

@@ -8,6 +8,7 @@ import 'package:whatsapp_workflow_mobileapp/features/home/data/models/get_branch
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/is_linked_response_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_stats_response_mode.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/data/models/update_branch_ordering_status_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/repository/home_repo.dart';
 
 @Injectable(as: HomeRepo)
@@ -112,6 +113,18 @@ class HomeRepoImpl implements HomeRepo {
   Future<Either<Failures, GetBranchResponseModel>> getBranchesData() async {
     try {
       final result = await homeDS.getBranchesData();
+      return Right(result);
+    } catch (e) {
+      log(e.toString());
+      return Left(RemoteFailures(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failures, UpdateBranchOrderingStatusResponseModel>>
+  updateBranchOrderingStatus(String branchId, String status) async {
+    try {
+      final result = await homeDS.updateBranchOrderingStatus(branchId, status);
       return Right(result);
     } catch (e) {
       log(e.toString());

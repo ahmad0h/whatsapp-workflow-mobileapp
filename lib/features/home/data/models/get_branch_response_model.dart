@@ -50,6 +50,30 @@ class GetBranchResponseModel {
     data['expected_order_duration_time'] = expectedOrderDurationTime;
     return data;
   }
+  
+  GetBranchResponseModel copyWith({
+    String? branchId,
+    Business? business,
+    String? branchName,
+    String? branchCity,
+    String? branchMapLocation,
+    String? branchStatus,
+    String? orderingStatus,
+    String? deviceToken,
+    int? expectedOrderDurationTime,
+  }) {
+    return GetBranchResponseModel(
+      branchId: branchId ?? this.branchId,
+      business: business ?? this.business,
+      branchName: branchName ?? this.branchName,
+      branchCity: branchCity ?? this.branchCity,
+      branchMapLocation: branchMapLocation ?? this.branchMapLocation,
+      branchStatus: branchStatus ?? this.branchStatus,
+      orderingStatus: orderingStatus ?? this.orderingStatus,
+      deviceToken: deviceToken ?? this.deviceToken,
+      expectedOrderDurationTime: expectedOrderDurationTime ?? this.expectedOrderDurationTime,
+    );
+  }
 }
 
 class Business {

@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
 
 class ApiConstants {
-  static const String baseUrl = 'https://ea09d14b6afe.ngrok-free.app';
+  static const String baseUrl = 'https://cfafb8f88f4b.ngrok-free.app';
   static const String order = '/order';
 
   static String get token {

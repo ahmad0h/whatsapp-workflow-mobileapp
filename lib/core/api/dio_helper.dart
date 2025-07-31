@@ -31,14 +31,14 @@ class DioHelper {
     }
   }
 
-  static Future<Response> getDataApple({
+  static Future<Response> patchData({
     required String url,
     Map<String, dynamic>? query,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? data,
   }) async {
     try {
-      return await dio.post(
+      return await dio.patch(
         url,
         queryParameters: query,
         data: data,

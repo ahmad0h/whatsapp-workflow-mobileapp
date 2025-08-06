@@ -44,20 +44,27 @@ class _InitialRouteWrapperState extends State<InitialRouteWrapper> {
         if (state.isLinkedStatus == ResponseStatus.success) {
           if (state.isLinked?.status == 'LINKED' &&
               state.isLinked?.accessToken != null) {
+            // Get the bloc reference before the async gap
+            final homeBloc = context.read<HomeBloc>();
+            
             // Navigate to home if linked
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              context.read<HomeBloc>().add(HomeEvent.getOrdersData());
-              if (mounted) {
-                GoRouter.of(context).go(GoRouterConfig.homeView);
-              }
+              if (!mounted) return;
+              
+              homeBloc.add(HomeEvent.getOrdersData());
+              GoRouter.of(context).go(GoRouterConfig.homeView);
             });
           } else {
             // Show auth screen if not linked
-            setState(() => _isLoading = false);
+            if (mounted) {
+              setState(() => _isLoading = false);
+            }
           }
         } else if (state.isLinkedStatus == ResponseStatus.failure) {
           // Show auth screen if there's an error checking status
-          setState(() => _isLoading = false);
+          if (mounted) {
+            setState(() => _isLoading = false);
+          }
         }
       },
       child: _isLoading

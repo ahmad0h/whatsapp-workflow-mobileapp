@@ -362,7 +362,7 @@ class HomeViewState extends State<HomeView> {
                                     state.updateBranchOrderingStatusStatus ==
                                     ResponseStatus.loading;
                                 return _buildStatusToggle(
-                                  'OPEN',
+                                  isEnabled ? 'OPEN' : 'CLOSED',
                                   isEnabled
                                       ? 'You are currently accepting all orders'
                                       : 'You are not accepting orders',
@@ -1048,16 +1048,16 @@ class HomeViewState extends State<HomeView> {
                     ),
                   ],
                 ),
-              if (model.orderType == 'delivery')
-                Text(
-                  'Delivery Address: ${model.customerAddress}',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                ),
-              if (model.orderType == 'branch')
-                Text(
-                  'PICK UP FROM THIS BRANCH.',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                ),
+              // if (model.orderType == 'delivery')
+              //   Text(
+              //     'Delivery Address: ${model.customerAddress}',
+              //     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              //   ),
+              // if (model.orderType == 'branch')
+              //   Text(
+              //     'PICK UP FROM THIS BRANCH.',
+              //     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              //   ),
             ],
           ),
         ),

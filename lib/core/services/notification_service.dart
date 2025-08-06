@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io' show Platform;
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -85,6 +86,7 @@ class NotificationService {
   Future<void> _initializeFirebaseMessaging() async {
     // Get the token for this device
     String? token = await _firebaseMessaging.getToken();
+    log('FCM Token: $token');
     if (token != null) {
       // log('FCM Token: $token');
     }
@@ -126,8 +128,8 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
           showWhen: true,
-          playSound: false,  // Disable sound for Android
-          sound: null,       // Explicitly set sound to null
+          playSound: false, // Disable sound for Android
+          sound: null, // Explicitly set sound to null
         );
 
     final DarwinNotificationDetails iosPlatformChannelSpecifics =
@@ -183,8 +185,8 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
           showWhen: true,
-          playSound: false,  // Disable sound for Android
-          sound: null,       // Explicitly set sound to null
+          playSound: false, // Disable sound for Android
+          sound: null, // Explicitly set sound to null
         );
 
     const DarwinNotificationDetails iosPlatformChannelSpecifics =

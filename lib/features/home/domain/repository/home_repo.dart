@@ -20,7 +20,7 @@ abstract class HomeRepo {
   Future<Either<Failures, OrderStatsReponseModel>> getOrderStats();
   Future<Either<Failures, DeviceInitReponseModel>> initDevice({
     required String deviceId,
-    String? deviceToken,
+    required String deviceToken,
   });
   Future<Either<Failures, IsLinkedReponseModel>> isLinked({
     required String deviceId,

@@ -24,6 +24,8 @@ class HomeDatasourceImpl implements HomeDatasource {
       headers: {'Authorization': ApiConstants.token},
     );
 
+    log('Orders data response: ${response.data}');
+
     try {
       if (response.data is String) {
         final decoded = jsonDecode(response.data);
@@ -117,9 +119,9 @@ class HomeDatasourceImpl implements HomeDatasource {
   Future<OrderStatsReponseModel> getOrderStats() async {
     try {
       final response = await DioHelper.getData(
-        url: '${ApiConstants.baseUrl}${ApiConstants.order}/stats',
+        url: '${ApiConstants.baseUrl}/order/stats',
         headers: {'Authorization': ApiConstants.token},
-        query: {'branchId': TokenManager().branchId},
+        query: {'branchId': '${TokenManager().branchId}'},
       );
 
       try {
@@ -129,7 +131,7 @@ class HomeDatasourceImpl implements HomeDatasource {
           );
           // log('Response data: $data');
           final stats = OrderStatsReponseModel.fromJson(data);
-
+          log('Order stats response: ${stats.toJson()}');
           return stats;
         } else {
           log('Response is not a Map, throwing format error');
@@ -148,19 +150,18 @@ class HomeDatasourceImpl implements HomeDatasource {
   @override
   Future<DeviceInitReponseModel> initDevice({
     required String deviceId,
-    String? deviceToken,
+    required String deviceToken,
   }) async {
     try {
       final data = {'deviceId': deviceId};
-      if (deviceToken != null) {
-        data['deviceToken'] = deviceToken;
-      }
+
+      data['deviceToken'] = deviceToken;
 
       final response = await DioHelper.postData(
-        url: '${ApiConstants.baseUrl}/devices/init',
+        url: '${ApiConstants.baseUrl}/device/init',
         data: data,
       );
-      log('Init device response: ${response.data}');
+      // log('Init device response: ${response.data}');
       return DeviceInitReponseModel.fromJson(response.data);
     } catch (e) {
       log('Error initializing device: $e');
@@ -172,7 +173,7 @@ class HomeDatasourceImpl implements HomeDatasource {
   Future<IsLinkedReponseModel> isLinked({required String deviceId}) async {
     try {
       final response = await DioHelper.getData(
-        url: '${ApiConstants.baseUrl}/devices/status/$deviceId',
+        url: '${ApiConstants.baseUrl}/device/status/$deviceId',
       );
 
       // If status is 404, device is not linked
@@ -230,7 +231,7 @@ class HomeDatasourceImpl implements HomeDatasource {
       query: {'date': date},
     );
 
-    log('Orders data response: ${response.data}');
+    // log('Orders data response: ${response.data}');
 
     try {
       if (response.data is String) {

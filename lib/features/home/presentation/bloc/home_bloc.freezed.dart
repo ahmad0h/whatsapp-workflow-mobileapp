@@ -1,6 +1,5 @@
-// dart format width=80
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -41,6 +40,190 @@ class $HomeEventCopyWith<$Res>  {
 $HomeEventCopyWith(HomeEvent _, $Res Function(HomeEvent) __);
 }
 
+
+/// Adds pattern-matching-related methods to [HomeEvent].
+extension HomeEventPatterns on HomeEvent {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Started value)?  started,TResult Function( _GetOrdersData value)?  getOrdersData,TResult Function( _UpdateOrderStatus value)?  updateOrderStatus,TResult Function( _RejectOrder value)?  rejectOrder,TResult Function( _GetOrderStats value)?  getOrderStats,TResult Function( _InitDevice value)?  initDevice,TResult Function( _IsLinked value)?  isLinked,TResult Function( _GetOrdersDataByBranchIdAndDate value)?  getOrdersDataByBranchIdAndDate,TResult Function( _GetBranchData value)?  getBranchData,TResult Function( _UpdateBranchOrderingStatus value)?  updateBranchOrderingStatus,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _Started() when started != null:
+return started(_that);case _GetOrdersData() when getOrdersData != null:
+return getOrdersData(_that);case _UpdateOrderStatus() when updateOrderStatus != null:
+return updateOrderStatus(_that);case _RejectOrder() when rejectOrder != null:
+return rejectOrder(_that);case _GetOrderStats() when getOrderStats != null:
+return getOrderStats(_that);case _InitDevice() when initDevice != null:
+return initDevice(_that);case _IsLinked() when isLinked != null:
+return isLinked(_that);case _GetOrdersDataByBranchIdAndDate() when getOrdersDataByBranchIdAndDate != null:
+return getOrdersDataByBranchIdAndDate(_that);case _GetBranchData() when getBranchData != null:
+return getBranchData(_that);case _UpdateBranchOrderingStatus() when updateBranchOrderingStatus != null:
+return updateBranchOrderingStatus(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Started value)  started,required TResult Function( _GetOrdersData value)  getOrdersData,required TResult Function( _UpdateOrderStatus value)  updateOrderStatus,required TResult Function( _RejectOrder value)  rejectOrder,required TResult Function( _GetOrderStats value)  getOrderStats,required TResult Function( _InitDevice value)  initDevice,required TResult Function( _IsLinked value)  isLinked,required TResult Function( _GetOrdersDataByBranchIdAndDate value)  getOrdersDataByBranchIdAndDate,required TResult Function( _GetBranchData value)  getBranchData,required TResult Function( _UpdateBranchOrderingStatus value)  updateBranchOrderingStatus,}){
+final _that = this;
+switch (_that) {
+case _Started():
+return started(_that);case _GetOrdersData():
+return getOrdersData(_that);case _UpdateOrderStatus():
+return updateOrderStatus(_that);case _RejectOrder():
+return rejectOrder(_that);case _GetOrderStats():
+return getOrderStats(_that);case _InitDevice():
+return initDevice(_that);case _IsLinked():
+return isLinked(_that);case _GetOrdersDataByBranchIdAndDate():
+return getOrdersDataByBranchIdAndDate(_that);case _GetBranchData():
+return getBranchData(_that);case _UpdateBranchOrderingStatus():
+return updateBranchOrderingStatus(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Started value)?  started,TResult? Function( _GetOrdersData value)?  getOrdersData,TResult? Function( _UpdateOrderStatus value)?  updateOrderStatus,TResult? Function( _RejectOrder value)?  rejectOrder,TResult? Function( _GetOrderStats value)?  getOrderStats,TResult? Function( _InitDevice value)?  initDevice,TResult? Function( _IsLinked value)?  isLinked,TResult? Function( _GetOrdersDataByBranchIdAndDate value)?  getOrdersDataByBranchIdAndDate,TResult? Function( _GetBranchData value)?  getBranchData,TResult? Function( _UpdateBranchOrderingStatus value)?  updateBranchOrderingStatus,}){
+final _that = this;
+switch (_that) {
+case _Started() when started != null:
+return started(_that);case _GetOrdersData() when getOrdersData != null:
+return getOrdersData(_that);case _UpdateOrderStatus() when updateOrderStatus != null:
+return updateOrderStatus(_that);case _RejectOrder() when rejectOrder != null:
+return rejectOrder(_that);case _GetOrderStats() when getOrderStats != null:
+return getOrderStats(_that);case _InitDevice() when initDevice != null:
+return initDevice(_that);case _IsLinked() when isLinked != null:
+return isLinked(_that);case _GetOrdersDataByBranchIdAndDate() when getOrdersDataByBranchIdAndDate != null:
+return getOrdersDataByBranchIdAndDate(_that);case _GetBranchData() when getBranchData != null:
+return getBranchData(_that);case _UpdateBranchOrderingStatus() when updateBranchOrderingStatus != null:
+return updateBranchOrderingStatus(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  getOrdersData,TResult Function( String orderId,  String status)?  updateOrderStatus,TResult Function( String orderId,  String reason)?  rejectOrder,TResult Function()?  getOrderStats,TResult Function( String deviceId,  String deviceToken)?  initDevice,TResult Function( String deviceId)?  isLinked,TResult Function( String date)?  getOrdersDataByBranchIdAndDate,TResult Function()?  getBranchData,TResult Function( String branchId,  String status)?  updateBranchOrderingStatus,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _Started() when started != null:
+return started();case _GetOrdersData() when getOrdersData != null:
+return getOrdersData();case _UpdateOrderStatus() when updateOrderStatus != null:
+return updateOrderStatus(_that.orderId,_that.status);case _RejectOrder() when rejectOrder != null:
+return rejectOrder(_that.orderId,_that.reason);case _GetOrderStats() when getOrderStats != null:
+return getOrderStats();case _InitDevice() when initDevice != null:
+return initDevice(_that.deviceId,_that.deviceToken);case _IsLinked() when isLinked != null:
+return isLinked(_that.deviceId);case _GetOrdersDataByBranchIdAndDate() when getOrdersDataByBranchIdAndDate != null:
+return getOrdersDataByBranchIdAndDate(_that.date);case _GetBranchData() when getBranchData != null:
+return getBranchData();case _UpdateBranchOrderingStatus() when updateBranchOrderingStatus != null:
+return updateBranchOrderingStatus(_that.branchId,_that.status);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  getOrdersData,required TResult Function( String orderId,  String status)  updateOrderStatus,required TResult Function( String orderId,  String reason)  rejectOrder,required TResult Function()  getOrderStats,required TResult Function( String deviceId,  String deviceToken)  initDevice,required TResult Function( String deviceId)  isLinked,required TResult Function( String date)  getOrdersDataByBranchIdAndDate,required TResult Function()  getBranchData,required TResult Function( String branchId,  String status)  updateBranchOrderingStatus,}) {final _that = this;
+switch (_that) {
+case _Started():
+return started();case _GetOrdersData():
+return getOrdersData();case _UpdateOrderStatus():
+return updateOrderStatus(_that.orderId,_that.status);case _RejectOrder():
+return rejectOrder(_that.orderId,_that.reason);case _GetOrderStats():
+return getOrderStats();case _InitDevice():
+return initDevice(_that.deviceId,_that.deviceToken);case _IsLinked():
+return isLinked(_that.deviceId);case _GetOrdersDataByBranchIdAndDate():
+return getOrdersDataByBranchIdAndDate(_that.date);case _GetBranchData():
+return getBranchData();case _UpdateBranchOrderingStatus():
+return updateBranchOrderingStatus(_that.branchId,_that.status);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  getOrdersData,TResult? Function( String orderId,  String status)?  updateOrderStatus,TResult? Function( String orderId,  String reason)?  rejectOrder,TResult? Function()?  getOrderStats,TResult? Function( String deviceId,  String deviceToken)?  initDevice,TResult? Function( String deviceId)?  isLinked,TResult? Function( String date)?  getOrdersDataByBranchIdAndDate,TResult? Function()?  getBranchData,TResult? Function( String branchId,  String status)?  updateBranchOrderingStatus,}) {final _that = this;
+switch (_that) {
+case _Started() when started != null:
+return started();case _GetOrdersData() when getOrdersData != null:
+return getOrdersData();case _UpdateOrderStatus() when updateOrderStatus != null:
+return updateOrderStatus(_that.orderId,_that.status);case _RejectOrder() when rejectOrder != null:
+return rejectOrder(_that.orderId,_that.reason);case _GetOrderStats() when getOrderStats != null:
+return getOrderStats();case _InitDevice() when initDevice != null:
+return initDevice(_that.deviceId,_that.deviceToken);case _IsLinked() when isLinked != null:
+return isLinked(_that.deviceId);case _GetOrdersDataByBranchIdAndDate() when getOrdersDataByBranchIdAndDate != null:
+return getOrdersDataByBranchIdAndDate(_that.date);case _GetBranchData() when getBranchData != null:
+return getBranchData();case _UpdateBranchOrderingStatus() when updateBranchOrderingStatus != null:
+return updateBranchOrderingStatus(_that.branchId,_that.status);case _:
+  return null;
+
+}
+}
+
+}
 
 /// @nodoc
 
@@ -282,7 +465,7 @@ class _InitDevice implements HomeEvent {
   
 
  final  String deviceId;
- final  String? deviceToken;
+ final  String deviceToken;
 
 /// Create a copy of HomeEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -314,7 +497,7 @@ abstract mixin class _$InitDeviceCopyWith<$Res> implements $HomeEventCopyWith<$R
   factory _$InitDeviceCopyWith(_InitDevice value, $Res Function(_InitDevice) _then) = __$InitDeviceCopyWithImpl;
 @useResult
 $Res call({
- String deviceId, String? deviceToken
+ String deviceId, String deviceToken
 });
 
 
@@ -331,11 +514,11 @@ class __$InitDeviceCopyWithImpl<$Res>
 
 /// Create a copy of HomeEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? deviceId = null,Object? deviceToken = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? deviceId = null,Object? deviceToken = null,}) {
   return _then(_InitDevice(
 null == deviceId ? _self.deviceId : deviceId // ignore: cast_nullable_to_non_nullable
-as String,freezed == deviceToken ? _self.deviceToken : deviceToken // ignore: cast_nullable_to_non_nullable
-as String?,
+as String,null == deviceToken ? _self.deviceToken : deviceToken // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
@@ -658,6 +841,136 @@ as UpdateBranchOrderingStatusResponseModel?,
 
 }
 
+
+/// Adds pattern-matching-related methods to [HomeState].
+extension HomeStatePatterns on HomeState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _HomeState value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _HomeState() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _HomeState value)  $default,){
+final _that = this;
+switch (_that) {
+case _HomeState():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _HomeState value)?  $default,){
+final _that = this;
+switch (_that) {
+case _HomeState() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ResponseStatus getOrdersListStatus,  Failures? getOrdersListFailures,  List<OrderModel>? ordersList,  ResponseStatus updateOrderStatus,  Failures? updateOrderStatusFailures,  ResponseStatus rejectOrderStatus,  Failures? rejectOrderFailures,  ResponseStatus getOrderStatsStatus,  Failures? getOrderStatsFailures,  OrderStatsReponseModel? orderStats,  ResponseStatus initDeviceStatus,  Failures? initDeviceFailures,  DeviceInitReponseModel? deviceInit,  ResponseStatus isLinkedStatus,  Failures? isLinkedFailures,  IsLinkedReponseModel? isLinked,  ResponseStatus getOrdersDataByBranchIdAndDateStatus,  Failures? getOrdersDataByBranchIdAndDateFailures,  List<OrderModel>? getOrdersDataByBranchIdAndDate,  ResponseStatus getBranchesDataStatus,  Failures? getBranchesDataFailures,  GetBranchResponseModel? getBranchesData,  ResponseStatus updateBranchOrderingStatusStatus,  Failures? updateBranchOrderingStatusFailures,  UpdateBranchOrderingStatusResponseModel? updateBranchOrderingStatus)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _HomeState() when $default != null:
+return $default(_that.getOrdersListStatus,_that.getOrdersListFailures,_that.ordersList,_that.updateOrderStatus,_that.updateOrderStatusFailures,_that.rejectOrderStatus,_that.rejectOrderFailures,_that.getOrderStatsStatus,_that.getOrderStatsFailures,_that.orderStats,_that.initDeviceStatus,_that.initDeviceFailures,_that.deviceInit,_that.isLinkedStatus,_that.isLinkedFailures,_that.isLinked,_that.getOrdersDataByBranchIdAndDateStatus,_that.getOrdersDataByBranchIdAndDateFailures,_that.getOrdersDataByBranchIdAndDate,_that.getBranchesDataStatus,_that.getBranchesDataFailures,_that.getBranchesData,_that.updateBranchOrderingStatusStatus,_that.updateBranchOrderingStatusFailures,_that.updateBranchOrderingStatus);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ResponseStatus getOrdersListStatus,  Failures? getOrdersListFailures,  List<OrderModel>? ordersList,  ResponseStatus updateOrderStatus,  Failures? updateOrderStatusFailures,  ResponseStatus rejectOrderStatus,  Failures? rejectOrderFailures,  ResponseStatus getOrderStatsStatus,  Failures? getOrderStatsFailures,  OrderStatsReponseModel? orderStats,  ResponseStatus initDeviceStatus,  Failures? initDeviceFailures,  DeviceInitReponseModel? deviceInit,  ResponseStatus isLinkedStatus,  Failures? isLinkedFailures,  IsLinkedReponseModel? isLinked,  ResponseStatus getOrdersDataByBranchIdAndDateStatus,  Failures? getOrdersDataByBranchIdAndDateFailures,  List<OrderModel>? getOrdersDataByBranchIdAndDate,  ResponseStatus getBranchesDataStatus,  Failures? getBranchesDataFailures,  GetBranchResponseModel? getBranchesData,  ResponseStatus updateBranchOrderingStatusStatus,  Failures? updateBranchOrderingStatusFailures,  UpdateBranchOrderingStatusResponseModel? updateBranchOrderingStatus)  $default,) {final _that = this;
+switch (_that) {
+case _HomeState():
+return $default(_that.getOrdersListStatus,_that.getOrdersListFailures,_that.ordersList,_that.updateOrderStatus,_that.updateOrderStatusFailures,_that.rejectOrderStatus,_that.rejectOrderFailures,_that.getOrderStatsStatus,_that.getOrderStatsFailures,_that.orderStats,_that.initDeviceStatus,_that.initDeviceFailures,_that.deviceInit,_that.isLinkedStatus,_that.isLinkedFailures,_that.isLinked,_that.getOrdersDataByBranchIdAndDateStatus,_that.getOrdersDataByBranchIdAndDateFailures,_that.getOrdersDataByBranchIdAndDate,_that.getBranchesDataStatus,_that.getBranchesDataFailures,_that.getBranchesData,_that.updateBranchOrderingStatusStatus,_that.updateBranchOrderingStatusFailures,_that.updateBranchOrderingStatus);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ResponseStatus getOrdersListStatus,  Failures? getOrdersListFailures,  List<OrderModel>? ordersList,  ResponseStatus updateOrderStatus,  Failures? updateOrderStatusFailures,  ResponseStatus rejectOrderStatus,  Failures? rejectOrderFailures,  ResponseStatus getOrderStatsStatus,  Failures? getOrderStatsFailures,  OrderStatsReponseModel? orderStats,  ResponseStatus initDeviceStatus,  Failures? initDeviceFailures,  DeviceInitReponseModel? deviceInit,  ResponseStatus isLinkedStatus,  Failures? isLinkedFailures,  IsLinkedReponseModel? isLinked,  ResponseStatus getOrdersDataByBranchIdAndDateStatus,  Failures? getOrdersDataByBranchIdAndDateFailures,  List<OrderModel>? getOrdersDataByBranchIdAndDate,  ResponseStatus getBranchesDataStatus,  Failures? getBranchesDataFailures,  GetBranchResponseModel? getBranchesData,  ResponseStatus updateBranchOrderingStatusStatus,  Failures? updateBranchOrderingStatusFailures,  UpdateBranchOrderingStatusResponseModel? updateBranchOrderingStatus)?  $default,) {final _that = this;
+switch (_that) {
+case _HomeState() when $default != null:
+return $default(_that.getOrdersListStatus,_that.getOrdersListFailures,_that.ordersList,_that.updateOrderStatus,_that.updateOrderStatusFailures,_that.rejectOrderStatus,_that.rejectOrderFailures,_that.getOrderStatsStatus,_that.getOrderStatsFailures,_that.orderStats,_that.initDeviceStatus,_that.initDeviceFailures,_that.deviceInit,_that.isLinkedStatus,_that.isLinkedFailures,_that.isLinked,_that.getOrdersDataByBranchIdAndDateStatus,_that.getOrdersDataByBranchIdAndDateFailures,_that.getOrdersDataByBranchIdAndDate,_that.getBranchesDataStatus,_that.getBranchesDataFailures,_that.getBranchesData,_that.updateBranchOrderingStatusStatus,_that.updateBranchOrderingStatusFailures,_that.updateBranchOrderingStatus);case _:
+  return null;
+
+}
+}
+
+}
 
 /// @nodoc
 

@@ -1,18 +1,13 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
-import 'package:whatsapp_workflow_mobileapp/core/utils/formant_status.dart';
-import 'package:whatsapp_workflow_mobileapp/core/utils/format_time.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
-import 'package:whatsapp_workflow_mobileapp/core/utils/get_current_status.dart';
-import 'package:whatsapp_workflow_mobileapp/core/utils/get_status_color.dart';
-import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/mapping.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_details_drawer.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/option_drawer.dart';
@@ -133,10 +128,68 @@ class HomeViewState extends State<HomeView> {
   OrderCardModel? _selectedOrder;
   bool _showRejectDrawer = false;
 
-  // Function to get status color based on status string
+  // Helper method to get responsive padding
+  double _getHorizontalPadding(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth > 1200) {
+      return 80;
+    } else if (screenWidth > 900) {
+      return 60;
+    } else {
+      return 48;
+    }
+  }
+
+  // Helper method to get responsive font sizes
+  double _getHeaderFontSize(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth > 1200) {
+      return 36;
+    } else if (screenWidth > 900) {
+      return 34;
+    } else {
+      return 32;
+    }
+  }
+
+  double _getOrderNumberFontSize(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth > 1200) {
+      return 35;
+    } else if (screenWidth > 900) {
+      return 33;
+    } else {
+      return 31;
+    }
+  }
+
+  // Helper method to get responsive aspect ratio
+  double _getGridAspectRatio(BuildContext context) {
+    final orientation = MediaQuery.of(context).orientation;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    if (orientation == Orientation.landscape) {
+      if (screenWidth > 1200) {
+        return 8 / 3.3;
+      } else {
+        return 8 / 3.8;
+      }
+    } else {
+      if (screenWidth > 900) {
+        return 8 / 4.0;
+      } else {
+        return 8 / 4.3;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final horizontalPadding = _getHorizontalPadding(context);
+    final headerFontSize = _getHeaderFontSize(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final orientation = MediaQuery.of(context).orientation;
+
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: _showRejectDrawer && _selectedOrder != null
@@ -192,15 +245,7 @@ class HomeViewState extends State<HomeView> {
 
       body: BlocConsumer<HomeBloc, HomeState>(
         listener: (context, state) {
-          if (state.getOrdersListStatus == ResponseStatus.failure) {
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(
-            //     content: Text(
-            //       state.getOrdersListFailures?.message ?? 'An error occurred',
-            //     ),
-            //   ),
-            // );
-          }
+          if (state.getOrdersListStatus == ResponseStatus.failure) {}
         },
         builder: (context, state) {
           final isLoading = state.getOrdersListStatus == ResponseStatus.loading;
@@ -215,11 +260,13 @@ class HomeViewState extends State<HomeView> {
                 ),
               );
           }
+
           return Column(
             children: [
               Expanded(
                 child: CustomScrollView(
                   slivers: [
+                    // Responsive AppBar
                     SliverAppBar(
                       automaticallyImplyLeading: false,
                       leading: const SizedBox.shrink(),
@@ -228,7 +275,9 @@ class HomeViewState extends State<HomeView> {
                       floating: false,
                       pinned: true,
                       toolbarHeight: kToolbarHeight,
-                      expandedHeight: 80,
+                      expandedHeight: orientation == Orientation.landscape
+                          ? 70
+                          : 80,
                       actions: [SizedBox.shrink()],
                       flexibleSpace: Container(
                         decoration: BoxDecoration(
@@ -240,15 +289,19 @@ class HomeViewState extends State<HomeView> {
                         ),
                         child: SafeArea(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 48.0,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: horizontalPadding,
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.asset('assets/ryze-logo.png'),
+                                // Responsive logo sizing
+                                Image.asset(
+                                  'assets/ryze-logo.png',
+                                  height: screenWidth > 1200 ? 50 : 40,
+                                ),
                                 BlocConsumer<HomeBloc, HomeState>(
                                   listener: (context, state) {
                                     if (state.getBranchesDataStatus ==
@@ -258,22 +311,17 @@ class HomeViewState extends State<HomeView> {
                                         ResponseStatus.failure) {}
                                   },
                                   builder: (context, state) {
-                                    // if (state.getBranchesDataStatus ==
-                                    //     ResponseStatus.loading) {
-                                    //   return Center(
-                                    //     child: Lottie.asset(
-                                    //       'assets/animations/loading.json',
-                                    //       width: 10,
-                                    //     ),
-                                    //   );
-                                    // }
-
                                     var branchData = state.getBranchesData;
                                     return Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Image.asset('assets/company-logo.png'),
-                                        SizedBox(width: 8),
+                                        Image.asset(
+                                          'assets/company-logo.png',
+                                          height: screenWidth > 1200 ? 45 : 35,
+                                        ),
+                                        SizedBox(
+                                          width: screenWidth > 900 ? 12 : 8,
+                                        ),
                                         Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -287,34 +335,41 @@ class HomeViewState extends State<HomeView> {
                                                   '',
                                               style: TextStyle(
                                                 color: AppColors.background,
-                                                fontSize: 12,
+                                                fontSize: screenWidth > 1200
+                                                    ? 14
+                                                    : 12,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                             ),
-
                                             Text(
                                               branchData?.branchName ?? '',
                                               style: TextStyle(
                                                 color:
                                                     AppColors.backgroundLight,
-                                                fontSize: 10,
+                                                fontSize: screenWidth > 1200
+                                                    ? 12
+                                                    : 10,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                             ),
                                           ],
                                         ),
-                                        SizedBox(width: 24),
+                                        SizedBox(
+                                          width: screenWidth > 900 ? 32 : 24,
+                                        ),
                                         Container(
-                                          height: 33,
+                                          height: screenWidth > 1200 ? 40 : 33,
                                           color: Colors.white,
                                           width: 1,
                                         ),
-                                        SizedBox(width: 24),
+                                        SizedBox(
+                                          width: screenWidth > 900 ? 32 : 24,
+                                        ),
                                         IconButton(
                                           icon: Icon(
                                             Icons.menu,
                                             color: AppColors.background,
-                                            size: 32,
+                                            size: screenWidth > 1200 ? 36 : 32,
                                           ),
                                           onPressed: () {
                                             if (_selectedOrder == null) {
@@ -346,10 +401,14 @@ class HomeViewState extends State<HomeView> {
                       ),
                     ),
 
-                    // Status toggles section
+                    // Status toggles section with responsive padding
                     SliverToBoxAdapter(
                       child: Container(
-                        padding: EdgeInsets.only(left: 48, right: 48, top: 32),
+                        padding: EdgeInsets.only(
+                          left: horizontalPadding,
+                          right: horizontalPadding,
+                          top: 32,
+                        ),
                         child: Column(
                           children: [
                             BlocBuilder<HomeBloc, HomeState>(
@@ -385,44 +444,16 @@ class HomeViewState extends State<HomeView> {
                                 );
                               },
                             ),
-                            // SizedBox(height: 12),
-                            // _buildStatusToggle(
-                            //   '',
-                            //   'Internet connection lost',
-                            //   hasInternetConnection,
-                            //   AppColors.warning.withValues(alpha: 0.1),
-                            //   (value) =>
-                            //       setState(() => hasInternetConnection = value),
-                            //   imagePath: 'assets/icons/wifi-off.png',
-                            // ),
-                            // SizedBox(height: 12),
-                            // _buildStatusToggle(
-                            //   'Closed',
-                            //   'You are currently not accepting any orders.',
-                            //   !isAcceptingOrders,
-                            //   AppColors.error,
-                            //   null,
-                            //   isInactive: true,
-                            // ),
                           ],
                         ),
                       ),
                     ),
 
-                    // Stats cards section
+                    // Responsive Stats cards section
                     BlocConsumer<HomeBloc, HomeState>(
                       listener: (context, state) {
                         if (state.getOrderStatsStatus ==
-                            ResponseStatus.failure) {
-                          // ScaffoldMessenger.of(context).showSnackBar(
-                          //   SnackBar(
-                          //     content: Text(
-                          //       state.getOrderStatsFailures?.message ??
-                          //           'An error occurred',
-                          //     ),
-                          //   ),
-                          // );
-                        }
+                            ResponseStatus.failure) {}
                       },
                       builder: (context, state) {
                         if (state.getOrderStatsStatus ==
@@ -431,7 +462,7 @@ class HomeViewState extends State<HomeView> {
                             child: Center(
                               child: Lottie.asset(
                                 'assets/loading.json',
-                                width: 150,
+                                width: screenWidth > 1200 ? 180 : 150,
                               ),
                             ),
                           );
@@ -440,86 +471,147 @@ class HomeViewState extends State<HomeView> {
                         return SliverToBoxAdapter(
                           child: Container(
                             padding: EdgeInsets.only(
-                              left: 48,
-                              right: 48,
+                              left: horizontalPadding,
+                              right: horizontalPadding,
                               top: 32,
                             ),
-                            child: Row(
-                              children: [
-                                _buildStatCard(
-                                  'Arrived Customers',
-                                  stats?.arrivedCustomers.toString() ?? '0',
-                                  AppColors.statusArrived,
-                                  'assets/icons/car.svg',
-                                ),
-                                SizedBox(width: 12),
-                                _buildStatCard(
-                                  'New Orders',
-                                  stats?.newOrders.toString() ?? '0',
-                                  AppColors.primary,
-                                  'assets/icons/user.svg',
-                                ),
-                                SizedBox(width: 12),
-                                _buildStatCard(
-                                  'Preparing',
-                                  stats?.preparingOrders.toString() ?? '0',
-                                  AppColors.statusPreparing,
-                                  'assets/icons/pot.svg',
-                                ),
-                              ],
-                            ),
+                            child:
+                                orientation == Orientation.landscape &&
+                                    screenWidth > 1200
+                                ? Row(
+                                    children: [
+                                      _buildStatCard(
+                                        'Arrived Customers',
+                                        stats?.arrivedCustomers.toString() ??
+                                            '0',
+                                        AppColors.statusArrived,
+                                        'assets/icons/car.svg',
+                                      ),
+                                      SizedBox(width: 16),
+                                      _buildStatCard(
+                                        'New Orders',
+                                        stats?.newOrders.toString() ?? '0',
+                                        AppColors.primary,
+                                        'assets/icons/user.svg',
+                                      ),
+                                      SizedBox(width: 16),
+                                      _buildStatCard(
+                                        'Preparing',
+                                        stats?.preparingOrders.toString() ??
+                                            '0',
+                                        AppColors.statusPreparing,
+                                        'assets/icons/pot.svg',
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    children: [
+                                      _buildStatCard(
+                                        'Arrived Customers',
+                                        stats?.arrivedCustomers.toString() ??
+                                            '0',
+                                        AppColors.statusArrived,
+                                        'assets/icons/car.svg',
+                                      ),
+                                      SizedBox(width: 12),
+                                      _buildStatCard(
+                                        'New Orders',
+                                        stats?.newOrders.toString() ?? '0',
+                                        AppColors.primary,
+                                        'assets/icons/user.svg',
+                                      ),
+                                      SizedBox(width: 12),
+                                      _buildStatCard(
+                                        'Preparing',
+                                        stats?.preparingOrders.toString() ??
+                                            '0',
+                                        AppColors.statusPreparing,
+                                        'assets/icons/pot.svg',
+                                      ),
+                                    ],
+                                  ),
                           ),
                         );
                       },
                     ),
 
-                    // Orders header section
+                    // Responsive Orders header section
                     SliverToBoxAdapter(
                       child: Container(
-                        padding: EdgeInsets.only(left: 48, right: 48, top: 32),
-
-                        child: Row(
+                        padding: EdgeInsets.only(
+                          left: horizontalPadding,
+                          right: horizontalPadding,
+                          top: 32,
+                        ),
+                        child: Flex(
+                          direction:
+                              orientation == Orientation.landscape &&
+                                  screenWidth > 1000
+                              ? Axis.horizontal
+                              : Axis.vertical,
+                          crossAxisAlignment:
+                              orientation == Orientation.landscape &&
+                                  screenWidth > 1000
+                              ? CrossAxisAlignment.center
+                              : CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Orders',
                               style: TextStyle(
-                                fontSize: 32,
+                                fontSize: headerFontSize,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            Spacer(),
-                            _buildTab(
-                              'All Orders',
-                              isSelected: selectedTab == 'All Orders',
-                              onTap: () =>
-                                  setState(() => selectedTab = 'All Orders'),
-                            ),
-                            _buildTab(
-                              'New Orders',
-                              isSelected: selectedTab == 'New Orders',
-                              onTap: () =>
-                                  setState(() => selectedTab = 'New Orders'),
-                            ),
-
-                            _buildTab(
-                              'In Progress',
-                              isSelected: selectedTab == 'In Progress',
-                              onTap: () =>
-                                  setState(() => selectedTab = 'In Progress'),
-                            ),
-                            _buildTab(
-                              'Arrived',
-                              isSelected: selectedTab == 'Arrived',
-                              onTap: () =>
-                                  setState(() => selectedTab = 'Arrived'),
+                            if (orientation == Orientation.landscape &&
+                                screenWidth > 1000)
+                              Spacer()
+                            else
+                              SizedBox(height: 16),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                _buildTab(
+                                  'All Orders',
+                                  isSelected: selectedTab == 'All Orders',
+                                  onTap: () => setState(
+                                    () => selectedTab = 'All Orders',
+                                  ),
+                                ),
+                                _buildTab(
+                                  'New Orders',
+                                  isSelected: selectedTab == 'New Orders',
+                                  onTap: () => setState(
+                                    () => selectedTab = 'New Orders',
+                                  ),
+                                ),
+                                _buildTab(
+                                  'In Progress',
+                                  isSelected: selectedTab == 'In Progress',
+                                  onTap: () => setState(
+                                    () => selectedTab = 'In Progress',
+                                  ),
+                                ),
+                                _buildTab(
+                                  'Arrived',
+                                  isSelected: selectedTab == 'Arrived',
+                                  onTap: () =>
+                                      setState(() => selectedTab = 'Arrived'),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
                     ),
 
+                    // Responsive grid with dynamic cross axis count
                     SliverPadding(
-                      padding: EdgeInsets.only(left: 48, right: 48, top: 32),
+                      padding: EdgeInsets.only(
+                        left: horizontalPadding,
+                        right: horizontalPadding,
+                        top: 32,
+                      ),
                       sliver: isLoading
                           ? SliverToBoxAdapter(
                               child: Center(
@@ -527,7 +619,7 @@ class HomeViewState extends State<HomeView> {
                                   padding: const EdgeInsets.all(32.0),
                                   child: Lottie.asset(
                                     'assets/loading.json',
-                                    width: 150,
+                                    width: screenWidth > 1200 ? 180 : 150,
                                   ),
                                 ),
                               ),
@@ -549,13 +641,15 @@ class HomeViewState extends State<HomeView> {
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
-                                    crossAxisSpacing: 24,
-                                    mainAxisSpacing: 24,
-                                    childAspectRatio:
-                                        MediaQuery.of(context).orientation ==
-                                            Orientation.portrait
-                                        ? 8 / 4.3
-                                        : 8 / 2.6,
+                                    crossAxisSpacing: screenWidth > 900
+                                        ? 32
+                                        : 24,
+                                    mainAxisSpacing: screenWidth > 900
+                                        ? 32
+                                        : 24,
+                                    childAspectRatio: _getGridAspectRatio(
+                                      context,
+                                    ),
                                   ),
                             ),
                     ),
@@ -564,11 +658,14 @@ class HomeViewState extends State<HomeView> {
                   ],
                 ),
               ),
-              // Footer
+              // Responsive Footer
               Container(
                 width: double.infinity,
                 color: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: horizontalPadding,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -576,10 +673,13 @@ class HomeViewState extends State<HomeView> {
                       'Powered By ',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        fontSize: 12,
+                        fontSize: screenWidth > 1200 ? 14 : 12,
                       ),
                     ),
-                    Image.asset('assets/footer-logo.png'),
+                    Image.asset(
+                      'assets/footer-logo.png',
+                      height: screenWidth > 1200 ? 20 : 16,
+                    ),
                   ],
                 ),
               ),
@@ -601,8 +701,10 @@ class HomeViewState extends State<HomeView> {
     bool isLoading = false,
   }) {
     final isEnabled = onChanged != null && !isLoading && !isInactive;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Container(
-      padding: EdgeInsets.all(12.5),
+      padding: EdgeInsets.all(screenWidth > 1200 ? 16 : 12.5),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
@@ -620,8 +722,8 @@ class HomeViewState extends State<HomeView> {
         children: [
           if (label.isNotEmpty)
             Container(
-              width: 67,
-              height: 49,
+              width: screenWidth > 1200 ? 80 : 67,
+              height: screenWidth > 1200 ? 60 : 49,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: color,
@@ -631,15 +733,15 @@ class HomeViewState extends State<HomeView> {
                 label,
                 style: TextStyle(
                   color: AppColors.background,
-                  fontSize: 16,
+                  fontSize: screenWidth > 1200 ? 18 : 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           if (imagePath != null)
             Container(
-              width: 67,
-              height: 49,
+              width: screenWidth > 1200 ? 80 : 67,
+              height: screenWidth > 1200 ? 60 : 49,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: color,
@@ -647,12 +749,12 @@ class HomeViewState extends State<HomeView> {
               ),
               child: Image.asset(imagePath, fit: BoxFit.contain),
             ),
-          SizedBox(width: 16),
+          SizedBox(width: screenWidth > 1200 ? 20 : 16),
           Expanded(
             child: Text(
               description,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: screenWidth > 1200 ? 18 : 16,
                 color: Color(0xFF343330),
                 fontWeight: FontWeight.w500,
               ),
@@ -662,7 +764,7 @@ class HomeViewState extends State<HomeView> {
             alignment: Alignment.center,
             children: [
               Transform.scale(
-                scale: 1.2,
+                scale: screenWidth > 1200 ? 1.4 : 1.2,
                 child: GestureDetector(
                   onTap: isEnabled ? () => onChanged.call(!value) : null,
                   child: Container(
@@ -712,22 +814,6 @@ class HomeViewState extends State<HomeView> {
                   ),
                 ),
               ),
-              // if (isLoading)
-              //   Positioned.fill(
-              //     child: Container(
-              //       color: Colors.transparent,
-              //       child: Center(
-              //         child: SizedBox(
-              //           width: 20,
-              //           height: 20,
-              //           child: CircularProgressIndicator(
-              //             strokeWidth: 2,
-              //             valueColor: AlwaysStoppedAnimation<Color>(color),
-              //           ),
-              //         ),
-              //       ),
-              //     ),
-              //   ),
             ],
           ),
         ],
@@ -736,11 +822,13 @@ class HomeViewState extends State<HomeView> {
   }
 
   Widget _buildStatCard(String title, String count, Color color, String icon) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Expanded(
       child: Stack(
         children: [
           Container(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.all(screenWidth > 1200 ? 20 : 16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
@@ -762,20 +850,24 @@ class HomeViewState extends State<HomeView> {
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: screenWidth > 1200 ? 18 : 16,
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Spacer(),
-                    SvgPicture.asset(icon),
+                    SvgPicture.asset(
+                      icon,
+                      width: screenWidth > 1200 ? 28 : 24,
+                      height: screenWidth > 1200 ? 28 : 24,
+                    ),
                   ],
                 ),
-                SizedBox(height: 18),
+                SizedBox(height: screenWidth > 1200 ? 22 : 18),
                 Text(
                   count,
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: screenWidth > 1200 ? 38 : 32,
                     fontWeight: FontWeight.w900,
                     color: AppColors.textPrimary,
                   ),
@@ -787,8 +879,8 @@ class HomeViewState extends State<HomeView> {
             right: 0,
             bottom: 0,
             child: Container(
-              width: 59,
-              height: 49,
+              width: screenWidth > 1200 ? 70 : 59,
+              height: screenWidth > 1200 ? 58 : 49,
               decoration: BoxDecoration(
                 color: color,
                 borderRadius: BorderRadius.only(
@@ -808,10 +900,15 @@ class HomeViewState extends State<HomeView> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7.5),
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth > 1200 ? 18 : 15,
+          vertical: screenWidth > 1200 ? 10 : 7.5,
+        ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(7.5),
           color: isSelected ? AppColors.background : Colors.transparent,
@@ -825,11 +922,11 @@ class HomeViewState extends State<HomeView> {
             ),
           ],
         ),
-        margin: EdgeInsets.only(left: 16),
+        margin: EdgeInsets.only(left: screenWidth > 900 ? 16 : 8),
         child: Text(
           text,
           style: TextStyle(
-            fontSize: 17.5,
+            fontSize: screenWidth > 1200 ? 19 : 17.5,
             color: isSelected ? AppColors.textPrimary : AppColors.textSecondary,
           ),
         ),
@@ -873,14 +970,28 @@ class HomeViewState extends State<HomeView> {
   }
 
   Widget _buildOrderCard(OrderCardModel model) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final orientation = MediaQuery.of(context).orientation;
+
+    // Responsive font sizes and spacing
+    final orderNumberFontSize = screenWidth > 1200 ? 28.0 : 25.33;
+    final customerNameFontSize = screenWidth > 1200 ? 26.0 : 24.0;
+    final timeFontSize = screenWidth > 1200 ? 12.0 : 11.08;
+    final statusFontSize = screenWidth > 1200 ? 13.0 : 12.0;
+    final orderTypeFontSize = screenWidth > 1200 ? 13.0 : 12.0;
+    final cardPadding = screenWidth > 1200 ? 20.0 : 16.0;
+    final borderWidth = screenWidth > 1200 ? 14.0 : 12.0;
+
     return GestureDetector(
       onTap: () => _showOrderDetails(model),
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(cardPadding),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12.66),
-          border: Border(left: BorderSide(color: model.statusColor, width: 12)),
+          border: Border(
+            left: BorderSide(color: model.statusColor, width: borderWidth),
+          ),
           boxShadow: [
             BoxShadow(
               color: AppColors.textHint.withValues(alpha: 0.1),
@@ -895,113 +1006,205 @@ class HomeViewState extends State<HomeView> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Order number and status row
               Row(
                 children: [
-                  Row(
-                    spacing: 8,
-                    children: [
-                      Text(
-                        "#${model.orderNumber}",
-                        style: TextStyle(
-                          fontSize: 25.33,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.backgroundDark,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          model.orderType.capitalize(),
+                  // Order number and type
+                  Expanded(
+                    child: Wrap(
+                      spacing: screenWidth > 1200 ? 10 : 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          "#${model.orderNumber}",
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: orderNumberFontSize,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
-                    ],
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth > 1200 ? 10 : 8,
+                            vertical: screenWidth > 1200 ? 5 : 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.backgroundDark,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            model.orderType.capitalize(),
+                            style: TextStyle(
+                              fontSize: orderTypeFontSize,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Spacer(),
 
+                  // Status badge
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth > 1200 ? 12 : 10,
+                      vertical: screenWidth > 1200 ? 5 : 4,
+                    ),
                     decoration: BoxDecoration(
                       color: model.statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
-                      spacing: 8,
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: screenWidth > 1200 ? 10 : 8,
                       children: [
                         Text(
                           model.status == "Is Finished"
                               ? "Finished"
+                              : model.orderType == "Delivery" &&
+                                    model.status == "arrived"
+                              ? "Delivered"
                               : model.status,
                           style: TextStyle(
                             color: model.statusColor,
-                            fontSize: 12,
+                            fontSize: statusFontSize,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         if (model.status == "Preparing")
-                          Padding(
-                            padding: EdgeInsets.only(right: 4),
-                            child: Icon(
-                              Icons.wb_sunny_outlined,
-                              size: 14,
-                              color: model.statusColor,
-                            ),
+                          Icon(
+                            Icons.wb_sunny_outlined,
+                            size: screenWidth > 1200 ? 16 : 14,
+                            color: model.statusColor,
                           )
                         else if (model.status == "Arrived")
-                          Padding(
-                            padding: EdgeInsets.only(right: 4),
-                            child: Icon(
-                              Icons.check_circle_outline,
-                              size: 14,
-                              color: model.statusColor,
-                            ),
+                          Icon(
+                            Icons.check_circle_outline,
+                            size: screenWidth > 1200 ? 16 : 14,
+                            color: model.statusColor,
                           ),
                       ],
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 4),
+
+              SizedBox(height: screenWidth > 1200 ? 6 : 4),
+
+              // Time
               Text(
                 model.time,
                 style: TextStyle(
-                  fontSize: 11.08,
+                  fontSize: timeFontSize,
                   fontWeight: FontWeight.w500,
                   height: 1.2,
                   color: Colors.grey[800],
                 ),
               ),
-              SizedBox(height: 4),
+
+              SizedBox(height: screenWidth > 1200 ? 6 : 4),
+
+              // Customer name
               Text(
                 model.customerName,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
+                style: TextStyle(
+                  fontSize: customerNameFontSize,
+                  fontWeight: FontWeight.w400,
+                ),
+                maxLines: orientation == Orientation.landscape ? 1 : 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              SizedBox(height: 8),
+
+              SizedBox(height: screenWidth > 1200 ? 10 : 8),
+
+              // Divider
               Container(
                 height: 1,
                 width: double.infinity,
                 color: AppColors.borderLight,
               ),
-              SizedBox(height: 16),
-              if (model.orderType == 'curbside')
+
+              SizedBox(height: screenWidth > 1200 ? 18 : 16),
+
+              if (model.orderType == "branch") ...[
                 Row(
+                  spacing: 12,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/brunch.svg',
+                      colorFilter: ColorFilter.mode(
+                        Colors.grey[600]!,
+                        BlendMode.srcIn,
+                      ),
+                      height: _getOrderNumberFontSize(context),
+                    ),
+                    Text(
+                      "Picked from this branch",
+                      style: TextStyle(
+                        fontSize: orderTypeFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
+              if (model.orderType == "delivery") ...[
+                Row(
+                  spacing: 12,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/location.svg',
+                      colorFilter: ColorFilter.mode(
+                        Colors.grey[600]!,
+                        BlendMode.srcIn,
+                      ),
+                      height: _getOrderNumberFontSize(context),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Address:",
+                          style: TextStyle(
+                            fontSize: orderTypeFontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          "${model.orderData.customerAddress}",
+                          style: TextStyle(
+                            fontSize: orderTypeFontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+
+              // Car details for curbside orders
+              if (model.orderType == 'curbside') ...[
+                Wrap(
+                  spacing: screenWidth > 1200 ? 8 : 5,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     // Car logo
-                    Center(child: Image.asset('assets/icons/car-logo.png')),
-                    SizedBox(width: 5),
+                    Image.asset(
+                      'assets/icons/car-logo.png',
+                      height: screenWidth > 1200 ? 20 : 16,
+                    ),
+
+                    // Plate number
                     Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6.3,
+                        horizontal: screenWidth > 1200 ? 10 : 8,
+                        vertical: screenWidth > 1200 ? 8 : 6.3,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.backgroundDark,
@@ -1010,33 +1213,36 @@ class HomeViewState extends State<HomeView> {
                       child: Text(
                         model.plateNumber,
                         style: TextStyle(
-                          fontSize: 11.08,
+                          fontSize: timeFontSize,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    SizedBox(width: 5),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6.3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.backgroundDark,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        model.carDetails.split('(')[0],
-                        style: TextStyle(
-                          fontSize: 11.08,
-                          fontWeight: FontWeight.w500,
+
+                    // Car details
+                    if (model.carDetails.isNotEmpty)
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth > 1200 ? 12 : 10,
+                          vertical: screenWidth > 1200 ? 8 : 6.3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.backgroundDark,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          model.carDetails.split('(')[0],
+                          style: TextStyle(
+                            fontSize: timeFontSize,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 5),
+
+                    // Car color
                     Container(
-                      width: 29,
-                      height: 29,
+                      width: screenWidth > 1200 ? 32 : 29,
+                      height: screenWidth > 1200 ? 32 : 29,
                       decoration: BoxDecoration(
                         color: getColorFromString(model.carColor),
                         border: Border.all(
@@ -1048,51 +1254,11 @@ class HomeViewState extends State<HomeView> {
                     ),
                   ],
                 ),
-              // if (model.orderType == 'delivery')
-              //   Text(
-              //     'Delivery Address: ${model.customerAddress}',
-              //     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-              //   ),
-              // if (model.orderType == 'branch')
-              //   Text(
-              //     'PICK UP FROM THIS BRANCH.',
-              //     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-              //   ),
+              ],
             ],
           ),
         ),
       ),
     );
   }
-}
-
-OrderCardModel mapOrderToCardModel(OrderModel order) {
-  final carColor = order.vehicle?.color?.toLowerCase() ?? 'grey';
-  final time = order.orderDate != null ? formatTime(order.orderDate!) : '--:--';
-
-  // Get the most up-to-date status from logs if available
-  final currentStatus = getCurrentStatus(order);
-  final formattedStatus = formatStatus(currentStatus);
-  final statusColor = getStatusColor(currentStatus);
-
-  final customerName = order.customer?.fullName ?? 'Unknown';
-  final carBrand = order.vehicle?.brand ?? 'Unknown';
-  final plateNumber = order.vehicle?.plateNumber ?? '--';
-  final carDetails =
-      '${order.vehicle?.brand ?? ''} ${order.vehicle?.model ?? ''} (${order.vehicle?.color ?? 'N/A'})';
-
-  return OrderCardModel(
-    orderNumber: order.orderNumber ?? '--',
-    customerName: customerName,
-    time: time,
-    status: formattedStatus,
-    statusColor: statusColor,
-    carBrand: carBrand,
-    plateNumber: plateNumber,
-    carDetails: carDetails,
-    carColor: carColor,
-    orderData: order,
-    orderType: order.type ?? '',
-    customerAddress: order.customerAddress ?? '',
-  );
 }

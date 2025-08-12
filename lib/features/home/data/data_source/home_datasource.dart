@@ -12,7 +12,7 @@ abstract class HomeDatasource {
   Future<OrderStatsReponseModel> getOrderStats();
   Future<DeviceInitReponseModel> initDevice({
     required String deviceId,
-    String? deviceToken,
+    required String deviceToken,
   });
   Future<IsLinkedReponseModel> isLinked({required String deviceId});
   Future<List<OrderModel>> getOrdersDataByBranchIdAndDate({

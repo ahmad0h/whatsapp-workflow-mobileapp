@@ -69,7 +69,7 @@ class HomeRepoImpl implements HomeRepo {
   @override
   Future<Either<Failures, DeviceInitReponseModel>> initDevice({
     required String deviceId,
-    String? deviceToken,
+    required String deviceToken,
   }) async {
     try {
       final result = await homeDS.initDevice(

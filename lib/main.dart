@@ -12,7 +12,6 @@ Future<void> main() async {
   await setupServiceLocator();
   configureDependencies();
 
-  // Initialize SharedPreferences and TokenManager
   await SharedPreferences.getInstance();
   await TokenManager().init();
 

@@ -580,7 +580,18 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                     children: [
                       _buildOrderHeader(),
                       const SizedBox(height: 20),
-                      _buildOrderInfoGrid(),
+                      if (widget.order.orderType == "curbside") ...[
+                        _buildOrderInfoGrid(),
+                      ],
+
+                      if (widget.order.orderType == "branch") ...[
+                        _buildOrderInfoDeliveryOrBranch(),
+                      ],
+
+                      if (widget.order.orderType == "delivery") ...[
+                        _buildOrderInfoDeliveryOrBranch(),
+                      ],
+
                       const SizedBox(height: 25),
                       _buildDivider(),
                       const SizedBox(height: 25),
@@ -805,6 +816,48 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                       ? widget.order.orderData.vehicle!.color!
                       : 'N/A',
                   isCarColor: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOrderInfoDeliveryOrBranch() {
+    return Column(
+      children: [
+        // First row
+        SizedBox(
+          height: _cardHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _buildInfoCard(
+                  title: 'Order Time',
+                  value: widget.order.time,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: _elementSpacing),
+        // Second row
+        SizedBox(
+          height: _cardHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _buildInfoCard(
+                  title: widget.order.orderType == 'branch'
+                      ? 'Branch'
+                      : 'Address',
+                  value: widget.order.orderType == 'branch'
+                      ? 'Picked up from this branch.'
+                      : widget.order.customerAddress,
                 ),
               ),
             ],

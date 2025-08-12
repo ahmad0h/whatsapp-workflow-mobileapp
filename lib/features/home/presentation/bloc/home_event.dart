@@ -11,7 +11,7 @@ class HomeEvent with _$HomeEvent {
     required String reason,
   }) = _RejectOrder;
   const factory HomeEvent.getOrderStats() = _GetOrderStats;
-  const factory HomeEvent.initDevice(String deviceId, String? deviceToken) =
+  const factory HomeEvent.initDevice(String deviceId, String deviceToken) =
       _InitDevice;
   const factory HomeEvent.isLinked(String deviceId) = _IsLinked;
   const factory HomeEvent.getOrdersDataByBranchIdAndDate(String date) =

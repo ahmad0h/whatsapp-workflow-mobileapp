@@ -279,7 +279,7 @@ class _AuthViewState extends State<AuthView> {
                                           context.read<HomeBloc>().add(
                                             HomeEvent.initDevice(
                                               deviceId,
-                                              deviceToken,
+                                              deviceToken!,
                                             ),
                                           );
                                         }

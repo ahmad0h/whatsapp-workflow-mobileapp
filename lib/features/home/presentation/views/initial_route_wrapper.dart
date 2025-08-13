@@ -46,11 +46,11 @@ class _InitialRouteWrapperState extends State<InitialRouteWrapper> {
               state.isLinked?.accessToken != null) {
             // Get the bloc reference before the async gap
             final homeBloc = context.read<HomeBloc>();
-            
+
             // Navigate to home if linked
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
-              
+
               homeBloc.add(HomeEvent.getOrdersData());
               GoRouter.of(context).go(GoRouterConfig.homeView);
             });

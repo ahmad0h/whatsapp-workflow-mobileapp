@@ -61,7 +61,7 @@ class HomeViewState extends State<HomeView> {
       }
       await _audioPlayer.play(AssetSource('sounds/$soundFile'));
     } catch (e) {
-      debugPrint('Error playing sound: $e');
+      log('Error playing sound: $e');
     }
   }
 
@@ -88,7 +88,7 @@ class HomeViewState extends State<HomeView> {
           title.contains('arrived') ||
           title.contains('payment') ||
           dataTitle.contains('payment')) {
-        debugPrint('Refreshing orders list due to notification...');
+        log('Refreshing orders list due to notification...');
 
         if (mounted) {
           context.read<HomeBloc>().add(const HomeEvent.getOrdersData());

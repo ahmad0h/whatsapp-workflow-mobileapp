@@ -24,7 +24,7 @@ class HomeDatasourceImpl implements HomeDatasource {
       headers: {'Authorization': ApiConstants.token},
     );
 
-    log('Orders data response: ${response.data}');
+    // log('Orders data response: ${response.data}');
 
     try {
       if (response.data is String) {

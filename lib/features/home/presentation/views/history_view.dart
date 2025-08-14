@@ -138,16 +138,31 @@ class _HistoryViewState extends State<HistoryView> {
 
           var orders =
               state.ordersList?.map(mapOrderToCardModel).toList().where((e) {
-                if (isDateMatch(e.orderData.orderDate, _selectedDate!)) {
-                  return true;
-                }
-                if (e.orderData.logs != null && e.orderData.logs!.isNotEmpty) {
+                // Check if order matches the selected date
+                bool matchesDate = isDateMatch(
+                  e.orderData.orderDate,
+                  _selectedDate!,
+                );
+
+                // If date doesn't match, check logs for any matching date
+                if (!matchesDate &&
+                    e.orderData.logs != null &&
+                    e.orderData.logs!.isNotEmpty) {
                   for (var log in e.orderData.logs!) {
                     if (log.logTimestamp != null &&
                         isDateMatch(log.logTimestamp, _selectedDate!)) {
-                      return true;
+                      matchesDate = true;
+                      break;
                     }
                   }
+                }
+
+                // Only include completed or rejected orders that match the date
+                if (matchesDate) {
+                  final status = e.status.trim().toLowerCase();
+                  return status == 'completed' ||
+                      status == 'rejected' ||
+                      status == 'cancelled';
                 }
                 return false;
               }).toList() ??

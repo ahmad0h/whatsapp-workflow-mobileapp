@@ -252,13 +252,41 @@ class HomeViewState extends State<HomeView> {
           List<OrderCardModel> orders = [];
 
           if (!isLoading && state.ordersList != null) {
-            // Map to OrderCardModel and sort by orderDate in descending order (newest first)
-            orders = state.ordersList!.map(mapOrderToCardModel).toList()
-              ..sort(
-                (a, b) => (b.orderData.orderDate ?? '').compareTo(
-                  a.orderData.orderDate ?? '',
-                ),
-              );
+            // Map to OrderCardModel, filter out completed orders, and sort by date and status
+            orders =
+                state.ordersList!.map(mapOrderToCardModel).where((order) {
+                  // Filter out completed and rejected orders
+                  final status = order.status.trim().toLowerCase();
+                  return status != 'completed' &&
+                      status != 'is_finished' &&
+                      status != 'rejected' &&
+                      status != 'cancelled';
+                }).toList()..sort((a, b) {
+                  // First sort by date (newest first)
+                  final dateCompare = (b.orderData.orderDate ?? '').compareTo(
+                    a.orderData.orderDate ?? '',
+                  );
+                  if (dateCompare != 0) return dateCompare;
+
+                  // If dates are equal, sort by status
+                  final statusA = a.status.trim().toLowerCase();
+                  final statusB = b.status.trim().toLowerCase();
+
+                  // New orders first
+                  if (statusA == 'active' || statusA == 'new order') return -1;
+                  if (statusB == 'active' || statusB == 'new order') return 1;
+
+                  // Then in progress orders
+                  if (statusA == 'in_progress' || statusA == 'in progress') {
+                    return -1;
+                  }
+                  if (statusB == 'in_progress' || statusB == 'in progress') {
+                    return 1;
+                  }
+
+                  // Finally, other statuses (excluding completed)
+                  return statusA.compareTo(statusB);
+                });
           }
 
           return Column(
@@ -971,11 +999,11 @@ class HomeViewState extends State<HomeView> {
 
   Widget _buildOrderCard(OrderCardModel model) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final orientation = MediaQuery.of(context).orientation;
+    // final orientation = MediaQuery.of(context).orientation;
 
     // Responsive font sizes and spacing
     final orderNumberFontSize = screenWidth > 1200 ? 28.0 : 25.33;
-    final customerNameFontSize = screenWidth > 1200 ? 26.0 : 24.0;
+
     final timeFontSize = screenWidth > 1200 ? 12.0 : 11.08;
     final statusFontSize = screenWidth > 1200 ? 13.0 : 12.0;
     final orderTypeFontSize = screenWidth > 1200 ? 13.0 : 12.0;
@@ -1107,11 +1135,8 @@ class HomeViewState extends State<HomeView> {
               // Customer name
               Text(
                 model.customerName,
-                style: TextStyle(
-                  fontSize: customerNameFontSize,
-                  fontWeight: FontWeight.w400,
-                ),
-                maxLines: orientation == Orientation.landscape ? 1 : 2,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
 
@@ -1223,7 +1248,7 @@ class HomeViewState extends State<HomeView> {
                     if (model.carDetails.isNotEmpty)
                       Container(
                         padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth > 1200 ? 12 : 10,
+                          horizontal: screenWidth > 1200 ? 12 : 6,
                           vertical: screenWidth > 1200 ? 8 : 6.3,
                         ),
                         decoration: BoxDecoration(
@@ -1236,6 +1261,8 @@ class HomeViewState extends State<HomeView> {
                             fontSize: timeFontSize,
                             fontWeight: FontWeight.w500,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
 

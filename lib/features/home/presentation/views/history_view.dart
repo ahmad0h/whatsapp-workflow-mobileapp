@@ -9,6 +9,7 @@ import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/mapping.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/option_drawer.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_details_drawer.dart';
 
 class HistoryView extends StatefulWidget {
@@ -58,7 +59,7 @@ class _HistoryViewState extends State<HistoryView> {
     if (_isLandscape(context)) {
       return _isLargeTablet(context) ? 8 / 3 : 8 / 3.5;
     } else {
-      return 8 / 4.6;
+      return 8 / 4.3;
     }
   }
 
@@ -439,172 +440,14 @@ class _HistoryViewState extends State<HistoryView> {
 
   Widget _buildOrderCard(OrderCardModel model, BuildContext context) {
     final isSmallCard = _isLandscape(context) && !_isLargeTablet(context);
-
-    return GestureDetector(
+    
+    return OrderCard(
+      model: model,
+      isSmallCard: isSmallCard,
       onTap: () => _showOrderDetails(model),
-      child: Container(
-        padding: EdgeInsets.all(isSmallCard ? 12 : 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.66),
-          border: Border(
-            left: BorderSide(
-              color: model.statusColor,
-              width: isSmallCard ? 10 : 12,
-            ),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.textHint.withValues(alpha: 0.1),
-              spreadRadius: 1,
-              blurRadius: 2,
-              offset: Offset(0, 1),
-            ),
-          ],
-        ),
-        child: IntrinsicHeight(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Flexible(
-                    child: Text(
-                      "#${model.orderNumber}",
-                      style: TextStyle(
-                        fontSize: isSmallCard ? 20 : 25.33,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isSmallCard ? 8 : 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: model.statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          model.status,
-                          style: TextStyle(
-                            color: model.statusColor,
-                            fontSize: isSmallCard ? 10 : 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        if (model.status == "Completed") ...[
-                          SizedBox(width: 4),
-                          Icon(
-                            Icons.check_circle_outline,
-                            size: isSmallCard ? 12 : 14,
-                            color: model.statusColor,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 4),
-              Text(
-                model.time,
-                style: TextStyle(
-                  fontSize: isSmallCard ? 9 : 11.08,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                model.customerName,
-                style: TextStyle(
-                  fontSize: isSmallCard ? 18 : 24,
-                  fontWeight: FontWeight.w400,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-              SizedBox(height: isSmallCard ? 12 : 16),
-              Container(
-                height: 1,
-                width: double.infinity,
-                color: Color(0xFFF2F2F2),
-              ),
-              SizedBox(height: isSmallCard ? 12 : 16),
-              if (model.orderType == 'curbside')
-                _buildCurbsideInfo(model, isSmallCard),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
-  Widget _buildCurbsideInfo(OrderCardModel model, bool isSmallCard) {
-    return Row(
-      children: [
-        Image.asset('assets/icons/car-logo.png', height: isSmallCard ? 16 : 20),
-        SizedBox(width: isSmallCard ? 6 : 8),
-        Flexible(
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: isSmallCard ? 6 : 8,
-              vertical: isSmallCard ? 4 : 6.3,
-            ),
-            decoration: BoxDecoration(
-              color: Color(0xFFF2F5F9),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              model.plateNumber,
-              style: TextStyle(
-                fontSize: isSmallCard ? 9 : 11.08,
-                fontWeight: FontWeight.w500,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ),
-        SizedBox(width: isSmallCard ? 4 : 8),
-        Flexible(
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: isSmallCard ? 6 : 10,
-              vertical: isSmallCard ? 4 : 6.3,
-            ),
-            decoration: BoxDecoration(
-              color: Color(0xFFF2F5F9),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              model.carDetails.split('(')[0],
-              style: TextStyle(
-                fontSize: isSmallCard ? 9 : 11.08,
-                fontWeight: FontWeight.w500,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ),
-        SizedBox(width: isSmallCard ? 4 : 8),
-        Container(
-          width: isSmallCard ? 24 : 29,
-          height: isSmallCard ? 24 : 29,
-          decoration: BoxDecoration(
-            color: Colors.green,
-            borderRadius: BorderRadius.circular(3.17),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildTab(String text) {
     bool isSelected = selectedTab == text;
@@ -677,16 +520,9 @@ class _HistoryViewState extends State<HistoryView> {
   }
 
   void _showOrderDetails(OrderCardModel model) {
-    if (_scaffoldKey.currentState!.isEndDrawerOpen) {
-      Navigator.of(context).pop();
-    }
-
     setState(() {
       _selectedOrder = model;
     });
-
-    Future.delayed(Duration(milliseconds: 100), () {
-      _scaffoldKey.currentState?.openEndDrawer();
-    });
+    _scaffoldKey.currentState?.openEndDrawer();
   }
 }

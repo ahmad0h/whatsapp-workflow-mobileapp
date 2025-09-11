@@ -1,14 +1,15 @@
 import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
-import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/mapping.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_details_drawer.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/option_drawer.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/reject_order_drawer.dart';
@@ -152,16 +153,6 @@ class HomeViewState extends State<HomeView> {
     }
   }
 
-  double _getOrderNumberFontSize(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    if (screenWidth > 1200) {
-      return 35;
-    } else if (screenWidth > 900) {
-      return 33;
-    } else {
-      return 31;
-    }
-  }
 
   // Helper method to get responsive aspect ratio
   double _getGridAspectRatio(BuildContext context) {
@@ -170,7 +161,7 @@ class HomeViewState extends State<HomeView> {
 
     if (orientation == Orientation.landscape) {
       if (screenWidth > 1200) {
-        return 8 / 3.3;
+        return 8 / 3;
       } else {
         return 8 / 3.8;
       }
@@ -343,9 +334,11 @@ class HomeViewState extends State<HomeView> {
                                     return Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Image.asset(
-                                          'assets/company-logo.png',
+                                        CachedNetworkImage(
+                                          imageUrl: branchData?.business?.businessLogoUrl ?? '',
                                           height: screenWidth > 1200 ? 45 : 35,
+                                          placeholder: (context, url) => const SizedBox.shrink(),
+                                          errorWidget: (context, url, error) => const Icon(Icons.error),
                                         ),
                                         SizedBox(
                                           width: screenWidth > 900 ? 12 : 8,
@@ -998,294 +991,19 @@ class HomeViewState extends State<HomeView> {
   }
 
   Widget _buildOrderCard(OrderCardModel model) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    // final orientation = MediaQuery.of(context).orientation;
-
-    // Responsive font sizes and spacing
-    final orderNumberFontSize = screenWidth > 1200 ? 28.0 : 25.33;
-
-    final timeFontSize = screenWidth > 1200 ? 12.0 : 11.08;
-    final statusFontSize = screenWidth > 1200 ? 13.0 : 12.0;
-    final orderTypeFontSize = screenWidth > 1200 ? 13.0 : 12.0;
-    final cardPadding = screenWidth > 1200 ? 20.0 : 16.0;
-    final borderWidth = screenWidth > 1200 ? 14.0 : 12.0;
-
-    return GestureDetector(
+    final isSmallCard = MediaQuery.of(context).orientation == Orientation.landscape &&
+        !_isLargeTablet(context);
+    
+    return OrderCard(
+      model: model,
+      isSmallCard: isSmallCard,
       onTap: () => _showOrderDetails(model),
-      child: Container(
-        padding: EdgeInsets.all(cardPadding),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.66),
-          border: Border(
-            left: BorderSide(color: model.statusColor, width: borderWidth),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.textHint.withValues(alpha: 0.1),
-              spreadRadius: 1,
-              blurRadius: 2,
-              offset: Offset(0, 1),
-            ),
-          ],
-        ),
-        child: IntrinsicHeight(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Order number and status row
-              Row(
-                children: [
-                  // Order number and type
-                  Expanded(
-                    child: Wrap(
-                      spacing: screenWidth > 1200 ? 10 : 8,
-                      runSpacing: 4,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          "#${model.orderNumber}",
-                          style: TextStyle(
-                            fontSize: orderNumberFontSize,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth > 1200 ? 10 : 8,
-                            vertical: screenWidth > 1200 ? 5 : 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.backgroundDark,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            model.orderType.capitalize(),
-                            style: TextStyle(
-                              fontSize: orderTypeFontSize,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Status badge
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth > 1200 ? 12 : 10,
-                      vertical: screenWidth > 1200 ? 5 : 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: model.statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: screenWidth > 1200 ? 10 : 8,
-                      children: [
-                        Text(
-                          model.status == "Is Finished"
-                              ? "Finished"
-                              : model.orderType == "Delivery" &&
-                                    model.status == "arrived"
-                              ? "Delivered"
-                              : model.status,
-                          style: TextStyle(
-                            color: model.statusColor,
-                            fontSize: statusFontSize,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        if (model.status == "Preparing")
-                          Icon(
-                            Icons.wb_sunny_outlined,
-                            size: screenWidth > 1200 ? 16 : 14,
-                            color: model.statusColor,
-                          )
-                        else if (model.status == "Arrived")
-                          Icon(
-                            Icons.check_circle_outline,
-                            size: screenWidth > 1200 ? 16 : 14,
-                            color: model.statusColor,
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: screenWidth > 1200 ? 6 : 4),
-
-              // Time
-              Text(
-                model.time,
-                style: TextStyle(
-                  fontSize: timeFontSize,
-                  fontWeight: FontWeight.w500,
-                  height: 1.2,
-                  color: Colors.grey[800],
-                ),
-              ),
-
-              SizedBox(height: screenWidth > 1200 ? 6 : 4),
-
-              // Customer name
-              Text(
-                model.customerName,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-
-              SizedBox(height: screenWidth > 1200 ? 10 : 8),
-
-              // Divider
-              Container(
-                height: 1,
-                width: double.infinity,
-                color: AppColors.borderLight,
-              ),
-
-              SizedBox(height: screenWidth > 1200 ? 18 : 16),
-
-              if (model.orderType == "branch") ...[
-                Row(
-                  spacing: 12,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/brunch.svg',
-                      colorFilter: ColorFilter.mode(
-                        Colors.grey[600]!,
-                        BlendMode.srcIn,
-                      ),
-                      height: _getOrderNumberFontSize(context),
-                    ),
-                    Text(
-                      "Picked from this branch",
-                      style: TextStyle(
-                        fontSize: orderTypeFontSize,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-
-              if (model.orderType == "delivery") ...[
-                Row(
-                  spacing: 12,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/location.svg',
-                      colorFilter: ColorFilter.mode(
-                        Colors.grey[600]!,
-                        BlendMode.srcIn,
-                      ),
-                      height: _getOrderNumberFontSize(context),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Address:",
-                          style: TextStyle(
-                            fontSize: orderTypeFontSize,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Text(
-                          "${model.orderData.customerAddress}",
-                          style: TextStyle(
-                            fontSize: orderTypeFontSize,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-
-              // Car details for curbside orders
-              if (model.orderType == 'curbside') ...[
-                Wrap(
-                  spacing: screenWidth > 1200 ? 8 : 5,
-                  runSpacing: 4,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    // Car logo
-                    Image.asset(
-                      'assets/icons/car-logo.png',
-                      height: screenWidth > 1200 ? 20 : 16,
-                    ),
-
-                    // Plate number
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth > 1200 ? 10 : 8,
-                        vertical: screenWidth > 1200 ? 8 : 6.3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.backgroundDark,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        model.plateNumber,
-                        style: TextStyle(
-                          fontSize: timeFontSize,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-
-                    // Car details
-                    if (model.carDetails.isNotEmpty)
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth > 1200 ? 12 : 6,
-                          vertical: screenWidth > 1200 ? 8 : 6.3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.backgroundDark,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          model.carDetails.split('(')[0],
-                          style: TextStyle(
-                            fontSize: timeFontSize,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-
-                    // Car color
-                    Container(
-                      width: screenWidth > 1200 ? 32 : 29,
-                      height: screenWidth > 1200 ? 32 : 29,
-                      decoration: BoxDecoration(
-                        color: getColorFromString(model.carColor),
-                        border: Border.all(
-                          color: Colors.grey.shade300,
-                          width: 0.5,
-                        ),
-                        borderRadius: BorderRadius.circular(3.17),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
     );
   }
+
+  bool _isLargeTablet(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth > 1200;
+  }
+
 }

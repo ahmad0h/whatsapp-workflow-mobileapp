@@ -89,6 +89,7 @@ class Business {
   String? businessContactPersonMobile;
   String? businessContactPersonEmail;
   Owner? owner;
+  String? businessLogoUrl;
 
   Business({
     this.businessId,
@@ -118,6 +119,7 @@ class Business {
     businessContactPersonMobile = json['business_contact_person_mobile'];
     businessContactPersonEmail = json['business_contact_person_email'];
     owner = json['owner'] != null ? Owner.fromJson(json['owner']) : null;
+    businessLogoUrl = json['business_logo_url'];
   }
 
   Map<String, dynamic> toJson() {
@@ -136,6 +138,7 @@ class Business {
     if (owner != null) {
       data['owner'] = owner!.toJson();
     }
+    data['business_logo_url'] = businessLogoUrl;
     return data;
   }
 }

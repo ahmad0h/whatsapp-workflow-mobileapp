@@ -25,6 +25,7 @@ class _HistoryViewState extends State<HistoryView> {
   OrderCardModel? _selectedOrder;
   DateTime? _selectedDate;
   final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _HistoryViewState extends State<HistoryView> {
   @override
   void dispose() {
     _dateController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -158,12 +160,16 @@ class _HistoryViewState extends State<HistoryView> {
                   }
                 }
 
-                // Only include completed or rejected orders that match the date
+                // Check if order matches search query if any
+                final searchQuery = _searchController.text.trim();
+                bool matchesSearch = searchQuery.isEmpty || 
+                    (e.orderData.orderNumber?.toLowerCase().contains(searchQuery.toLowerCase()) ?? false);
+
+                // Only include completed or rejected orders that match the date and search query
                 if (matchesDate) {
                   final status = e.status.trim().toLowerCase();
-                  return status == 'completed' ||
-                      status == 'rejected' ||
-                      status == 'cancelled';
+                  return (status == 'completed' || status == 'rejected' || status == 'cancelled') &&
+                      matchesSearch;
                 }
                 return false;
               }).toList() ??
@@ -379,6 +385,8 @@ class _HistoryViewState extends State<HistoryView> {
         ],
       ),
       child: TextField(
+        controller: _searchController,
+        onChanged: (_) => setState(() {}), // Trigger rebuild on text change
         decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(
             vertical: _isLandscape(context) ? 10 : 12,

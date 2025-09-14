@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 
 class OrderCard extends StatelessWidget {
@@ -19,7 +20,7 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     // Responsive font sizes and spacing
     final orderNumberFontSize = screenWidth > 1200 ? 28.0 : 25.33;
     final timeFontSize = screenWidth > 1200 ? 12.0 : 11.08;
@@ -36,7 +37,10 @@ class OrderCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12.66),
           border: Border(
-            left: BorderSide(color: model.statusColor, width: isSmallCard ? borderWidth * 0.8 : borderWidth),
+            left: BorderSide(
+              color: model.statusColor,
+              width: isSmallCard ? borderWidth * 0.8 : borderWidth,
+            ),
           ),
           boxShadow: [
             BoxShadow(
@@ -131,7 +135,13 @@ class OrderCard extends StatelessWidget {
                 ],
               ),
 
-              if (showFullDetails) ..._buildFullDetails(context, model, timeFontSize, orderTypeFontSize),
+              if (showFullDetails)
+                ..._buildFullDetails(
+                  context,
+                  model,
+                  timeFontSize,
+                  orderTypeFontSize,
+                ),
             ],
           ),
         ),
@@ -140,10 +150,10 @@ class OrderCard extends StatelessWidget {
   }
 
   List<Widget> _buildFullDetails(
-    BuildContext context, 
-    OrderCardModel model, 
-    double timeFontSize, 
-    double orderTypeFontSize
+    BuildContext context,
+    OrderCardModel model,
+    double timeFontSize,
+    double orderTypeFontSize,
   ) {
     return [
       SizedBox(height: 4),
@@ -170,15 +180,15 @@ class OrderCard extends StatelessWidget {
       ),
       SizedBox(height: 16),
       // Divider
-      Container(
-        height: 1,
-        width: double.infinity,
-        color: Colors.grey[200],
-      ),
+      Container(height: 1, width: double.infinity, color: Colors.grey[200]),
       SizedBox(height: 16),
       // Order type specific info
-      if (model.orderType.toLowerCase() == "branch") ..._buildBranchInfo(orderTypeFontSize),
-      if (model.orderType.toLowerCase() == "delivery") ..._buildDeliveryInfo(model, orderTypeFontSize),
+      if (model.orderType.toLowerCase() == "branch")
+        ..._buildBranchInfo(orderTypeFontSize),
+      if (model.orderType.toLowerCase() == "delivery")
+        ..._buildDeliveryInfo(model, orderTypeFontSize),
+      if (model.orderType.toLowerCase() == "curbside")
+        ..._buildCurbsideInfo(model, orderTypeFontSize),
     ];
   }
 
@@ -188,10 +198,7 @@ class OrderCard extends StatelessWidget {
         children: [
           SvgPicture.asset(
             'assets/icons/CheckCircle.svg',
-            colorFilter: ColorFilter.mode(
-              Colors.grey[600]!,
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(Colors.grey[600]!, BlendMode.srcIn),
             height: 24,
           ),
           SizedBox(width: 12),
@@ -214,10 +221,7 @@ class OrderCard extends StatelessWidget {
         children: [
           SvgPicture.asset(
             'assets/icons/MapPinArea.svg',
-            colorFilter: ColorFilter.mode(
-              Colors.grey[600]!,
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(Colors.grey[600]!, BlendMode.srcIn),
             height: 24,
           ),
           SizedBox(width: 12),
@@ -238,10 +242,73 @@ class OrderCard extends StatelessWidget {
     ];
   }
 
+  List<Widget> _buildCurbsideInfo(OrderCardModel model, double fontSize) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        spacing: 6,
+        children: [
+          Image.asset('assets/icons/car-logo.png', height: 24),
+
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              textAlign: TextAlign.center,
+              model.plateNumber,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[500],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              textAlign: TextAlign.center,
+              model.carDetails.split('(')[0].length > 8
+                  ? '${model.carDetails.split('(')[0].substring(0, 8)}...'
+                  : model.carDetails.split('(')[0],
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[500],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Container(
+            height: 23,
+            width: 23,
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: getColorFromString(model.carColor),
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+        ],
+      ),
+    ];
+  }
+
   String _getStatusText(OrderCardModel model) {
     if (model.status == "Is Finished") {
       return "Finished";
-    } else if (model.orderType == "Delivery" && model.status.toLowerCase() == "arrived") {
+    } else if (model.orderType == "Delivery" &&
+        model.status.toLowerCase() == "arrived") {
       return "Delivered";
     }
     return model.status;

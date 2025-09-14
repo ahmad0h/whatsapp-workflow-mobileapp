@@ -249,7 +249,7 @@ class OrderCard extends StatelessWidget {
   List<Widget> _buildDeliveryInfo(TabletResponsiveConfig config) {
     return [
       Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SvgPicture.asset(
             'assets/icons/MapPinArea.svg',

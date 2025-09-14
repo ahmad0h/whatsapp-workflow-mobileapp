@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:whatsapp_workflow_mobileapp/config/router/go_router_config.dart';
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
     return BlocProvider(
       create: (context) => getIt<HomeBloc>(),
       child: MaterialApp.router(
+        builder: FToastBuilder(),
         routerConfig: _goRouter,
         debugShowCheckedModeBanner: false,
         theme: ThemeData().copyWith(

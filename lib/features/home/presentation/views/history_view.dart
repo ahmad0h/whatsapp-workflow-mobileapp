@@ -11,6 +11,7 @@ import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/wid
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_details_drawer.dart';
+import 'package:whatsapp_workflow_mobileapp/core/widgets/connectivity_wrapper.dart';
 
 class HistoryView extends StatefulWidget {
   const HistoryView({super.key});
@@ -110,97 +111,99 @@ class _HistoryViewState extends State<HistoryView> {
   Widget build(BuildContext context) {
     final horizontalPadding = _getHorizontalPadding(context);
 
-    return Scaffold(
-      key: _scaffoldKey,
-      endDrawer: _selectedOrder != null
-          ? OrderDetailsDrawer(order: _selectedOrder!)
-          : OptionDrawer(),
-      body: BlocConsumer<HomeBloc, HomeState>(
-        listener: (context, state) {
-          if (state.getOrdersListStatus == ResponseStatus.failure) {
-            log(state.getOrdersListFailures?.message ?? '');
-          }
-        },
-        builder: (context, state) {
-          bool isDateMatch(String? dateString, DateTime targetDate) {
-            if (dateString == null) return false;
-            try {
-              final date = DateTime.parse(dateString);
-              final dateOnly = DateTime(date.year, date.month, date.day);
-              final targetDateOnly = DateTime(
-                targetDate.year,
-                targetDate.month,
-                targetDate.day,
-              );
-              return dateOnly.isAtSameMomentAs(targetDateOnly);
-            } catch (e) {
-              log('Error parsing date: $e');
-              return false;
+    return ConnectivityWrapper(
+      child: Scaffold(
+        key: _scaffoldKey,
+        endDrawer: _selectedOrder != null
+            ? OrderDetailsDrawer(order: _selectedOrder!)
+            : OptionDrawer(),
+        body: BlocConsumer<HomeBloc, HomeState>(
+          listener: (context, state) {
+            if (state.getOrdersListStatus == ResponseStatus.failure) {
+              log(state.getOrdersListFailures?.message ?? '');
             }
-          }
-
-          var orders =
-              state.ordersList?.map(mapOrderToCardModel).toList().where((e) {
-                // Check if order matches the selected date
-                bool matchesDate = isDateMatch(
-                  e.orderData.orderDate,
-                  _selectedDate!,
+          },
+          builder: (context, state) {
+            bool isDateMatch(String? dateString, DateTime targetDate) {
+              if (dateString == null) return false;
+              try {
+                final date = DateTime.parse(dateString);
+                final dateOnly = DateTime(date.year, date.month, date.day);
+                final targetDateOnly = DateTime(
+                  targetDate.year,
+                  targetDate.month,
+                  targetDate.day,
                 );
+                return dateOnly.isAtSameMomentAs(targetDateOnly);
+              } catch (e) {
+                log('Error parsing date: $e');
+                return false;
+              }
+            }
 
-                // If date doesn't match, check logs for any matching date
-                if (!matchesDate &&
-                    e.orderData.logs != null &&
-                    e.orderData.logs!.isNotEmpty) {
-                  for (var log in e.orderData.logs!) {
-                    if (log.logTimestamp != null &&
-                        isDateMatch(log.logTimestamp, _selectedDate!)) {
-                      matchesDate = true;
-                      break;
+            var orders =
+                state.ordersList?.map(mapOrderToCardModel).toList().where((e) {
+                  // Check if order matches the selected date
+                  bool matchesDate = isDateMatch(
+                    e.orderData.orderDate,
+                    _selectedDate!,
+                  );
+
+                  // If date doesn't match, check logs for any matching date
+                  if (!matchesDate &&
+                      e.orderData.logs != null &&
+                      e.orderData.logs!.isNotEmpty) {
+                    for (var log in e.orderData.logs!) {
+                      if (log.logTimestamp != null &&
+                          isDateMatch(log.logTimestamp, _selectedDate!)) {
+                        matchesDate = true;
+                        break;
+                      }
                     }
                   }
-                }
 
-                // Check if order matches search query if any
-                final searchQuery = _searchController.text.trim();
-                bool matchesSearch =
-                    searchQuery.isEmpty ||
-                    (e.orderData.orderNumber?.toLowerCase().contains(
-                          searchQuery.toLowerCase(),
-                        ) ??
-                        false);
+                  // Check if order matches search query if any
+                  final searchQuery = _searchController.text.trim();
+                  bool matchesSearch =
+                      searchQuery.isEmpty ||
+                      (e.orderData.orderNumber?.toLowerCase().contains(
+                            searchQuery.toLowerCase(),
+                          ) ??
+                          false);
 
-                // Only include completed or rejected orders that match the date and search query
-                if (matchesDate) {
-                  final status = e.status.trim().toLowerCase();
-                  return (status == 'completed' ||
-                          status == 'rejected' ||
-                          status == 'cancelled') &&
-                      matchesSearch;
-                }
-                return false;
-              }).toList() ??
-              [];
+                  // Only include completed or rejected orders that match the date and search query
+                  if (matchesDate) {
+                    final status = e.status.trim().toLowerCase();
+                    return (status == 'completed' ||
+                            status == 'rejected' ||
+                            status == 'cancelled') &&
+                        matchesSearch;
+                  }
+                  return false;
+                }).toList() ??
+                [];
 
-          return CustomScrollView(
-            slivers: [
-              _buildResponsiveAppBar(context, horizontalPadding),
-              _buildOrdersHeader(context, horizontalPadding),
-              // Show loading indicator or orders grid based on loading state
-              if (state.getOrdersListStatus == ResponseStatus.loading)
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 300, // Adjust height as needed
-                    child: Center(
-                      child: Lottie.asset('assets/loading.json', width: 150),
+            return CustomScrollView(
+              slivers: [
+                _buildResponsiveAppBar(context, horizontalPadding),
+                _buildOrdersHeader(context, horizontalPadding),
+                // Show loading indicator or orders grid based on loading state
+                if (state.getOrdersListStatus == ResponseStatus.loading)
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 300, // Adjust height as needed
+                      child: Center(
+                        child: Lottie.asset('assets/loading.json', width: 150),
+                      ),
                     ),
-                  ),
-                )
-              else
-                _buildOrdersGrid(context, orders, horizontalPadding),
-              SliverToBoxAdapter(child: SizedBox(height: 100)),
-            ],
-          );
-        },
+                  )
+                else
+                  _buildOrdersGrid(context, orders, horizontalPadding),
+                SliverToBoxAdapter(child: SizedBox(height: 100)),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

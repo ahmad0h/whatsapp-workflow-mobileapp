@@ -17,6 +17,7 @@ import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
+import 'package:whatsapp_workflow_mobileapp/core/widgets/connectivity_wrapper.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -180,7 +181,8 @@ class HomeViewState extends State<HomeView> {
     final screenWidth = MediaQuery.of(context).size.width;
     final orientation = MediaQuery.of(context).orientation;
 
-    return Scaffold(
+    return ConnectivityWrapper(
+      child: Scaffold(
       key: _scaffoldKey,
       endDrawer: _showRejectDrawer && _selectedOrder != null
           ? RejectOrderDrawer(
@@ -712,6 +714,7 @@ class HomeViewState extends State<HomeView> {
             ],
           );
         },
+      ),
       ),
     );
   }

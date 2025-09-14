@@ -61,7 +61,7 @@ class _HistoryViewState extends State<HistoryView> {
     if (_isLandscape(context)) {
       return _isLargeTablet(context) ? 8 / 3 : 8 / 3.5;
     } else {
-      return 8 / 4.3;
+      return 8 / 4.6;
     }
   }
 
@@ -162,13 +162,19 @@ class _HistoryViewState extends State<HistoryView> {
 
                 // Check if order matches search query if any
                 final searchQuery = _searchController.text.trim();
-                bool matchesSearch = searchQuery.isEmpty || 
-                    (e.orderData.orderNumber?.toLowerCase().contains(searchQuery.toLowerCase()) ?? false);
+                bool matchesSearch =
+                    searchQuery.isEmpty ||
+                    (e.orderData.orderNumber?.toLowerCase().contains(
+                          searchQuery.toLowerCase(),
+                        ) ??
+                        false);
 
                 // Only include completed or rejected orders that match the date and search query
                 if (matchesDate) {
                   final status = e.status.trim().toLowerCase();
-                  return (status == 'completed' || status == 'rejected' || status == 'cancelled') &&
+                  return (status == 'completed' ||
+                          status == 'rejected' ||
+                          status == 'cancelled') &&
                       matchesSearch;
                 }
                 return false;
@@ -448,14 +454,13 @@ class _HistoryViewState extends State<HistoryView> {
 
   Widget _buildOrderCard(OrderCardModel model, BuildContext context) {
     final isSmallCard = _isLandscape(context) && !_isLargeTablet(context);
-    
+
     return OrderCard(
       model: model,
       isSmallCard: isSmallCard,
       onTap: () => _showOrderDetails(model),
     );
   }
-
 
   Widget _buildTab(String text) {
     bool isSelected = selectedTab == text;

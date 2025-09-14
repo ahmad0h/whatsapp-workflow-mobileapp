@@ -153,7 +153,6 @@ class HomeViewState extends State<HomeView> {
     }
   }
 
-
   // Helper method to get responsive aspect ratio
   double _getGridAspectRatio(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
@@ -161,15 +160,15 @@ class HomeViewState extends State<HomeView> {
 
     if (orientation == Orientation.landscape) {
       if (screenWidth > 1200) {
-        return 8 / 3;
+        return 2.6; // More reasonable width-to-height ratio for large tablets
       } else {
-        return 8 / 3.8;
+        return 1.6; // Slightly taller for medium tablets in landscape
       }
     } else {
       if (screenWidth > 900) {
-        return 8 / 4.0;
+        return 1.4; // Good proportion for large tablets in portrait
       } else {
-        return 8 / 4.3;
+        return 1.7; // Taller cards for smaller tablets to accommodate content
       }
     }
   }
@@ -335,10 +334,16 @@ class HomeViewState extends State<HomeView> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         CachedNetworkImage(
-                                          imageUrl: branchData?.business?.businessLogoUrl ?? '',
+                                          imageUrl:
+                                              branchData
+                                                  ?.business
+                                                  ?.businessLogoUrl ??
+                                              '',
                                           height: screenWidth > 1200 ? 45 : 35,
-                                          placeholder: (context, url) => const SizedBox.shrink(),
-                                          errorWidget: (context, url, error) => const Icon(Icons.error),
+                                          placeholder: (context, url) =>
+                                              const SizedBox.shrink(),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
                                         ),
                                         SizedBox(
                                           width: screenWidth > 900 ? 12 : 8,
@@ -991,9 +996,10 @@ class HomeViewState extends State<HomeView> {
   }
 
   Widget _buildOrderCard(OrderCardModel model) {
-    final isSmallCard = MediaQuery.of(context).orientation == Orientation.landscape &&
+    final isSmallCard =
+        MediaQuery.of(context).orientation == Orientation.landscape &&
         !_isLargeTablet(context);
-    
+
     return OrderCard(
       model: model,
       isSmallCard: isSmallCard,
@@ -1005,5 +1011,4 @@ class HomeViewState extends State<HomeView> {
     final screenWidth = MediaQuery.of(context).size.width;
     return screenWidth > 1200;
   }
-
 }

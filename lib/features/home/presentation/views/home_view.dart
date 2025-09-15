@@ -1008,9 +1008,15 @@ class HomeViewState extends State<HomeView> {
     // Refresh the orders list to get the latest data from the server
     homeBloc.add(const HomeEvent.getOrdersData());
 
-    // Trigger a UI rebuild to ensure the order list is refreshed
+    // Close the sidebar/drawer after order update
+    if (_scaffoldKey.currentState?.isEndDrawerOpen ?? false) {
+      Navigator.of(context).pop(); // Close the drawer
+    }
+
+    // Reset the selected order and showRejectDrawer state
     setState(() {
-      // This will cause the BlocConsumer to rebuild with the latest state
+      _selectedOrder = null;
+      _showRejectDrawer = false;
     });
   }
 

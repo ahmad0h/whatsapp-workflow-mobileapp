@@ -367,11 +367,11 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       }
     } catch (e) {
       log('Failed to update order status to finished: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to finish order: $e')));
-      }
+      // if (mounted) {
+      //   ScaffoldMessenger.of(
+      //     context,
+      //   ).showSnackBar(SnackBar(content: Text('Failed to finish order: $e')));
+      // }
     }
   }
 

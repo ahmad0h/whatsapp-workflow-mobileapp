@@ -55,11 +55,10 @@ extension HomeEventPatterns on HomeEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Started value)?  started,TResult Function( _GetOrdersData value)?  getOrdersData,TResult Function( _UpdateOrderStatus value)?  updateOrderStatus,TResult Function( _RejectOrder value)?  rejectOrder,TResult Function( _GetOrderStats value)?  getOrderStats,TResult Function( _InitDevice value)?  initDevice,TResult Function( _IsLinked value)?  isLinked,TResult Function( _GetOrdersDataByBranchIdAndDate value)?  getOrdersDataByBranchIdAndDate,TResult Function( _GetBranchData value)?  getBranchData,TResult Function( _UpdateBranchOrderingStatus value)?  updateBranchOrderingStatus,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _GetOrdersData value)?  getOrdersData,TResult Function( _UpdateOrderStatus value)?  updateOrderStatus,TResult Function( _RejectOrder value)?  rejectOrder,TResult Function( _GetOrderStats value)?  getOrderStats,TResult Function( _InitDevice value)?  initDevice,TResult Function( _IsLinked value)?  isLinked,TResult Function( _GetOrdersDataByBranchIdAndDate value)?  getOrdersDataByBranchIdAndDate,TResult Function( _GetBranchData value)?  getBranchData,TResult Function( _UpdateBranchOrderingStatus value)?  updateBranchOrderingStatus,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _Started() when started != null:
-return started(_that);case _GetOrdersData() when getOrdersData != null:
+case _GetOrdersData() when getOrdersData != null:
 return getOrdersData(_that);case _UpdateOrderStatus() when updateOrderStatus != null:
 return updateOrderStatus(_that);case _RejectOrder() when rejectOrder != null:
 return rejectOrder(_that);case _GetOrderStats() when getOrderStats != null:
@@ -86,11 +85,10 @@ return updateBranchOrderingStatus(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Started value)  started,required TResult Function( _GetOrdersData value)  getOrdersData,required TResult Function( _UpdateOrderStatus value)  updateOrderStatus,required TResult Function( _RejectOrder value)  rejectOrder,required TResult Function( _GetOrderStats value)  getOrderStats,required TResult Function( _InitDevice value)  initDevice,required TResult Function( _IsLinked value)  isLinked,required TResult Function( _GetOrdersDataByBranchIdAndDate value)  getOrdersDataByBranchIdAndDate,required TResult Function( _GetBranchData value)  getBranchData,required TResult Function( _UpdateBranchOrderingStatus value)  updateBranchOrderingStatus,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _GetOrdersData value)  getOrdersData,required TResult Function( _UpdateOrderStatus value)  updateOrderStatus,required TResult Function( _RejectOrder value)  rejectOrder,required TResult Function( _GetOrderStats value)  getOrderStats,required TResult Function( _InitDevice value)  initDevice,required TResult Function( _IsLinked value)  isLinked,required TResult Function( _GetOrdersDataByBranchIdAndDate value)  getOrdersDataByBranchIdAndDate,required TResult Function( _GetBranchData value)  getBranchData,required TResult Function( _UpdateBranchOrderingStatus value)  updateBranchOrderingStatus,}){
 final _that = this;
 switch (_that) {
-case _Started():
-return started(_that);case _GetOrdersData():
+case _GetOrdersData():
 return getOrdersData(_that);case _UpdateOrderStatus():
 return updateOrderStatus(_that);case _RejectOrder():
 return rejectOrder(_that);case _GetOrderStats():
@@ -116,11 +114,10 @@ return updateBranchOrderingStatus(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Started value)?  started,TResult? Function( _GetOrdersData value)?  getOrdersData,TResult? Function( _UpdateOrderStatus value)?  updateOrderStatus,TResult? Function( _RejectOrder value)?  rejectOrder,TResult? Function( _GetOrderStats value)?  getOrderStats,TResult? Function( _InitDevice value)?  initDevice,TResult? Function( _IsLinked value)?  isLinked,TResult? Function( _GetOrdersDataByBranchIdAndDate value)?  getOrdersDataByBranchIdAndDate,TResult? Function( _GetBranchData value)?  getBranchData,TResult? Function( _UpdateBranchOrderingStatus value)?  updateBranchOrderingStatus,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _GetOrdersData value)?  getOrdersData,TResult? Function( _UpdateOrderStatus value)?  updateOrderStatus,TResult? Function( _RejectOrder value)?  rejectOrder,TResult? Function( _GetOrderStats value)?  getOrderStats,TResult? Function( _InitDevice value)?  initDevice,TResult? Function( _IsLinked value)?  isLinked,TResult? Function( _GetOrdersDataByBranchIdAndDate value)?  getOrdersDataByBranchIdAndDate,TResult? Function( _GetBranchData value)?  getBranchData,TResult? Function( _UpdateBranchOrderingStatus value)?  updateBranchOrderingStatus,}){
 final _that = this;
 switch (_that) {
-case _Started() when started != null:
-return started(_that);case _GetOrdersData() when getOrdersData != null:
+case _GetOrdersData() when getOrdersData != null:
 return getOrdersData(_that);case _UpdateOrderStatus() when updateOrderStatus != null:
 return updateOrderStatus(_that);case _RejectOrder() when rejectOrder != null:
 return rejectOrder(_that);case _GetOrderStats() when getOrderStats != null:
@@ -146,10 +143,9 @@ return updateBranchOrderingStatus(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  getOrdersData,TResult Function( String orderId,  String status)?  updateOrderStatus,TResult Function( String orderId,  String reason)?  rejectOrder,TResult Function()?  getOrderStats,TResult Function( String deviceId,  String deviceToken)?  initDevice,TResult Function( String deviceId)?  isLinked,TResult Function( String date)?  getOrdersDataByBranchIdAndDate,TResult Function()?  getBranchData,TResult Function( String branchId,  String status)?  updateBranchOrderingStatus,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  getOrdersData,TResult Function( String orderId,  String status)?  updateOrderStatus,TResult Function( String orderId,  String reason)?  rejectOrder,TResult Function()?  getOrderStats,TResult Function( String deviceId,  String deviceToken)?  initDevice,TResult Function( String deviceId)?  isLinked,TResult Function( String date)?  getOrdersDataByBranchIdAndDate,TResult Function()?  getBranchData,TResult Function( String branchId,  String status)?  updateBranchOrderingStatus,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _Started() when started != null:
-return started();case _GetOrdersData() when getOrdersData != null:
+case _GetOrdersData() when getOrdersData != null:
 return getOrdersData();case _UpdateOrderStatus() when updateOrderStatus != null:
 return updateOrderStatus(_that.orderId,_that.status);case _RejectOrder() when rejectOrder != null:
 return rejectOrder(_that.orderId,_that.reason);case _GetOrderStats() when getOrderStats != null:
@@ -176,10 +172,9 @@ return updateBranchOrderingStatus(_that.branchId,_that.status);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  getOrdersData,required TResult Function( String orderId,  String status)  updateOrderStatus,required TResult Function( String orderId,  String reason)  rejectOrder,required TResult Function()  getOrderStats,required TResult Function( String deviceId,  String deviceToken)  initDevice,required TResult Function( String deviceId)  isLinked,required TResult Function( String date)  getOrdersDataByBranchIdAndDate,required TResult Function()  getBranchData,required TResult Function( String branchId,  String status)  updateBranchOrderingStatus,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  getOrdersData,required TResult Function( String orderId,  String status)  updateOrderStatus,required TResult Function( String orderId,  String reason)  rejectOrder,required TResult Function()  getOrderStats,required TResult Function( String deviceId,  String deviceToken)  initDevice,required TResult Function( String deviceId)  isLinked,required TResult Function( String date)  getOrdersDataByBranchIdAndDate,required TResult Function()  getBranchData,required TResult Function( String branchId,  String status)  updateBranchOrderingStatus,}) {final _that = this;
 switch (_that) {
-case _Started():
-return started();case _GetOrdersData():
+case _GetOrdersData():
 return getOrdersData();case _UpdateOrderStatus():
 return updateOrderStatus(_that.orderId,_that.status);case _RejectOrder():
 return rejectOrder(_that.orderId,_that.reason);case _GetOrderStats():
@@ -205,10 +200,9 @@ return updateBranchOrderingStatus(_that.branchId,_that.status);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  getOrdersData,TResult? Function( String orderId,  String status)?  updateOrderStatus,TResult? Function( String orderId,  String reason)?  rejectOrder,TResult? Function()?  getOrderStats,TResult? Function( String deviceId,  String deviceToken)?  initDevice,TResult? Function( String deviceId)?  isLinked,TResult? Function( String date)?  getOrdersDataByBranchIdAndDate,TResult? Function()?  getBranchData,TResult? Function( String branchId,  String status)?  updateBranchOrderingStatus,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  getOrdersData,TResult? Function( String orderId,  String status)?  updateOrderStatus,TResult? Function( String orderId,  String reason)?  rejectOrder,TResult? Function()?  getOrderStats,TResult? Function( String deviceId,  String deviceToken)?  initDevice,TResult? Function( String deviceId)?  isLinked,TResult? Function( String date)?  getOrdersDataByBranchIdAndDate,TResult? Function()?  getBranchData,TResult? Function( String branchId,  String status)?  updateBranchOrderingStatus,}) {final _that = this;
 switch (_that) {
-case _Started() when started != null:
-return started();case _GetOrdersData() when getOrdersData != null:
+case _GetOrdersData() when getOrdersData != null:
 return getOrdersData();case _UpdateOrderStatus() when updateOrderStatus != null:
 return updateOrderStatus(_that.orderId,_that.status);case _RejectOrder() when rejectOrder != null:
 return rejectOrder(_that.orderId,_that.reason);case _GetOrderStats() when getOrderStats != null:
@@ -224,38 +218,6 @@ return updateBranchOrderingStatus(_that.branchId,_that.status);case _:
 }
 
 }
-
-/// @nodoc
-
-
-class _Started implements HomeEvent {
-  const _Started();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Started);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'HomeEvent.started()';
-}
-
-
-}
-
-
-
 
 /// @nodoc
 

@@ -80,6 +80,23 @@ class _HistoryViewState extends State<HistoryView> {
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.primary,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+            dialogTheme: DialogThemeData(backgroundColor: Colors.white),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -412,6 +429,24 @@ class _HistoryViewState extends State<HistoryView> {
           prefixIconConstraints: BoxConstraints(
             minWidth: _isLandscape(context) ? 35 : 40,
             minHeight: _isLandscape(context) ? 20 : 24,
+          ),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: Icon(
+                    Icons.cancel,
+                    color: AppColors.textHint,
+                    size: _isLandscape(context) ? 18 : 20,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _searchController.clear();
+                    });
+                  },
+                )
+              : null,
+          suffixIconConstraints: BoxConstraints(
+            minWidth: _isLandscape(context) ? 30 : 35,
+            minHeight: _isLandscape(context) ? 18 : 20,
           ),
           hintText: 'Search by Order Number',
           hintStyle: TextStyle(

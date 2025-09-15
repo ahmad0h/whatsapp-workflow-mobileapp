@@ -1,32 +1,44 @@
+import 'dart:developer';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
-import 'dart:developer' as dev;
 
 class DeviceUtils {
   static const String _deviceIdKey = 'device_id';
-  static final Uuid _uuid = const Uuid();
+  static final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
 
-  /// Gets a unique device ID, generating one if it doesn't exist
+  /// Gets the actual device ID from device hardware and stores it
   static Future<String> getDeviceId() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? deviceId = prefs.getString(_deviceIdKey);
+    
+    // If no device ID exists, get the actual device ID and store it
+    if (deviceId == null) {
+      deviceId = await _getActualDeviceId();
+      await prefs.setString(_deviceIdKey, deviceId);
+      log('Generated and stored new device ID: $deviceId');
+    } else {
+      log('Using existing device ID: $deviceId');
+    }
+    
+    return deviceId;
+  }
+  
+  /// Gets the actual device ID from device hardware
+  static Future<String> _getActualDeviceId() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      String? deviceId = prefs.getString(_deviceIdKey);
-      
-      // If no device ID exists, generate a new one and save it
-      if (deviceId == null) {
-        deviceId = _uuid.v4();
-        await prefs.setString(_deviceIdKey, deviceId);
-        dev.log('Generated new device ID: $deviceId');
-      } else {
-        dev.log('Using existing device ID: $deviceId');
-      }
-      
-      return deviceId;
+      // For Android
+      final androidInfo = await _deviceInfoPlugin.androidInfo;
+      return androidInfo.id; // This returns the Android device ID
     } catch (e) {
-      // Fallback to a random UUID if there's an error with SharedPreferences
-      final fallbackId = _uuid.v4();
-      dev.log('Error getting device ID, using fallback: $fallbackId. Error: $e');
-      return fallbackId;
+      try {
+        // Fallback for iOS
+        final iosInfo = await _deviceInfoPlugin.iosInfo;
+        return iosInfo.identifierForVendor ?? 'unknown_ios_device';
+      } catch (e) {
+        // Ultimate fallback - generate a unique ID based on device info
+        log('Error getting device ID: $e');
+        return 'device_${DateTime.now().millisecondsSinceEpoch}';
+      }
     }
   }
 }

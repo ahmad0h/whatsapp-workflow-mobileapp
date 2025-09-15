@@ -23,7 +23,9 @@ class HomeDatasourceImpl implements HomeDatasource {
           '${ApiConstants.baseUrl}${ApiConstants.order}/branch/${TokenManager().branchId}',
       headers: {'Authorization': ApiConstants.token},
     );
-
+    if (response.statusCode == 401) {
+      log('waiting to be linked');
+    }
     // log('Orders data response: ${response.data}');
 
     try {
@@ -124,6 +126,10 @@ class HomeDatasourceImpl implements HomeDatasource {
         query: {'branchId': '${TokenManager().branchId}'},
       );
 
+      if (response.statusCode == 401) {
+        log('waiting to be linked');
+      }
+
       try {
         if (response.data is Map) {
           final Map<String, dynamic> data = Map<String, dynamic>.from(
@@ -161,6 +167,11 @@ class HomeDatasourceImpl implements HomeDatasource {
         url: '${ApiConstants.baseUrl}/device/init',
         data: data,
       );
+      if (response.statusCode == 200) {
+        log('Device initialized successfully');
+      } else if (response.statusCode == 401) {
+        log('waiting to be linked');
+      }
       // log('Init device response: ${response.data}');
       return DeviceInitReponseModel.fromJson(response.data);
     } catch (e) {
@@ -230,7 +241,9 @@ class HomeDatasourceImpl implements HomeDatasource {
       headers: {'Authorization': ApiConstants.token},
       query: {'date': date},
     );
-
+    if (response.statusCode == 401) {
+      log('waiting to be linked');
+    }
     // log('Orders data response: ${response.data}');
 
     try {
@@ -272,6 +285,9 @@ class HomeDatasourceImpl implements HomeDatasource {
         url: '${ApiConstants.baseUrl}/branch/${TokenManager().branchId}',
         headers: {'Authorization': ApiConstants.token},
       );
+      if (response.statusCode == 401) {
+        log('waiting to be linked');
+      }
       log('Branch data response: ${response.data}');
       return GetBranchResponseModel.fromJson(response.data);
     } catch (e) {

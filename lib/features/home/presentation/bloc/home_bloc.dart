@@ -47,7 +47,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     this.getBranchDataUsecase,
     this.updateBranchOrderingStatusUsecase,
   ) : super(const HomeState()) {
-    on<HomeEvent>((event, emit) async {
+    on<_GetOrdersData>((event, emit) async {
       emit(state.copyWith(getOrdersListStatus: ResponseStatus.loading));
       var result = await getOrdersUseCase();
       result.fold(

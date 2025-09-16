@@ -149,6 +149,7 @@ class Vehicle {
   String? type;
   String? createdAt;
   String? userId;
+  String? image;
 
   Vehicle({
     this.id,
@@ -159,6 +160,7 @@ class Vehicle {
     this.type,
     this.createdAt,
     this.userId,
+    this.image,
   });
 
   Vehicle.fromJson(Map<String, dynamic> json) {
@@ -170,6 +172,7 @@ class Vehicle {
     type = json['type'];
     createdAt = json['created_at'];
     userId = json['user_id'];
+    image = json['logo_url'];
   }
 
   Map<String, dynamic> toJson() {
@@ -182,6 +185,7 @@ class Vehicle {
     data['type'] = type;
     data['created_at'] = createdAt;
     data['user_id'] = userId;
+    data['logo_url'] = image;
     return data;
   }
 }

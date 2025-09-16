@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:whatsapp_workflow_mobileapp/core/api/api_constants.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 
@@ -279,7 +281,13 @@ class OrderCard extends StatelessWidget {
     return [
       Row(
         children: [
-          Image.asset('assets/icons/car-logo.png', height: config.infoIconSize),
+          CachedNetworkImage(
+            imageUrl:
+                '${ApiConstants.baseUrl}${model.orderData.vehicle?.image}',
+            height: config.infoIconSize,
+            errorWidget: (context, url, error) =>
+                Icon(Icons.error, color: Colors.red),
+          ),
           SizedBox(width: config.infoSpacing),
 
           // Plate number

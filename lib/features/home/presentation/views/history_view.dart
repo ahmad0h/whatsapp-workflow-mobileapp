@@ -89,6 +89,7 @@ class _HistoryViewState extends State<HistoryView> {
               surface: Colors.white,
               onSurface: Colors.black,
             ),
+            dividerTheme: DividerThemeData(color: Colors.grey[100]),
             dialogTheme: DialogThemeData(backgroundColor: Colors.white),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: AppColors.primary),

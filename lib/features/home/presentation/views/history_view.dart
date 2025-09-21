@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart' show DateFormat;
@@ -283,9 +284,12 @@ class _HistoryViewState extends State<HistoryView> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Image.asset(
-              'assets/company-logo.png',
+            CachedNetworkImage(
               height: _isLandscape(context) ? 25 : 30,
+              imageUrl: branchData?.business?.businessLogoUrl ?? '',
+              placeholder: (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
             ),
             SizedBox(width: 8),
             Flexible(

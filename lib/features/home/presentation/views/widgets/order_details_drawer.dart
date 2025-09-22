@@ -945,6 +945,9 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   }
 
   Widget _buildTotalAmount() {
+    final vatAmount = widget.order.orderData.vatAmount ?? '0';
+    final netAmount = widget.order.orderData.netAmount ?? '0';
+    final subtotal = double.parse(netAmount) - double.parse(vatAmount);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
       decoration: BoxDecoration(
@@ -969,7 +972,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    widget.order.orderData.netAmount ?? '0',
+                    subtotal.toStringAsFixed(2),
                     style: const TextStyle(fontSize: 16, color: _textColor),
                   ),
                 ],

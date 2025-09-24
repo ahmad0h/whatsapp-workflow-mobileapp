@@ -89,7 +89,15 @@ class HomeViewState extends State<HomeView> {
           title.contains('customer arrived') ||
           title.contains('arrived') ||
           title.contains('payment') ||
-          dataTitle.contains('payment')) {
+          title.contains('manager approved') ||
+          title.contains('approved') ||
+          dataTitle.contains('payment') ||
+          dataTitle.contains('manager approved') ||
+          dataTitle.contains('approved') ||
+          title.contains('in-progress') ||
+          title.contains('in progress') ||
+          dataTitle.contains('in-progress') ||
+          dataTitle.contains('in progress')) {
         log('Refreshing orders list due to notification...');
 
         if (mounted) {

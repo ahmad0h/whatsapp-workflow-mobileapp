@@ -16,9 +16,19 @@ class ApiConstants {
   }
 
   static String getCarLogoUrl(String logoPath) {
+    // If the path already contains the full base URL, return it as-is
+    if (logoPath.startsWith(baseUrl)) {
+      return logoPath;
+    }
+    // If the path starts with /public/, prepend the base URL
+    if (logoPath.startsWith('/public/')) {
+      return '$baseUrl$logoPath';
+    }
+    // If the path starts with /, prepend base URL + /public
     if (logoPath.startsWith('/')) {
       return '$baseUrl/public$logoPath';
     }
+    // Otherwise, prepend base URL + /public/
     return '$baseUrl/public/$logoPath';
   }
 }

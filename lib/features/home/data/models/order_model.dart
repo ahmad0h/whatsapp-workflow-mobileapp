@@ -1,3 +1,5 @@
+import 'package:whatsapp_workflow_mobileapp/core/api/api_constants.dart';
+
 class OrderModel {
   String? id;
   String? orderNumber;
@@ -172,7 +174,12 @@ class Vehicle {
     type = json['type'];
     createdAt = json['created_at'];
     userId = json['user_id'];
-    image = json['logo_url'];
+    final logoUrl = json['logo_url'];
+    if (logoUrl != null && logoUrl.isNotEmpty) {
+      image = ApiConstants.getCarLogoUrl(logoUrl);
+    } else {
+      image = null;
+    }
   }
 
   Map<String, dynamic> toJson() {

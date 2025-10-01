@@ -137,7 +137,7 @@ class HomeDatasourceImpl implements HomeDatasource {
           );
           // log('Response data: $data');
           final stats = OrderStatsReponseModel.fromJson(data);
-          log('Order stats response: ${stats.toJson()}');
+          // log('Order stats response: ${stats.toJson()}');
           return stats;
         } else {
           log('Response is not a Map, throwing format error');
@@ -201,7 +201,7 @@ class HomeDatasourceImpl implements HomeDatasource {
           refreshToken: response.data['refreshToken'] as String? ?? '',
           branchId: response.data['branchId'] as String? ?? '',
         );
-        log('Device status response: ${response.data}');
+        // log('Device status response: ${response.data}');
         return IsLinkedReponseModel.fromJson(response.data);
       }
 
@@ -288,7 +288,7 @@ class HomeDatasourceImpl implements HomeDatasource {
       if (response.statusCode == 401) {
         log('waiting to be linked');
       }
-      log('Branch data response: ${response.data}');
+      // log('Branch data response: ${response.data}');
       return GetBranchResponseModel.fromJson(response.data);
     } catch (e) {
       throw Exception('Failed to process response: $e');

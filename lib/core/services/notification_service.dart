@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io' show Platform;
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -86,7 +85,7 @@ class NotificationService {
   Future<void> _initializeFirebaseMessaging() async {
     // Get the token for this device
     String? token = await _firebaseMessaging.getToken();
-    log('FCM Token: $token');
+    // log('FCM Token: $token');
     if (token != null) {
       // log('FCM Token: $token');
     }

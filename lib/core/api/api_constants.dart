@@ -14,4 +14,11 @@ class ApiConstants {
     log('Access token: $accessToken');
     return 'Bearer $accessToken';
   }
+
+  static String getCarLogoUrl(String logoPath) {
+    if (logoPath.startsWith('/')) {
+      return '$baseUrl/public$logoPath';
+    }
+    return '$baseUrl/public/$logoPath';
+  }
 }

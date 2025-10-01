@@ -948,8 +948,9 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     final vatAmount = widget.order.orderData.vatAmount ?? '0';
     final netAmount = widget.order.orderData.netAmount ?? '0';
     final deliveryFee = 22;
-    final subtotal =
-        double.parse(netAmount) - double.parse(vatAmount) - deliveryFee;
+    final subtotal = widget.order.orderType == 'delivery'
+        ? double.parse(netAmount) - double.parse(vatAmount) - deliveryFee
+        : double.parse(netAmount) - double.parse(vatAmount);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
       decoration: BoxDecoration(
@@ -1006,29 +1007,30 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Delivery Fee',
-                  style: TextStyle(fontSize: 16, color: _secondaryTextColor),
-                ),
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/riyal.svg',
-                      width: 16,
-                      height: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      deliveryFee.toStringAsFixed(2),
-                      style: const TextStyle(fontSize: 16, color: _textColor),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            if (widget.order.orderType == 'delivery')
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Delivery Fee',
+                    style: TextStyle(fontSize: 16, color: _secondaryTextColor),
+                  ),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/riyal.svg',
+                        width: 16,
+                        height: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        deliveryFee.toStringAsFixed(2),
+                        style: const TextStyle(fontSize: 16, color: _textColor),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
           ],
           const Divider(height: 24, thickness: 1, color: _dividerColor),
           Row(

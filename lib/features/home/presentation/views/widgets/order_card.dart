@@ -282,8 +282,9 @@ class OrderCard extends StatelessWidget {
       Row(
         children: [
           CachedNetworkImage(
-            imageUrl:
-                '${ApiConstants.baseUrl}${model.orderData.vehicle?.image}',
+            imageUrl: model.orderData.vehicle?.image != null 
+                ? ApiConstants.getCarLogoUrl(model.orderData.vehicle!.image!)
+                : '',
             height: config.infoIconSize,
             errorWidget: (context, url, error) =>
                 Icon(Icons.error, color: Colors.red),

@@ -202,7 +202,7 @@ class OrderCard extends StatelessWidget {
           fontWeight: FontWeight.w400,
           height: 1.2,
         ),
-        maxLines: 2,
+        maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
 
@@ -282,7 +282,7 @@ class OrderCard extends StatelessWidget {
       Row(
         children: [
           CachedNetworkImage(
-            imageUrl: model.orderData.vehicle?.image != null 
+            imageUrl: model.orderData.vehicle?.image != null
                 ? ApiConstants.getCarLogoUrl(model.orderData.vehicle!.image!)
                 : '',
             height: config.infoIconSize,

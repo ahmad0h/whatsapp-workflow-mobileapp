@@ -14,7 +14,7 @@ class HomeAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final horizontalPadding = ResponsiveUtils.getHorizontalPadding(context);
-    final screenWidth = MediaQuery.of(context).size.width;
+    // final screenWidth = MediaQuery.of(context).size.width;
     final orientation = MediaQuery.of(context).orientation;
 
     return SliverAppBar(
@@ -41,74 +41,135 @@ class HomeAppBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
               children: [
                 // Responsive logo sizing
-                Image.asset(
-                  'assets/ryze-logo.png',
-                  height: screenWidth > 1200 ? 50 : 40,
-                ),
-                BlocConsumer<HomeBloc, HomeState>(
-                  listener: (context, state) {
-                    if (state.getBranchesDataStatus ==
-                        ResponseStatus.success) {}
-                    if (state.getBranchesDataStatus ==
-                        ResponseStatus.failure) {}
-                  },
-                  builder: (context, state) {
-                    var branchData = state.getBranchesData;
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CachedNetworkImage(
-                          imageUrl: branchData?.business?.businessLogoUrl ?? '',
-                          height: screenWidth > 1200 ? 45 : 35,
-                          placeholder: (context, url) =>
-                              const SizedBox.shrink(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                        ),
-                        SizedBox(width: screenWidth > 900 ? 12 : 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              branchData?.business?.businessName ?? '',
-                              style: TextStyle(
-                                color: AppColors.background,
-                                fontSize: screenWidth > 1200 ? 14 : 12,
-                                fontWeight: FontWeight.w500,
+                // Image.asset(
+                //   'assets/ryze-logo.png',
+                //   height: screenWidth > 1200 ? 50 : 40,
+                // ),
+                Expanded(
+                  child: BlocConsumer<HomeBloc, HomeState>(
+                    listener: (context, state) {
+                      if (state.getBranchesDataStatus ==
+                          ResponseStatus.success) {}
+                      if (state.getBranchesDataStatus ==
+                          ResponseStatus.failure) {}
+                    },
+                    builder: (context, state) {
+                      var branchData = state.getBranchesData;
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          if (constraints.maxWidth < 600) {
+                            return Row(
+                              spacing: 8,
+                              children: [
+                                CachedNetworkImage(
+                                  imageUrl:
+                                      branchData?.business?.businessLogoUrl ??
+                                      '',
+                                  height: 50,
+                                  placeholder: (context, url) =>
+                                      const SizedBox.shrink(),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                ),
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          branchData?.business?.businessName ??
+                                              '',
+                                          style: TextStyle(
+                                            color: AppColors.background,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          branchData?.branchName ?? '',
+                                          style: TextStyle(
+                                            color: AppColors.backgroundLight,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.menu,
+                                    color: AppColors.background,
+                                    size: 32,
+                                  ),
+                                  onPressed: onMenuPressed,
+                                ),
+                              ],
+                            );
+                          }
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl:
+                                    branchData?.business?.businessLogoUrl ?? '',
+                                height: 50,
+                                placeholder: (context, url) =>
+                                    const SizedBox.shrink(),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error),
                               ),
-                            ),
-                            Text(
-                              branchData?.branchName ?? '',
-                              style: TextStyle(
-                                color: AppColors.backgroundLight,
-                                fontSize: screenWidth > 1200 ? 12 : 10,
-                                fontWeight: FontWeight.w500,
+                              SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    branchData?.business?.businessName ?? '',
+                                    style: TextStyle(
+                                      color: AppColors.background,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    branchData?.branchName ?? '',
+                                    style: TextStyle(
+                                      color: AppColors.backgroundLight,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(width: screenWidth > 900 ? 32 : 24),
-                        Container(
-                          height: screenWidth > 1200 ? 40 : 33,
-                          color: Colors.white,
-                          width: 1,
-                        ),
-                        SizedBox(width: screenWidth > 900 ? 32 : 24),
-                        IconButton(
-                          icon: Icon(
-                            Icons.menu,
-                            color: AppColors.background,
-                            size: screenWidth > 1200 ? 36 : 32,
-                          ),
-                          onPressed: onMenuPressed,
-                        ),
-                      ],
-                    );
-                  },
+                              Spacer(),
+                              Container(
+                                height: 33,
+                                color: Colors.white,
+                                width: 1,
+                              ),
+                              SizedBox(width: 24),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.menu,
+                                  color: AppColors.background,
+                                  size: 38,
+                                ),
+                                onPressed: onMenuPressed,
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

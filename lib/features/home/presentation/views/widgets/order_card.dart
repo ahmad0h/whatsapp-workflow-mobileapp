@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:whatsapp_workflow_mobileapp/core/api/api_constants.dart';
+// import 'package:whatsapp_workflow_mobileapp/core/api/api_constants.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 
@@ -147,7 +147,11 @@ class OrderCard extends StatelessWidget {
               Text(
                 _getStatusText(model),
                 style: TextStyle(
-                  color: model.statusColor,
+                  color:
+                      model.status == "Is Finished" ||
+                          model.status.toLowerCase() == "in progress"
+                      ? const Color(0xFF9F771D)
+                      : model.statusColor,
                   fontSize: isSmallCard
                       ? config.statusFontSize * 0.8
                       : config.statusFontSize,
@@ -161,12 +165,12 @@ class OrderCard extends StatelessWidget {
                   color: model.statusColor,
                 )
               else if (model.status.toLowerCase() == "arrived")
-                Icon(
-                  Icons.check_circle_outline,
-                  size: config.iconSize,
-                  color: model.statusColor,
-                ),
-              SizedBox(width: config.iconSpacing),
+                // Icon(
+                //   Icons.check_circle_outline,
+                //   size: config.iconSize,
+                //   color: model.statusColor,
+                // ),
+                SizedBox(width: config.iconSpacing),
             ],
           ),
         ),
@@ -225,54 +229,71 @@ class OrderCard extends StatelessWidget {
 
   List<Widget> _buildBranchInfo(TabletResponsiveConfig config) {
     return [
-      Row(
-        children: [
-          SvgPicture.asset(
-            'assets/icons/CheckCircle.svg',
-            colorFilter: ColorFilter.mode(Colors.grey[600]!, BlendMode.srcIn),
-            height: config.infoIconSize,
-          ),
-          SizedBox(width: config.infoSpacing),
-          Expanded(
-            child: Text(
-              "Picked from this branch",
+      Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: config.curbsideTagPadding,
+          vertical: config.curbsideTagPadding * 0.1,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(config.tagBorderRadius),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(
+              'assets/icons/branch.svg',
+              colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
+              height: 24,
+            ),
+            SizedBox(width: config.infoSpacing),
+            Text(
+              "Picked Up",
               style: TextStyle(
                 fontSize: config.infoFontSize,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ];
   }
 
   List<Widget> _buildDeliveryInfo(TabletResponsiveConfig config) {
     return [
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SvgPicture.asset(
-            'assets/icons/MapPinArea.svg',
-            colorFilter: ColorFilter.mode(Colors.grey[600]!, BlendMode.srcIn),
-            height: config.infoIconSize,
-          ),
-          SizedBox(width: config.infoSpacing),
-          Expanded(
-            child: Text(
-              model.orderData.customerAddress ?? 'No address provided',
+      Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: config.curbsideTagPadding,
+          vertical: config.curbsideTagPadding * 0.1,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(config.tagBorderRadius),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/icons/delivery.svg',
+              colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
+              height: 24,
+            ),
+            SizedBox(width: config.infoSpacing),
+            Text(
+              "Delivery",
               style: TextStyle(
                 fontSize: config.infoFontSize,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
+                fontWeight: FontWeight.bold,
                 height: 1.3,
               ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ];
   }
@@ -281,14 +302,14 @@ class OrderCard extends StatelessWidget {
     return [
       Row(
         children: [
-          CachedNetworkImage(
-            imageUrl: model.orderData.vehicle?.image != null
-                ? ApiConstants.getCarLogoUrl(model.orderData.vehicle!.image!)
-                : '',
-            height: config.infoIconSize,
-            errorWidget: (context, url, error) =>
-                Icon(Icons.error, color: Colors.red),
-          ),
+          // CachedNetworkImage(
+          //   imageUrl: model.orderData.vehicle?.image != null
+          //       ? ApiConstants.getCarLogoUrl(model.orderData.vehicle!.image!)
+          //       : '',
+          //   height: config.infoIconSize,
+          //   errorWidget: (context, url, error) =>
+          //       Icon(Icons.error, color: Colors.red),
+          // ),
           SizedBox(width: config.infoSpacing),
 
           // Plate number
@@ -302,13 +323,10 @@ class OrderCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(config.tagBorderRadius),
             ),
             child: Text(
-              model.plateNumber.split(' ')[0].length > 8
-                  ? '${model.plateNumber.split(' ')[0].substring(0, 8)}...'
-                  : model.plateNumber.split(' ')[0],
+              model.plateNumber,
               style: TextStyle(
                 fontSize: config.curbsideFontSize,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -326,16 +344,10 @@ class OrderCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(config.tagBorderRadius),
             ),
             child: Text(
-              _getCarDetailsText(
-                model.carDetails.split('(')[0].length > 8
-                    ? '${model.carDetails.split('(')[0].substring(0, 8)}...'
-                    : model.carDetails.split('(')[0],
-                config,
-              ),
+              _getCarDetailsText(model.carDetails.split('(')[0], config),
               style: TextStyle(
                 fontSize: config.curbsideFontSize,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -369,8 +381,8 @@ class OrderCard extends StatelessWidget {
 
   String _getStatusText(OrderCardModel model) {
     if (model.status == "Is Finished") {
-      return "Finished";
-    } else if (model.orderType == "Delivery" &&
+      return "Ready";
+    } else if (model.orderType == "delivery" &&
         model.status.toLowerCase() == "arrived") {
       return "Delivered";
     }
@@ -467,8 +479,8 @@ class TabletResponsiveConfig {
       statusFontSize: isPortrait ? 15.0 : 14.0,
       orderTypeFontSize: isPortrait ? 14.0 : 13.0,
       customerNameFontSize: isPortrait ? 22.0 : 20.0,
-      infoFontSize: isPortrait ? 14.0 : 13.0,
-      curbsideFontSize: isPortrait ? 13.0 : 12.0,
+      infoFontSize: isPortrait ? 18.0 : 20.0,
+      curbsideFontSize: isPortrait ? 18.0 : 20.0,
       cardPadding: isPortrait ? 24.0 : 20.0,
       borderWidth: isPortrait ? 16.0 : 14.0,
       borderRadius: 16.0,

@@ -560,10 +560,10 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
         currentStatus == 'rejected' || currentStatus == 'cancelled';
 
     return Drawer(
-      width: MediaQuery.of(context).size.width * 0.5,
-      child: Container(
-        color: _backgroundColor,
-        child: SafeArea(
+      width: MediaQuery.of(context).size.width * 0.7,
+      child: SafeArea(
+        child: Container(
+          color: _backgroundColor,
           child: Column(
             children: [
               _buildHeader(context),
@@ -718,8 +718,12 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   ? AppColors
                         .error // Red for Rejected/Cancelled
                   : widget.order.status == 'In Progress'
-                  ? const Color(0xFFEEB128) // Yellow for In Progress
-                  : const Color(0xFF27AE60), // Green for other statuses
+                  ? const Color(0xFFEEB128).withValues(
+                      alpha: 0.1,
+                    ) // Yellow for In Progress
+                  : const Color(
+                      0xFF27AE60,
+                    ).withValues(alpha: 0.1), // Green for other statuses
               borderRadius: BorderRadius.circular(25),
             ),
             child: Row(
@@ -727,10 +731,10 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
               children: [
                 Text(
                   isRejected ? 'Rejected' : _getStatusDisplayText(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: widget.order.statusColor,
                   ),
                 ),
                 if (widget.order.status != 'Arrived' &&
@@ -1177,7 +1181,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                           currentStatus == 'completed' ||
                           currentStatus == 'arrived'
                       ? 'Order Marked as Finished${finishedTime != null ? ' at ${formatTime(finishedTime)}' : ''}'
-                      : 'Order is finished?',
+                      : 'Order is ready?',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

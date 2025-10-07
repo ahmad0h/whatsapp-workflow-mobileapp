@@ -190,12 +190,14 @@ class _HistoryViewState extends State<HistoryView> {
                           ) ??
                           false);
 
-                  // Only include completed or rejected orders that match the date and search query
+                  // Only include completed, rejected or cancelled orders that match the date and search query
                   if (matchesDate) {
                     final status = e.status.trim().toLowerCase();
                     return (status == 'completed' ||
                             status == 'rejected' ||
-                            status == 'cancelled') &&
+                            status == 'cancelled' ||
+                            status ==
+                                'canceled') && // Handle both 'cancelled' and 'canceled' spellings
                         matchesSearch;
                   }
                   return false;

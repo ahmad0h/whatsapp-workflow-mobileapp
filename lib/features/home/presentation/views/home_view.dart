@@ -81,9 +81,12 @@ class HomeViewState extends State<HomeView> {
         title.contains('payment') ||
         title.contains('manager approved') ||
         title.contains('approved') ||
+        title.contains('delivered') ||
         dataTitle.contains('payment') ||
         dataTitle.contains('manager approved') ||
         dataTitle.contains('approved') ||
+        dataTitle.contains('delivered') ||
+        dataTitle.contains('branch') ||
         title.contains('in-progress') ||
         title.contains('in progress') ||
         dataTitle.contains('in-progress') ||
@@ -222,91 +225,110 @@ class HomeViewState extends State<HomeView> {
               )
             : const OptionDrawer(),
         onEndDrawerChanged: _handleDrawerChanged,
-        body: BlocConsumer<HomeBloc, HomeState>(
-          listener: (context, state) {
-            if (state.getOrdersListStatus == ResponseStatus.failure) {}
-          },
-          builder: (context, state) {
-            final isLoading =
-                state.getOrdersListStatus == ResponseStatus.loading;
-            List<OrderCardModel> orders = [];
+        body: SafeArea(
+          child: BlocConsumer<HomeBloc, HomeState>(
+            listener: (context, state) {
+              if (state.getOrdersListStatus == ResponseStatus.failure) {}
+            },
+            builder: (context, state) {
+              final isLoading =
+                  state.getOrdersListStatus == ResponseStatus.loading;
+              List<OrderCardModel> orders = [];
 
-            if (!isLoading && state.ordersList != null) {
-              orders = HomeUtils.processOrders(state.ordersList!);
-            }
+              if (!isLoading && state.ordersList != null) {
+                orders = HomeUtils.processOrders(state.ordersList!);
+              }
 
-            return Column(
-              children: [
-                Expanded(
-                  child: CustomScrollView(
-                    slivers: [
-                      // Responsive AppBar
-                      HomeAppBar(onMenuPressed: _handleMenuPressed),
+              // Function to handle refresh
+              Future<void> onRefresh() async {
+                context.read<HomeBloc>().add(const HomeEvent.getOrdersData());
+                context.read<HomeBloc>().add(const HomeEvent.getOrderStats());
+                context.read<HomeBloc>().add(const HomeEvent.getBranchData());
+                // Wait for a short delay to allow the refresh indicator to show
+                await Future.delayed(const Duration(seconds: 1));
+              }
 
-                      // Status toggles section
-                      SliverToBoxAdapter(
-                        child: Container(
-                          padding: EdgeInsets.only(
-                            left: horizontalPadding,
-                            right: horizontalPadding,
-                            top: 32,
-                          ),
-                          child: Column(
-                            children: [
-                              BlocBuilder<HomeBloc, HomeState>(
-                                builder: (context, state) {
-                                  final isEnabled =
-                                      state.getBranchesData?.orderingStatus
-                                          ?.toLowerCase() !=
-                                      'disabled';
-                                  final isLoading =
-                                      state.updateBranchOrderingStatusStatus ==
-                                      ResponseStatus.loading;
-                                  return HomeStatusToggle(
-                                    isEnabled: isEnabled,
-                                    isLoading: isLoading,
-                                    onChanged: (value) {
-                                      log(
-                                        'value: ${state.getBranchesData?.branchId}',
-                                      );
-                                      context.read<HomeBloc>().add(
-                                        HomeEvent.updateBranchOrderingStatus(
-                                          state.getBranchesData?.branchId ?? '',
-                                          value ? 'enabled' : 'disabled',
-                                        ),
+              return Column(
+                children: [
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: onRefresh,
+                      child: CustomScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        slivers: [
+                          // Responsive AppBar
+                          HomeAppBar(onMenuPressed: _handleMenuPressed),
+
+                          // Status toggles section
+                          SliverToBoxAdapter(
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                left: horizontalPadding,
+                                right: horizontalPadding,
+                                top: 32,
+                              ),
+                              child: Column(
+                                children: [
+                                  BlocBuilder<HomeBloc, HomeState>(
+                                    builder: (context, state) {
+                                      final isEnabled =
+                                          state.getBranchesData?.orderingStatus
+                                              ?.toLowerCase() !=
+                                          'disabled';
+                                      final isLoading =
+                                          state
+                                              .updateBranchOrderingStatusStatus ==
+                                          ResponseStatus.loading;
+                                      return HomeStatusToggle(
+                                        isEnabled: isEnabled,
+                                        isLoading: isLoading,
+                                        onChanged: (value) {
+                                          log(
+                                            'value: ${state.getBranchesData?.branchId}',
+                                          );
+                                          context.read<HomeBloc>().add(
+                                            HomeEvent.updateBranchOrderingStatus(
+                                              state.getBranchesData?.branchId ??
+                                                  '',
+                                              value ? 'enabled' : 'disabled',
+                                            ),
+                                          );
+                                        },
                                       );
                                     },
-                                  );
-                                },
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+
+                          // Stats cards section
+                          HomeStatsSection(
+                            horizontalPadding: horizontalPadding,
+                          ),
+
+                          // Orders section
+                          HomeOrdersSection(
+                            horizontalPadding: horizontalPadding,
+                            headerFontSize: headerFontSize,
+                            selectedTab: selectedTab,
+                            orders: orders,
+                            isLoading: isLoading,
+                            onTabChanged: _handleTabChanged,
+                            onOrderTap: _showOrderDetails,
+                          ),
+
+                          const SliverToBoxAdapter(child: SizedBox(height: 50)),
+                        ],
                       ),
-
-                      // Stats cards section
-                      HomeStatsSection(horizontalPadding: horizontalPadding),
-
-                      // Orders section
-                      HomeOrdersSection(
-                        horizontalPadding: horizontalPadding,
-                        headerFontSize: headerFontSize,
-                        selectedTab: selectedTab,
-                        orders: orders,
-                        isLoading: isLoading,
-                        onTabChanged: _handleTabChanged,
-                        onOrderTap: _showOrderDetails,
-                      ),
-
-                      SliverToBoxAdapter(child: SizedBox(height: 50)),
-                    ],
+                    ),
                   ),
-                ),
-                // Footer
-                HomeFooter(horizontalPadding: horizontalPadding),
-              ],
-            );
-          },
+                  // Footer
+                  HomeFooter(horizontalPadding: horizontalPadding),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

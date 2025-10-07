@@ -46,7 +46,7 @@ class HomeStatsSection extends StatelessWidget {
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: screenWidth > 1200 ? 18 : 16,
+                        fontSize: screenWidth > 1200 ? 18 : 14,
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
@@ -75,8 +75,8 @@ class HomeStatsSection extends StatelessWidget {
             right: 0,
             bottom: 0,
             child: Container(
-              width: screenWidth > 1200 ? 70 : 59,
-              height: screenWidth > 1200 ? 58 : 49,
+              width: screenWidth > 1200 ? 70 : 49,
+              height: screenWidth > 1200 ? 58 : 39,
               decoration: BoxDecoration(
                 color: color,
                 borderRadius: BorderRadius.only(
@@ -125,19 +125,12 @@ class HomeStatsSection extends StatelessWidget {
                     children: [
                       _buildStatCard(
                         context,
-                        'Arrived Customers',
-                        stats?.arrivedCustomers.toString() ?? '0',
-                        AppColors.statusArrived,
-                        'assets/icons/car.svg',
-                      ),
-                      SizedBox(width: 16),
-                      _buildStatCard(
-                        context,
                         'New Orders',
                         stats?.newOrders.toString() ?? '0',
                         AppColors.primary,
                         'assets/icons/user.svg',
                       ),
+
                       SizedBox(width: 16),
                       _buildStatCard(
                         context,
@@ -145,6 +138,15 @@ class HomeStatsSection extends StatelessWidget {
                         stats?.preparingOrders.toString() ?? '0',
                         AppColors.statusPreparing,
                         'assets/icons/pot.svg',
+                      ),
+
+                      SizedBox(width: 16),
+                      _buildStatCard(
+                        context,
+                        'Arrived',
+                        stats?.arrivedCustomers.toString() ?? '0',
+                        AppColors.statusArrived,
+                        'assets/icons/car.svg',
                       ),
                     ],
                   )
@@ -152,26 +154,27 @@ class HomeStatsSection extends StatelessWidget {
                     children: [
                       _buildStatCard(
                         context,
-                        'Arrived Customers',
-                        stats?.arrivedCustomers.toString() ?? '0',
-                        AppColors.statusArrived,
-                        'assets/icons/car.svg',
-                      ),
-                      SizedBox(width: 12),
-                      _buildStatCard(
-                        context,
                         'New Orders',
                         stats?.newOrders.toString() ?? '0',
                         AppColors.primary,
                         'assets/icons/user.svg',
                       ),
                       SizedBox(width: 12),
+
                       _buildStatCard(
                         context,
                         'Preparing',
                         stats?.preparingOrders.toString() ?? '0',
                         AppColors.statusPreparing,
                         'assets/icons/pot.svg',
+                      ),
+                      SizedBox(width: 12),
+                      _buildStatCard(
+                        context,
+                        'Arrived',
+                        stats?.arrivedCustomers.toString() ?? '0',
+                        AppColors.statusArrived,
+                        'assets/icons/car.svg',
                       ),
                     ],
                   ),

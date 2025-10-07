@@ -26,7 +26,7 @@ class HomeDatasourceImpl implements HomeDatasource {
     if (response.statusCode == 401) {
       log('waiting to be linked');
     }
-    log('Orders data response: ${response.data}');
+    // log('Orders data response: ${response.data}');
 
     try {
       if (response.data is String) {

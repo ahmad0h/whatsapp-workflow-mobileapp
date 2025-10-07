@@ -31,16 +31,30 @@ class ResponsiveUtils {
     final screenWidth = MediaQuery.of(context).size.width;
 
     if (orientation == Orientation.landscape) {
-      if (screenWidth > 1200) {
-        return 2.6; // More reasonable width-to-height ratio for large tablets
+      // Landscape mode - wider cards
+      if (screenWidth >= 1400) {
+        return 2.8; // Extra large tablets (iPad Pro 12.9" landscape)
+      } else if (screenWidth >= 1200) {
+        return 2.2; // Large tablets (iPad Pro 11" landscape)
+      } else if (screenWidth >= 1024) {
+        return 2.2; // Standard tablets (iPad 10.2" landscape)
+      } else if (screenWidth >= 800) {
+        return 1.9; // Medium tablets landscape
       } else {
-        return 1.6; // Slightly taller for medium tablets in landscape
+        return 3; // Small tablets landscape
       }
     } else {
-      if (screenWidth > 900) {
-        return 1.4; // Good proportion for large tablets in portrait
+      // Portrait mode - taller cards
+      if (screenWidth >= 1024) {
+        return 1.5; // Large tablets portrait (iPad Pro 12.9")
+      } else if (screenWidth >= 900) {
+        return 1; // Standard large tablets portrait
+      } else if (screenWidth >= 768) {
+        return 1.2; // Medium tablets portrait (iPad Mini, standard iPad) - REDUCED from 3.5
+      } else if (screenWidth >= 600) {
+        return 1.3; // Smaller tablets portrait
       } else {
-        return 1.7; // Taller cards for smaller tablets to accommodate content
+        return 1.5; // Very small tablets/large phones
       }
     }
   }

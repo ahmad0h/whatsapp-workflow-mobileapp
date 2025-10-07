@@ -169,7 +169,7 @@ class HomeOrdersSection extends StatelessWidget {
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: HomeUtils.filterOrders(orders, selectedTab).length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
+                    crossAxisCount: 1,
                     crossAxisSpacing: screenWidth > 900 ? 32 : 24,
                     mainAxisSpacing: screenWidth > 900 ? 32 : 24,
                     childAspectRatio: ResponsiveUtils.getGridAspectRatio(

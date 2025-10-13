@@ -201,74 +201,96 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      width: MediaQuery.of(context).size.width * 0.5,
+      width: MediaQuery.of(context).size.width * 0.7,
       child: Container(
         color: _backgroundColor,
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildHeader(context),
-              SizedBox(height: 16),
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildOrderHeader(),
-                      SizedBox(height: 32),
-                      _buildRejectionReasonSection(),
-                      SizedBox(height: 24),
-                      _buildCustomReasonSection(),
-                      SizedBox(height: 40),
-                      _buildSendButton(),
-                      SizedBox(height: 24),
-                    ],
-                  ),
+        child: Stack(
+          children: [
+            SafeArea(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  top: 20,
+                  bottom: 100, // Add bottom padding for button space
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(context),
+                    SizedBox(height: 16),
+                    _buildOrderHeader(),
+                    SizedBox(height: 32),
+                    _buildRejectionReasonSection(),
+                    SizedBox(height: 24),
+                    _buildCustomReasonSection(),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+            // Send button positioned at the bottom
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: _backgroundColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  bottom: 45,
+                  top: 24,
+                ),
+                child: _buildSendButton(),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(top: 24, left: 24, right: 24, bottom: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              padding: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: _secondaryTextColor.withValues(alpha: 0.5),
-                ),
-              ),
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                size: 16,
-                color: _textColor,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Container(
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: _secondaryTextColor.withValues(alpha: 0.5),
               ),
             ),
+            child: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              size: 16,
+              color: _textColor,
+            ),
           ),
-          // const Text(
-          //   'Reject Order',
-          //   style: TextStyle(
-          //     fontSize: 18,
-          //     fontWeight: FontWeight.bold,
-          //     color: _textColor,
-          //   ),
-          // ),
-          SizedBox(width: 40), // For balance
-        ],
-      ),
+        ),
+        // const Text(
+        //   'Reject Order',
+        //   style: TextStyle(
+        //     fontSize: 18,
+        //     fontWeight: FontWeight.bold,
+        //     color: _textColor,
+        //   ),
+        // ),
+        SizedBox(width: 40), // For balance
+      ],
     );
   }
 
@@ -277,13 +299,13 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Order #${widget.orderNumber}',
-          style: TextStyle(fontSize: 25.33, fontWeight: FontWeight.w500),
+          '#${widget.orderNumber}',
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 8),
+
         Text(
           'Reject order',
-          style: TextStyle(fontSize: 40, fontWeight: FontWeight.w400),
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -306,7 +328,7 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.borderLight),
           ),
           child: DropdownButtonHideUnderline(
@@ -353,7 +375,7 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
         ),
         const SizedBox(height: 12),
         Container(
-          height: 120,
+          height: 200,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: AppColors.borderLight),
@@ -398,7 +420,7 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
             : Text(
                 'Send',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 20,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),

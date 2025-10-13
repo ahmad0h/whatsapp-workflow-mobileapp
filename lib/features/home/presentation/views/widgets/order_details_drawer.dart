@@ -114,15 +114,15 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   // Dimensions
   static const _cardHeight = 80.0;
   static const _cardBorderRadius = 3.17;
-  static const _sectionSpacing = 25.0;
+  // static const _sectionSpacing = 25.0;
   static const _buttonBorderRadius = 25.0;
 
   // Text Styles
-  static final TextStyle _buttonTextStyle = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    color: _backgroundColor,
-  );
+  // static final TextStyle _buttonTextStyle = TextStyle(
+  //   fontSize: 16,
+  //   fontWeight: FontWeight.w600,
+  //   color: _backgroundColor,
+  // );
 
   void _showRejectOrderDrawer() {
     if (widget.onRejectPressed != null) {
@@ -587,11 +587,11 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   _buildDivider(),
                   const SizedBox(height: 25),
                   _buildOrderDetailsSection(),
-                  const SizedBox(height: _sectionSpacing),
+                  const SizedBox(height: 25),
                   _buildTotalAmount(),
-                  const SizedBox(height: _sectionSpacing),
+                  const SizedBox(height: 25),
                   _buildDivider(),
-                  const SizedBox(height: _sectionSpacing),
+                  const SizedBox(height: 25),
                   if (_isOrderAccepted && !isRejected) ...[
                     const SizedBox(height: 20),
                     OrderTrackingTimeline(
@@ -649,7 +649,11 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                           ),
                           child: SlideAction(
                             text: 'Reject Order',
-                            textColor: AppColors.error,
+                            textStyle: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.error,
+                            ),
                             sliderButtonIcon: const Icon(
                               Icons.arrow_forward_ios,
                               color: AppColors.error,
@@ -669,6 +673,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                               return null;
                             },
                             sliderButtonYOffset: -8,
+                            sliderRotate: false,
                             innerColor: const Color(0xFFFFFFFF),
                             outerColor: Colors.transparent,
                             borderRadius: 50,
@@ -803,15 +808,15 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                 Text(
                   '#${widget.order.orderNumber}',
                   style: TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 35,
+                    fontWeight: FontWeight.bold,
                     color: Color(0xFF3E4069),
                   ),
                 ),
                 Text(
                   widget.order.customerName,
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF3E4069),
                   ),
@@ -926,29 +931,31 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
         Text(
           'Order details',
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
             color: Color(0xFF3E4069),
           ),
         ),
-        const SizedBox(height: _sectionSpacing),
-        ...orderDetails.expand<Widget>((detail) {
+
+        ListView.separated(
+          separatorBuilder: (context, index) => SizedBox(height: 12),
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: orderDetails.length,
+          itemBuilder: (context, index) {
+            final detail = orderDetails[index];
             final price = double.tryParse(detail.productPrice ?? '0') ?? 0;
             final quantity = detail.productQuantity ?? 0;
             final total = price * quantity;
 
-            return [
-              _buildOrderItem(
-                detail.productName ?? 'Unknown Item',
-                quantity,
-                total,
-              ),
-              _buildDivider(),
-              const SizedBox(height: 16),
-            ];
-          }).toList()
-          ..removeLast()
-          ..removeLast(),
+            return Column(
+              children: [
+                if (index == 0) _buildDivider(),
+                _buildOrderItem(detail.productName ?? '', quantity, total),
+              ],
+            );
+          },
+        ),
       ],
     );
   }
@@ -1102,7 +1109,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
         ? double.parse(netAmount) - double.parse(vatAmount) - deliveryFee
         : double.parse(netAmount) - double.parse(vatAmount);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
       decoration: BoxDecoration(
         color: Color(0xFFF2F5F9),
         borderRadius: BorderRadius.circular(8),
@@ -1126,6 +1133,10 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                     'assets/icons/riyal.svg',
                     width: 20,
                     height: 20,
+                    colorFilter: ColorFilter.mode(
+                      Color(0xFF3E4069),
+                      BlendMode.srcIn,
+                    ),
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -1141,7 +1152,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
             ],
           ),
           if (double.parse(widget.order.orderData.vatAmount ?? '0') > 0) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1159,6 +1170,10 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                       'assets/icons/riyal.svg',
                       width: 20,
                       height: 20,
+                      colorFilter: ColorFilter.mode(
+                        Color(0xFF3E4069),
+                        BlendMode.srcIn,
+                      ),
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -1173,38 +1188,42 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                 ),
               ],
             ),
-            if (widget.order.orderType == 'delivery')
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Delivery Fee',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFF3E4069),
-                      fontWeight: FontWeight.w600,
+            if (widget.order.orderType == 'delivery') const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Delivery Fee',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF3E4069),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Row(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/riyal.svg',
+                      width: 20,
+                      height: 20,
+                      colorFilter: ColorFilter.mode(
+                        Color(0xFF3E4069),
+                        BlendMode.srcIn,
+                      ),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/riyal.svg',
-                        width: 20,
-                        height: 20,
+                    const SizedBox(width: 4),
+                    Text(
+                      deliveryFee.toStringAsFixed(2),
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Color(0xFF3E4069),
+                        fontWeight: FontWeight.w600,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        deliveryFee.toStringAsFixed(2),
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Color(0xFF3E4069),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ],
           const Divider(height: 24, thickness: 2, color: _dividerColor),
           Row(
@@ -1224,6 +1243,10 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                     'assets/icons/riyal.svg',
                     width: 20,
                     height: 20,
+                    colorFilter: ColorFilter.mode(
+                      Color(0xFF3E4069),
+                      BlendMode.srcIn,
+                    ),
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -1350,10 +1373,10 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   currentStatus == 'is_finished' ||
                           currentStatus == 'completed' ||
                           currentStatus == 'arrived'
-                      ? 'Order Marked as Finished${finishedTime != null ? ' at ${formatTime(finishedTime)}' : ''}'
+                      ? 'Order Marked as Finished${finishedTime != null ? ' at (${_formatTimeOnly(finishedTime)})' : ''}'
                       : 'Order is ready?',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
                     color:
                         currentStatus == 'is_finished' ||
@@ -1383,7 +1406,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                 child: Text(
                   'Mark as Completed',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
@@ -1407,7 +1430,14 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           ),
           elevation: 0,
         ),
-        child: Text('Accept', style: _buttonTextStyle),
+        child: Text(
+          'Accept',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
@@ -1445,33 +1475,38 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   }
 
   Widget _buildOrderItem(String itemName, int quantity, double price) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
       children: [
-        Expanded(
-          child: Text(
-            itemName,
-            style: TextStyle(
-              fontSize: 20,
-              color: Color(0xFF3E4069),
-              fontWeight: FontWeight.w600,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                itemName,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Color(0xFF3E4069),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
-          ),
+
+            Text(
+              '$quantity x',
+              style: TextStyle(fontSize: 18, color: Color(0xFF3E4069)),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '${price.toStringAsFixed(2)} SAR',
+              style: TextStyle(
+                fontSize: 18,
+                color: Color(0xFF3E4069),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
-        const Spacer(),
-        Text(
-          '$quantity x',
-          style: TextStyle(fontSize: 18, color: Color(0xFF3E4069)),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          '${price.toStringAsFixed(2)} SAR',
-          style: TextStyle(
-            fontSize: 20,
-            color: Color(0xFF3E4069),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        _buildDivider(),
       ],
     );
   }

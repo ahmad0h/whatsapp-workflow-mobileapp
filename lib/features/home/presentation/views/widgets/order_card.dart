@@ -166,6 +166,7 @@ class OrderCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 4),
               Text(
                 "#${model.orderNumber}",
                 style: TextStyle(

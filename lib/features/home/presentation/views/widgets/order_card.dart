@@ -46,7 +46,7 @@ class OrderCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -60,15 +60,13 @@ class OrderCard extends StatelessWidget {
             ),
           ],
         ),
-        child: IntrinsicHeight(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Order number and status row
-              if (showFullDetails) ..._buildFullDetails(context),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Order number and status row
+            if (showFullDetails) ..._buildFullDetails(context),
+          ],
         ),
       ),
     );
@@ -115,7 +113,7 @@ class OrderCard extends StatelessWidget {
 
   Container statusBadge() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
         color: model.status.toLowerCase() == "new order"
             ? const Color(0xFFEFF4FF)
@@ -181,7 +179,7 @@ class OrderCard extends StatelessWidget {
               // Time
               Text(
                 model.time,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
               ),
 
               SizedBox(height: 4),
@@ -191,7 +189,7 @@ class OrderCard extends StatelessWidget {
                 model.customerName.length > 15
                     ? "${model.customerName.substring(0, 15)}..."
                     : model.customerName,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -318,9 +316,9 @@ class OrderCard extends StatelessWidget {
               imageUrl: model.orderData.vehicle?.image != null
                   ? ApiConstants.getCarLogoUrl(model.orderData.vehicle!.image!)
                   : '',
-              width: 45,
+              width: 25,
               height: fixedHeight,
-              fit: BoxFit.contain,
+              fit: BoxFit.cover,
               errorWidget: (context, url, error) =>
                   Icon(Icons.error, color: Colors.red),
             ),
@@ -368,7 +366,7 @@ class OrderCard extends StatelessWidget {
 
             // Color indicator
             Container(
-              width: 35,
+              width: 25,
               decoration: BoxDecoration(
                 color: getColorFromString(model.carColor),
                 borderRadius: BorderRadius.circular(8),
@@ -427,7 +425,7 @@ class OrderTypeBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(141.18),

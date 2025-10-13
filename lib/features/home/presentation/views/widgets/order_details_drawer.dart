@@ -1009,6 +1009,18 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
             spacing: 6,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              CachedNetworkImage(
+                imageUrl: widget.order.orderData.vehicle?.image != null
+                    ? ApiConstants.getCarLogoUrl(
+                        widget.order.orderData.vehicle!.image!,
+                      )
+                    : '',
+                width: 60,
+                height: fixedHeight,
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) =>
+                    Icon(Icons.error, color: Colors.red),
+              ),
               // Plate number
               Expanded(
                 child: Container(
@@ -1064,18 +1076,6 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey[300]!, width: 1),
                 ),
-              ),
-              CachedNetworkImage(
-                imageUrl: widget.order.orderData.vehicle?.image != null
-                    ? ApiConstants.getCarLogoUrl(
-                        widget.order.orderData.vehicle!.image!,
-                      )
-                    : '',
-                width: 60,
-                height: fixedHeight,
-                fit: BoxFit.cover,
-                errorWidget: (context, url, error) =>
-                    Icon(Icons.error, color: Colors.red),
               ),
             ],
           ),

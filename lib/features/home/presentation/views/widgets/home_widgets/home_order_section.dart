@@ -179,19 +179,19 @@ class HomeOrdersSection extends StatelessWidget {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Orders',
-                          style: TextStyle(
-                            fontSize: headerFontSize,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
                         SizedBox(height: 4),
-                        // Tabs with counts
+
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                           children: [
+                            Text(
+                              'Orders',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             Row(
                               children: [
                                 _buildTab(
@@ -244,7 +244,7 @@ class HomeOrdersSection extends StatelessWidget {
                             );
                             return Padding(
                               padding: EdgeInsets.symmetric(
-                                vertical: screenWidth > 900 ? 16 : 10,
+                                vertical: 10,
                                 horizontal: 0,
                               ),
                               child: _buildOrderCard(

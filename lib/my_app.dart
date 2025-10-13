@@ -17,34 +17,7 @@ class MyApp extends StatelessWidget {
     return BlocProvider(
       create: (context) => getIt<HomeBloc>(),
       child: MaterialApp.router(
-        builder: (context, child) {
-          // Scale down UI for tablets to prevent oversized elements
-          final mediaQuery = MediaQuery.of(context);
-          final screenWidth = mediaQuery.size.width;
-          final screenHeight = mediaQuery.size.height;
-
-          // Calculate aspect ratio
-          final aspectRatio = screenHeight / screenWidth;
-
-          // Detect Honor Pad 7x (5:3 ratio = 1.666...) or similar tablets
-          // 1340/800 = 1.675, so check if ratio is close to 5:3
-          final is5to3Ratio = (aspectRatio - 1.666).abs() < 0.05;
-          final isTabletSize = screenWidth >= 600 && screenWidth <= 900;
-          final isTargetDevice = is5to3Ratio && isTabletSize;
-
-          // Apply scaling factor for Honor Pad 7x
-          final scaleFactor = isTargetDevice ? 0.85 : 1.0;
-
-          final constrainedMediaQuery = mediaQuery.copyWith(
-            textScaler: TextScaler.linear(scaleFactor),
-            devicePixelRatio: mediaQuery.devicePixelRatio / scaleFactor,
-          );
-
-          return MediaQuery(
-            data: constrainedMediaQuery,
-            child: FToastBuilder()(context, child),
-          );
-        },
+        builder: FToastBuilder(),
         routerConfig: _goRouter,
         debugShowCheckedModeBanner: false,
         theme: ThemeData().copyWith(

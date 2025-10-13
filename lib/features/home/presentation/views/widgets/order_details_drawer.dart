@@ -1,14 +1,19 @@
 import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic_ui/flutter_neumorphic_ui.dart';
+// import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:slide_to_act/slide_to_act.dart';
+import 'package:whatsapp_workflow_mobileapp/core/api/api_constants.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/format_time.dart';
+import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_tracking_widget.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/reject_order_drawer.dart';
@@ -84,12 +89,8 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
 
   // Colors
   static const _backgroundColor = AppColors.background;
-  static const _cardBackgroundColor = AppColors.backgroundDark;
   static const _primaryColor = AppColors.primary;
-  static const _successColor = AppColors.success;
   static const _dividerColor = AppColors.borderLight;
-  static const _textColor = AppColors.textPrimary;
-  static const _secondaryTextColor = AppColors.textSecondary;
 
   // Get status color based on status string
   Color _getStatusColor(String status) {
@@ -111,28 +112,13 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   }
 
   // Dimensions
-  static const _cardHeight = 90.0;
+  static const _cardHeight = 80.0;
   static const _cardBorderRadius = 3.17;
   static const _sectionSpacing = 25.0;
-  static const _elementSpacing = 8.0;
   static const _buttonBorderRadius = 25.0;
 
   // Text Styles
-  static const _titleStyle = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-    color: _textColor,
-  );
-
-  static const _subtitleStyle = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    color: _textColor,
-  );
-
-  static const _bodyStyle = TextStyle(fontSize: 18, color: _textColor);
-
-  static const _buttonTextStyle = TextStyle(
+  static final TextStyle _buttonTextStyle = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w600,
     color: _backgroundColor,
@@ -513,7 +499,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     };
 
     // Try to find the color in the map, default to green if not found
-    return colorMap[name] ?? _successColor;
+    return colorMap[name] ?? AppColors.success;
   }
 
   Widget _buildInfoCard({
@@ -525,29 +511,42 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     final borderColor = _getColorFromName(value);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       height: _cardHeight,
       decoration: BoxDecoration(
-        color: _cardBackgroundColor,
+        color: Color(0xFFF2F5F9),
         borderRadius: BorderRadius.circular(_cardBorderRadius),
         border: isCarColor
             ? Border(right: BorderSide(color: borderColor, width: 25))
             : null,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 12,
-              color: _secondaryTextColor,
-              fontWeight: FontWeight.w500,
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF3E4069),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF3E4069),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(value, style: _subtitleStyle),
+          OrderTypeBadge(model: widget.order, color: Colors.white),
         ],
       ),
     );
@@ -561,135 +560,181 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
 
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.7,
-      child: SafeArea(
-        child: Container(
-          color: _backgroundColor,
-          child: Column(
-            children: [
-              _buildHeader(context),
-              const SizedBox(height: 16),
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildOrderHeader(),
-                      const SizedBox(height: 20),
-                      if (widget.order.orderType == "curbside") ...[
-                        _buildOrderInfoGrid(),
-                      ],
-
-                      if (widget.order.orderType == "branch") ...[
-                        _buildOrderInfoDeliveryOrBranch(),
-                      ],
-
-                      if (widget.order.orderType == "delivery") ...[
-                        _buildOrderInfoDeliveryOrBranch(),
-                      ],
-
-                      const SizedBox(height: 25),
-                      _buildDivider(),
-                      const SizedBox(height: 25),
-                      _buildOrderDetailsSection(),
-                      const SizedBox(height: _sectionSpacing),
-                      _buildTotalAmount(),
-                      const SizedBox(height: _sectionSpacing),
-                      _buildDivider(),
-                      const SizedBox(height: _sectionSpacing),
-                      _buildAcceptButton(context),
-                      if (_isOrderAccepted && !isRejected) ...[
-                        const SizedBox(height: 20),
-                        OrderTrackingTimeline(
-                          logs: widget.order.orderData.logs,
-                          currentStatus: widget.order.status.toLowerCase(),
-                        ),
-                      ],
-                      if (!_isOrderAccepted &&
-                          !isRejected &&
-                          currentStatus != 'is_finished') ...[
-                        const SizedBox(height: 50),
-                        SizedBox(
-                          height: 60,
-                          child: NeumorphicButton(
-                            style: NeumorphicStyle(
-                              depth: 50,
-                              surfaceIntensity: 50,
-                              lightSource: LightSource(0, 0),
-                              oppositeShadowLightSource: false,
-                              color: const Color.fromARGB(255, 240, 238, 238),
-                              border: NeumorphicBorder(
-                                color: Colors.black.withValues(alpha: 0.07),
-                              ),
-                              boxShape: NeumorphicBoxShape.roundRect(
-                                BorderRadius.circular(50),
-                              ),
+      child: Container(
+        color: _backgroundColor,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 12,
+                bottom: _getBottomPadding(currentStatus, isRejected),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context),
+                  const SizedBox(height: 16),
+                  _buildOrderHeader(),
+                  const SizedBox(height: 20),
+                  _buildInfoCard(title: 'Order Time', value: widget.order.time),
+                  if (widget.order.orderType == "curbside") ...[
+                    ...buildCurbsideInfo(),
+                  ],
+                  const SizedBox(height: 25),
+                  _buildDivider(),
+                  const SizedBox(height: 25),
+                  _buildOrderDetailsSection(),
+                  const SizedBox(height: _sectionSpacing),
+                  _buildTotalAmount(),
+                  const SizedBox(height: _sectionSpacing),
+                  _buildDivider(),
+                  const SizedBox(height: _sectionSpacing),
+                  if (_isOrderAccepted && !isRejected) ...[
+                    const SizedBox(height: 20),
+                    OrderTrackingTimeline(
+                      logs: widget.order.orderData.logs,
+                      currentStatus: widget.order.status.toLowerCase(),
+                    ),
+                  ],
+                  const SizedBox(height: 100),
+                ],
+              ),
+            ),
+            // Buttons positioned at the bottom
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: _backgroundColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 26,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildAcceptButton(context),
+                    if (!_isOrderAccepted &&
+                        !isRejected &&
+                        currentStatus != 'is_finished') ...[
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 60,
+                        child: NeumorphicButton(
+                          style: NeumorphicStyle(
+                            depth: 50,
+                            surfaceIntensity: 50,
+                            lightSource: LightSource(0, 0),
+                            oppositeShadowLightSource: false,
+                            color: const Color.fromARGB(255, 240, 238, 238),
+                            border: NeumorphicBorder(
+                              color: Colors.black.withValues(alpha: 0.07),
                             ),
-                            child: SlideAction(
-                              text: 'Reject Order',
-                              textColor: AppColors.error,
-                              sliderButtonIcon: const Icon(
-                                Icons.arrow_forward_ios,
-                                color: AppColors.error,
-                                size: 15,
-                              ),
-                              submittedIcon: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                child: const Icon(
-                                  Icons.check,
-                                  color: AppColors.success,
-                                  size: 15,
-                                ),
-                              ),
-                              elevation: 0.0,
-                              onSubmit: () {
-                                _showRejectOrderDrawer();
-                                return null;
-                              },
-                              sliderButtonYOffset: -8,
-                              innerColor: const Color(0xFFFFFFFF),
-                              outerColor: Colors.transparent,
-                              borderRadius: 50,
+                            boxShape: NeumorphicBoxShape.roundRect(
+                              BorderRadius.circular(50),
                             ),
                           ),
+                          child: SlideAction(
+                            text: 'Reject Order',
+                            textColor: AppColors.error,
+                            sliderButtonIcon: const Icon(
+                              Icons.arrow_forward_ios,
+                              color: AppColors.error,
+                              size: 15,
+                            ),
+                            submittedIcon: CircleAvatar(
+                              backgroundColor: Colors.white,
+                              child: const Icon(
+                                Icons.check,
+                                color: AppColors.success,
+                                size: 15,
+                              ),
+                            ),
+                            elevation: 0.0,
+                            onSubmit: () {
+                              _showRejectOrderDrawer();
+                              return null;
+                            },
+                            sliderButtonYOffset: -8,
+                            innerColor: const Color(0xFFFFFFFF),
+                            outerColor: Colors.transparent,
+                            borderRadius: 50,
+                          ),
                         ),
-                      ],
-                      const SizedBox(
-                        height: 24,
-                      ), // Add bottom padding for better scrolling
+                      ),
                     ],
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
+  // Calculate bottom padding based on button visibility
+  double _getBottomPadding(String currentStatus, bool isRejected) {
+    if (!_isOrderAccepted && !isRejected && currentStatus != 'is_finished') {
+      // Accept button + Reject button + padding
+      return 180;
+    } else if (_isOrderAccepted ||
+        isRejected ||
+        currentStatus == 'is_finished') {
+      // Just the accept/status button(s) + padding
+      final isArrived = currentStatus == 'arrived';
+      final showFinishButton =
+          currentStatus == 'in_progress' ||
+          currentStatus == 'in progress' ||
+          currentStatus == 'is_finished' ||
+          currentStatus == 'completed' ||
+          currentStatus == 'arrived';
+
+      if (isArrived) {
+        // All three buttons visible
+        return 220;
+      } else if (showFinishButton) {
+        // Two buttons visible
+        return 160;
+      } else {
+        // One button visible
+        return 100;
+      }
+    }
+    return 100;
+  }
+
   Widget _buildHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(top: 54, left: 24),
+      padding: const EdgeInsets.only(top: 16),
 
       child: Row(
         children: [
           GestureDetector(
             onTap: () => Navigator.of(context).pop(),
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
                 border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.close,
                 size: 24,
-                color: _textColor,
+                color: Color(0xFF3E4069),
                 weight: 2.5,
               ),
             ),
@@ -700,176 +745,173 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   }
 
   Widget _buildOrderHeader() {
-    final currentStatus = _getCurrentStatus().toLowerCase();
-    final isRejected =
-        currentStatus == 'rejected' || currentStatus == 'cancelled';
+    // final currentStatus = _getCurrentStatus().toLowerCase();
+    // final isRejected =
+    //     currentStatus == 'rejected' || currentStatus == 'cancelled';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_isOrderAccepted || isRejected)
-          Container(
-            width: double.infinity,
-            alignment: Alignment.center,
-            height: 48,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            decoration: BoxDecoration(
-              color: isRejected
-                  ? AppColors
-                        .error // Red for Rejected/Cancelled
-                  : widget.order.status == 'In Progress'
-                  ? const Color(0xFFEEB128).withValues(
-                      alpha: 0.1,
-                    ) // Yellow for In Progress
-                  : const Color(
-                      0xFF27AE60,
-                    ).withValues(alpha: 0.1), // Green for other statuses
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // if (_isOrderAccepted || isRejected)
+        //   Container(
+        //     width: double.infinity,
+        //     alignment: Alignment.center,
+        //     height: 48,
+        //     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        //     decoration: BoxDecoration(
+        //       color: isRejected
+        //           ? AppColors
+        //                 .error // Red for Rejected/Cancelled
+        //           : widget.order.status == 'In Progress'
+        //           ? const Color(0xFFEEB128).withValues(
+        //               alpha: 0.1,
+        //             ) // Yellow for In Progress
+        //           : const Color(
+        //               0xFF27AE60,
+        //             ).withValues(alpha: 0.1), // Green for other statuses
+        //       borderRadius: BorderRadius.circular(25),
+        //     ),
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //       children: [
+        //         Text(
+        //           isRejected ? 'Rejected' : _getStatusDisplayText(),
+        //           style: TextStyle(
+        //             fontSize: 16,
+        //             fontWeight: FontWeight.w700,
+        //             color: widget.order.statusColor,
+        //           ),
+        //         ),
+        //         if (widget.order.status != 'Arrived' &&
+        //             widget.order.status != 'Completed' &&
+        //             !isRejected)
+        //           Image.asset(
+        //             'assets/icons/spinner.png',
+        //             width: 24,
+        //             height: 24,
+        //           ),
+        //       ],
+        //     ),
+        //   ),
+        // const SizedBox(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isRejected ? 'Rejected' : _getStatusDisplayText(),
+                  '#${widget.order.orderNumber}',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: widget.order.statusColor,
+                    fontSize: 40,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF3E4069),
                   ),
                 ),
-                if (widget.order.status != 'Arrived' &&
-                    widget.order.status != 'Completed' &&
-                    !isRejected)
-                  Image.asset(
-                    'assets/icons/spinner.png',
-                    width: 24,
-                    height: 24,
+                Text(
+                  widget.order.customerName,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF3E4069),
                   ),
+                ),
               ],
             ),
-          ),
-        const SizedBox(height: 24),
-        Row(
-          children: [
-            Text(
-              '#${widget.order.orderNumber}',
-              style: _bodyStyle.copyWith(
-                fontSize: 25.33,
-                color: _secondaryTextColor,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            OrderCard(model: widget.order).statusBadge(),
           ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          widget.order.customerName,
-          style: _titleStyle.copyWith(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
       ],
     );
   }
 
-  Widget _buildOrderInfoGrid() {
-    return Column(
-      children: [
-        // First row
-        SizedBox(
-          height: _cardHeight,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: _buildInfoCard(
-                  title: 'Order Time',
-                  value: widget.order.time,
-                ),
-              ),
-              const SizedBox(width: _elementSpacing),
-              Expanded(
-                child: _buildInfoCard(
-                  title: 'Plate No.',
-                  value: widget.order.plateNumber,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: _elementSpacing),
-        // Second row
-        SizedBox(
-          height: _cardHeight,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: _buildInfoCard(
-                  title: 'Car Details',
-                  value: widget.order.carDetails.split('(')[0],
-                ),
-              ),
-              const SizedBox(width: _elementSpacing),
-              Expanded(
-                child: _buildInfoCard(
-                  title: 'Car Color',
-                  value:
-                      widget.order.orderData.vehicle?.color?.isNotEmpty == true
-                      ? widget.order.orderData.vehicle!.color!
-                      : 'N/A',
-                  isCarColor: true,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildOrderInfoGrid() {
+  //   return Column(
+  //     children: [
+  //       // First row
+  //       SizedBox(
+  //         height: _cardHeight,
+  //         child: Row(
+  //           crossAxisAlignment: CrossAxisAlignment.stretch,
+  //           children: [
+  //             Expanded(
+  //               child: _buildInfoCard(
+  //                 title: 'Order Time',
+  //                 value: widget.order.time,
+  //               ),
+  //             ),
+  //             const SizedBox(width: _elementSpacing),
+  //             Expanded(
+  //               child: _buildInfoCard(
+  //                 title: 'Plate No.',
+  //                 value: widget.order.plateNumber,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //       const SizedBox(height: _elementSpacing),
+  //       // Second row
+  //       SizedBox(
+  //         height: _cardHeight,
+  //         child: Row(
+  //           crossAxisAlignment: CrossAxisAlignment.stretch,
+  //           children: [
+  //             Expanded(
+  //               child: _buildInfoCard(
+  //                 title: 'Car Details',
+  //                 value: widget.order.carDetails.split('(')[0],
+  //               ),
+  //             ),
+  //             const SizedBox(width: _elementSpacing),
+  //             Expanded(
+  //               child: _buildInfoCard(
+  //                 title: 'Car Color',
+  //                 value:
+  //                     widget.order.orderData.vehicle?.color?.isNotEmpty == true
+  //                     ? widget.order.orderData.vehicle!.color!
+  //                     : 'N/A',
+  //                 isCarColor: true,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
-  Widget _buildOrderInfoDeliveryOrBranch() {
-    return Column(
-      children: [
-        // First row
-        SizedBox(
-          height: _cardHeight,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: _buildInfoCard(
-                  title: 'Order Time',
-                  value: widget.order.time,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: _elementSpacing),
-        // Second row
-        SizedBox(
-          height: _cardHeight,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: _buildInfoCard(
-                  title: widget.order.orderType == 'branch'
-                      ? 'Branch'
-                      : 'Address',
-                  value: widget.order.orderType == 'branch'
-                      ? 'Picked up from this branch.'
-                      : widget.order.customerAddress,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildNewInfoCard() {
+  //   return Row(
+  //     children: [
+  //       Column(
+  //         children: [
+  //           // First row
+  //           SizedBox(
+  //             height: _cardHeight,
+  //             child: _buildInfoCard(
+  //               title: 'Order Time',
+  //               value: widget.order.time,
+  //             ),
+  //           ),
+  //           const SizedBox(height: _elementSpacing),
+  //           // Second row
+  //           SizedBox(
+  //             height: _cardHeight,
+  //             child: _buildInfoCard(
+  //               title: widget.order.orderType == 'branch'
+  //                   ? 'Branch'
+  //                   : 'Address',
+  //               value: widget.order.orderType == 'branch'
+  //                   ? 'Picked up from this branch.'
+  //                   : widget.order.customerAddress,
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildOrderDetailsSection() {
     final orderDetails = widget.order.orderData.orderDetails ?? [];
@@ -881,7 +923,14 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Order details', style: _titleStyle),
+        Text(
+          'Order details',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF3E4069),
+          ),
+        ),
         const SizedBox(height: _sectionSpacing),
         ...orderDetails.expand<Widget>((detail) {
             final price = double.tryParse(detail.productPrice ?? '0') ?? 0;
@@ -894,58 +943,155 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                 quantity,
                 total,
               ),
-              const SizedBox(height: _sectionSpacing),
               _buildDivider(),
-              const SizedBox(height: _sectionSpacing),
+              const SizedBox(height: 16),
             ];
           }).toList()
           ..removeLast()
-          ..removeLast(), // Remove the last divider and SizedBox
+          ..removeLast(),
       ],
     );
   }
 
   Widget _buildDivider() {
-    return Container(height: 1, width: double.infinity, color: _dividerColor);
+    return Container(height: 0.7, width: double.infinity, color: _dividerColor);
   }
 
   // Helper method to get the correct status text for display
-  String _getStatusDisplayText() {
-    // First try to get status from logs
-    final currentStatus = _getCurrentStatus().toLowerCase();
+  // String _getStatusDisplayText() {
+  //   // First try to get status from logs
+  //   final currentStatus = _getCurrentStatus().toLowerCase();
 
-    if (currentStatus.contains('new') || currentStatus == 'active') {
-      return 'New Order';
-    } else if (currentStatus.contains('progress') ||
-        currentStatus == 'in_progress') {
-      return 'In Progress';
-    } else if (currentStatus.contains('is_finished') ||
-        currentStatus == 'is_finished') {
-      return 'Finished';
-    } else if (currentStatus == 'arrived') {
-      return 'Arrived';
-    } else if (currentStatus == 'completed') {
-      return 'Completed';
+  //   if (currentStatus.contains('new') || currentStatus == 'active') {
+  //     return 'New Order';
+  //   } else if (currentStatus.contains('progress') ||
+  //       currentStatus == 'in_progress') {
+  //     return 'In Progress';
+  //   } else if (currentStatus.contains('is_finished') ||
+  //       currentStatus == 'is_finished') {
+  //     return 'Finished';
+  //   } else if (currentStatus == 'arrived') {
+  //     return 'Arrived';
+  //   } else if (currentStatus == 'completed') {
+  //     return 'Completed';
+  //   }
+
+  //   // Fallback to order status if no match found in logs
+  //   final orderStatus = widget.order.status.toLowerCase();
+  //   if (orderStatus.contains('new') || orderStatus == 'active') {
+  //     return 'New Order';
+  //   } else if (orderStatus.contains('progress') ||
+  //       orderStatus == 'in_progress') {
+  //     return 'In Progress';
+  //   } else if (orderStatus.contains('is_finished') ||
+  //       orderStatus == 'is_finished') {
+  //     return 'Finished';
+  //   } else if (orderStatus == 'arrived') {
+  //     return 'Arrived';
+  //   } else if (orderStatus == 'completed') {
+  //     return 'Completed';
+  //   }
+
+  //   // Default to the raw status if no match is found
+  //   return widget.order.status;
+  // }
+
+  List<Widget> buildCurbsideInfo() {
+    final double fixedHeight = 35;
+
+    return [
+      Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: SizedBox(
+          height: fixedHeight,
+          child: Row(
+            spacing: 6,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Plate number
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFF2F5F9),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Text(
+                      widget.order.orderData.vehicle?.plateNumber ?? '',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF3E4069),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Car details
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFF2F5F9),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Text(
+                      _getCarDetailsText(
+                        widget.order.orderData.vehicle?.type ?? '',
+                      ),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF3E4069),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Color indicator
+              Container(
+                width: 60,
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: getColorFromString(
+                    widget.order.orderData.vehicle?.color ?? '',
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!, width: 1),
+                ),
+              ),
+              CachedNetworkImage(
+                imageUrl: widget.order.orderData.vehicle?.image != null
+                    ? ApiConstants.getCarLogoUrl(
+                        widget.order.orderData.vehicle!.image!,
+                      )
+                    : '',
+                width: 60,
+                height: fixedHeight,
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) =>
+                    Icon(Icons.error, color: Colors.red),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ];
+  }
+
+  String _getCarDetailsText(String carDetails) {
+    final maxLength = 10;
+    final cleanText = carDetails.split('(')[0].trim();
+
+    if (cleanText.length > maxLength) {
+      return '${cleanText.substring(0, maxLength)}...';
     }
-
-    // Fallback to order status if no match found in logs
-    final orderStatus = widget.order.status.toLowerCase();
-    if (orderStatus.contains('new') || orderStatus == 'active') {
-      return 'New Order';
-    } else if (orderStatus.contains('progress') ||
-        orderStatus == 'in_progress') {
-      return 'In Progress';
-    } else if (orderStatus.contains('is_finished') ||
-        orderStatus == 'is_finished') {
-      return 'Finished';
-    } else if (orderStatus == 'arrived') {
-      return 'Arrived';
-    } else if (orderStatus == 'completed') {
-      return 'Completed';
-    }
-
-    // Default to the raw status if no match is found
-    return widget.order.status;
+    return cleanText;
   }
 
   Widget _buildTotalAmount() {
@@ -958,29 +1104,37 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
       decoration: BoxDecoration(
-        color: _cardBackgroundColor,
-        borderRadius: BorderRadius.circular(_buttonBorderRadius),
+        color: Color(0xFFF2F5F9),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Subtotal',
-                style: TextStyle(fontSize: 16, color: _secondaryTextColor),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF3E4069),
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               Row(
                 children: [
                   SvgPicture.asset(
                     'assets/icons/riyal.svg',
-                    width: 16,
-                    height: 16,
+                    width: 20,
+                    height: 20,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     subtotal.toStringAsFixed(2),
-                    style: const TextStyle(fontSize: 16, color: _textColor),
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xFF3E4069),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
@@ -991,21 +1145,29 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'VAT',
-                  style: TextStyle(fontSize: 16, color: _secondaryTextColor),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF3E4069),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 Row(
                   children: [
                     SvgPicture.asset(
                       'assets/icons/riyal.svg',
-                      width: 16,
-                      height: 16,
+                      width: 20,
+                      height: 20,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       widget.order.orderData.vatAmount ?? '0',
-                      style: const TextStyle(fontSize: 16, color: _textColor),
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Color(0xFF3E4069),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -1015,37 +1177,45 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Delivery Fee',
-                    style: TextStyle(fontSize: 16, color: _secondaryTextColor),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF3E4069),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   Row(
                     children: [
                       SvgPicture.asset(
                         'assets/icons/riyal.svg',
-                        width: 16,
-                        height: 16,
+                        width: 20,
+                        height: 20,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         deliveryFee.toStringAsFixed(2),
-                        style: const TextStyle(fontSize: 16, color: _textColor),
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xFF3E4069),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
                 ],
               ),
           ],
-          const Divider(height: 24, thickness: 1, color: _dividerColor),
+          const Divider(height: 24, thickness: 2, color: _dividerColor),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Total',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: _textColor,
+                  color: Color(0xFF3E4069),
                 ),
               ),
               Row(
@@ -1058,10 +1228,10 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   const SizedBox(width: 4),
                   Text(
                     widget.order.orderData.netAmount ?? '0',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: _textColor,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF3E4069),
                     ),
                   ),
                 ],
@@ -1107,7 +1277,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
             ),
             elevation: 0,
           ),
-          child: const Text(
+          child: Text(
             'Order Rejected',
             style: TextStyle(
               color: Colors.white,
@@ -1142,7 +1312,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
               ),
               child: Text(
                 _getAcceptanceStatusText().split('-').join('\n'),
-                style: TextStyle(fontSize: 20, color: Colors.black),
+                style: TextStyle(fontSize: 20, color: Color(0xFF3E4069)),
               ),
             ),
           ),
@@ -1210,7 +1380,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
+                child: Text(
                   'Mark as Completed',
                   style: TextStyle(
                     fontSize: 16,
@@ -1237,15 +1407,32 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           ),
           elevation: 0,
         ),
-        child: const Text('Accept', style: _buttonTextStyle),
+        child: Text('Accept', style: _buttonTextStyle),
       ),
     );
+  }
+
+  String _formatTimeOnly(String isoTime) {
+    try {
+      final dateTime = DateTime.parse(isoTime).toLocal();
+      final hour = dateTime.hour > 12
+          ? dateTime.hour - 12
+          : dateTime.hour == 0
+          ? 12
+          : dateTime.hour;
+      final minute = dateTime.minute.toString().padLeft(2, '0');
+      final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+
+      return '${hour.toString().padLeft(2, '0')}:$minute $period';
+    } catch (e) {
+      return '--:-- --';
+    }
   }
 
   String _getAcceptanceStatusText() {
     final logs = widget.order.orderData.logs;
     if (logs == null || logs.isEmpty) {
-      return 'Accepted at ${formatTime(DateTime.now().toIso8601String())}';
+      return 'Accepted at (${_formatTimeOnly(DateTime.now().toIso8601String())})';
     }
 
     // Find the in_progress log
@@ -1254,23 +1441,36 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       orElse: () => logs.first,
     );
 
-    return 'Accepted at ${formatTime(inProgressLog.logTimestamp ?? DateTime.now().toIso8601String())}';
+    return 'Accepted at (${_formatTimeOnly(inProgressLog.logTimestamp ?? DateTime.now().toIso8601String())})';
   }
 
   Widget _buildOrderItem(String itemName, int quantity, double price) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: Text(itemName, style: _bodyStyle)),
+        Expanded(
+          child: Text(
+            itemName,
+            style: TextStyle(
+              fontSize: 20,
+              color: Color(0xFF3E4069),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
         const Spacer(),
         Text(
           '$quantity x',
-          style: _bodyStyle.copyWith(color: _secondaryTextColor),
+          style: TextStyle(fontSize: 18, color: Color(0xFF3E4069)),
         ),
         const SizedBox(width: 8),
         Text(
           '${price.toStringAsFixed(2)} SAR',
-          style: _bodyStyle.copyWith(fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 20,
+            color: Color(0xFF3E4069),
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );

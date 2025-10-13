@@ -4,16 +4,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:audioplayers/audioplayers.dart';
+// import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_appbar.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_footer.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_order_section.dart';
-import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_stats_section.dart';
+// import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_stats_section.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_status_toggle.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_util.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/notification_util.dart';
-import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/responsive_util.dart';
+// import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/responsive_util.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_details_drawer.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/option_drawer.dart';
@@ -195,8 +196,8 @@ class HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final horizontalPadding = ResponsiveUtils.getHorizontalPadding(context);
-    final headerFontSize = ResponsiveUtils.getHeaderFontSize(context);
+    // final horizontalPadding = ResponsiveUtils.getHorizontalPadding(context);
+    // final headerFontSize = ResponsiveUtils.getHeaderFontSize(context);
     // final screenWidth = MediaQuery.of(context).size.width;
     // final orientation = MediaQuery.of(context).orientation;
 
@@ -225,110 +226,108 @@ class HomeViewState extends State<HomeView> {
               )
             : const OptionDrawer(),
         onEndDrawerChanged: _handleDrawerChanged,
-        body: SafeArea(
-          child: BlocConsumer<HomeBloc, HomeState>(
-            listener: (context, state) {
-              if (state.getOrdersListStatus == ResponseStatus.failure) {}
-            },
-            builder: (context, state) {
-              final isLoading =
-                  state.getOrdersListStatus == ResponseStatus.loading;
-              List<OrderCardModel> orders = [];
+        body: BlocConsumer<HomeBloc, HomeState>(
+          listener: (context, state) {
+            if (state.getOrdersListStatus == ResponseStatus.failure) {}
+          },
+          builder: (context, state) {
+            final isLoading =
+                state.getOrdersListStatus == ResponseStatus.loading;
+            List<OrderCardModel> orders = [];
 
-              if (!isLoading && state.ordersList != null) {
-                orders = HomeUtils.processOrders(state.ordersList!);
-              }
+            if (!isLoading && state.ordersList != null) {
+              orders = HomeUtils.processOrders(state.ordersList!);
+            }
 
-              // Function to handle refresh
-              Future<void> onRefresh() async {
-                context.read<HomeBloc>().add(const HomeEvent.getOrdersData());
-                context.read<HomeBloc>().add(const HomeEvent.getOrderStats());
-                context.read<HomeBloc>().add(const HomeEvent.getBranchData());
-                // Wait for a short delay to allow the refresh indicator to show
-                await Future.delayed(const Duration(seconds: 1));
-              }
+            // Function to handle refresh
+            Future<void> onRefresh() async {
+              context.read<HomeBloc>().add(const HomeEvent.getOrdersData());
+              context.read<HomeBloc>().add(const HomeEvent.getOrderStats());
+              context.read<HomeBloc>().add(const HomeEvent.getBranchData());
+              // Wait for a short delay to allow the refresh indicator to show
+              await Future.delayed(const Duration(seconds: 1));
+            }
 
-              return Column(
-                children: [
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: onRefresh,
-                      child: CustomScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        slivers: [
-                          // Responsive AppBar
-                          HomeAppBar(onMenuPressed: _handleMenuPressed),
+            return Column(
+              children: [
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: onRefresh,
+                    child: CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        // Responsive AppBar
+                        HomeAppBar(onMenuPressed: _handleMenuPressed),
 
-                          // Status toggles section
-                          SliverToBoxAdapter(
-                            child: Container(
-                              padding: EdgeInsets.only(
-                                left: horizontalPadding,
-                                right: horizontalPadding,
-                                top: 32,
-                              ),
-                              child: Column(
-                                children: [
-                                  BlocBuilder<HomeBloc, HomeState>(
-                                    builder: (context, state) {
-                                      final isEnabled =
-                                          state.getBranchesData?.orderingStatus
-                                              ?.toLowerCase() !=
-                                          'disabled';
-                                      final isLoading =
-                                          state
-                                              .updateBranchOrderingStatusStatus ==
-                                          ResponseStatus.loading;
-                                      return HomeStatusToggle(
-                                        isEnabled: isEnabled,
-                                        isLoading: isLoading,
-                                        onChanged: (value) {
-                                          log(
-                                            'value: ${state.getBranchesData?.branchId}',
-                                          );
-                                          context.read<HomeBloc>().add(
-                                            HomeEvent.updateBranchOrderingStatus(
-                                              state.getBranchesData?.branchId ??
-                                                  '',
-                                              value ? 'enabled' : 'disabled',
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
+                        // Status toggles section
+                        SliverToBoxAdapter(
+                          child: Container(
+                            padding: EdgeInsets.only(
+                              left: 20,
+                              right: 20,
+                              top: 20,
+                            ),
+                            child: Column(
+                              children: [
+                                BlocBuilder<HomeBloc, HomeState>(
+                                  builder: (context, state) {
+                                    final isEnabled =
+                                        state.getBranchesData?.orderingStatus
+                                            ?.toLowerCase() !=
+                                        'disabled';
+                                    final isLoading =
+                                        state
+                                            .updateBranchOrderingStatusStatus ==
+                                        ResponseStatus.loading;
+                                    return HomeStatusToggle(
+                                      isEnabled: isEnabled,
+                                      isLoading: isLoading,
+                                      onChanged: (value) {
+                                        log(
+                                          'value: ${state.getBranchesData?.branchId}',
+                                        );
+                                        context.read<HomeBloc>().add(
+                                          HomeEvent.updateBranchOrderingStatus(
+                                            state.getBranchesData?.branchId ??
+                                                '',
+                                            value ? 'enabled' : 'disabled',
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                           ),
+                        ),
 
-                          // Stats cards section
-                          HomeStatsSection(
-                            horizontalPadding: horizontalPadding,
-                          ),
+                        // // Stats cards section
+                        // HomeStatsSection(
+                        //   horizontalPadding: horizontalPadding,
+                        // ),
 
-                          // Orders section
-                          HomeOrdersSection(
-                            horizontalPadding: horizontalPadding,
-                            headerFontSize: headerFontSize,
-                            selectedTab: selectedTab,
-                            orders: orders,
-                            isLoading: isLoading,
-                            onTabChanged: _handleTabChanged,
-                            onOrderTap: _showOrderDetails,
-                          ),
+                        // Orders section
+                        HomeOrdersSection(
+                          horizontalPadding: 48,
+                          headerFontSize: 32,
+                          selectedTab: selectedTab,
+                          orders: orders,
+                          isLoading: isLoading,
+                          onTabChanged: _handleTabChanged,
+                          onOrderTap: _showOrderDetails,
+                        ),
 
-                          const SliverToBoxAdapter(child: SizedBox(height: 50)),
-                        ],
-                      ),
+                        const SliverToBoxAdapter(child: SizedBox(height: 50)),
+                      ],
                     ),
                   ),
-                  // Footer
-                  HomeFooter(horizontalPadding: horizontalPadding),
-                ],
-              );
-            },
-          ),
+                ),
+                // Footer
+                HomeFooter(),
+              ],
+            );
+          },
         ),
       ),
     );

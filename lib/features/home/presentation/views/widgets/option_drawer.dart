@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:whatsapp_workflow_mobileapp/config/router/go_router_config.dart';
@@ -13,7 +14,7 @@ class OptionDrawer extends StatelessWidget {
       width: MediaQuery.of(context).size.width * 0.5,
       backgroundColor: AppColors.background,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 54, horizontal: 24),
+        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
         child: Column(
           children: [
             GestureDetector(
@@ -21,12 +22,10 @@ class OptionDrawer extends StatelessWidget {
               child: Align(
                 alignment: Alignment.topLeft,
                 child: Container(
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(
-                      color: AppColors.textPrimary,
-                      width: 2.5,
-                    ),
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(Icons.close, size: 24, weight: 2.5),
                 ),

@@ -26,7 +26,7 @@ class OrderTrackingTimeline extends StatelessWidget {
       case 'arrived':
         return 'Customer Arrived';
       case 'is_finished':
-        return 'Order Finished';
+        return 'Order is ready';
       case 'completed':
         return 'Order Completed';
       default:
@@ -149,11 +149,19 @@ class TimelineItem extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF3E4069),
+                  ),
                 ),
                 Text(
                   time,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF3E4069),
+                  ),
                 ),
               ],
             ),

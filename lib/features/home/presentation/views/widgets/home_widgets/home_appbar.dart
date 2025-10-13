@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
-import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/responsive_util.dart';
+// import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/responsive_util.dart';
 
 class HomeAppBar extends StatelessWidget {
   final VoidCallback onMenuPressed;
@@ -13,9 +13,9 @@ class HomeAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final horizontalPadding = ResponsiveUtils.getHorizontalPadding(context);
+    // final horizontalPadding = ResponsiveUtils.getHorizontalPadding(context);
     // final screenWidth = MediaQuery.of(context).size.width;
-    final orientation = MediaQuery.of(context).orientation;
+    // final orientation = MediaQuery.of(context).orientation;
 
     return SliverAppBar(
       automaticallyImplyLeading: false,
@@ -24,8 +24,7 @@ class HomeAppBar extends StatelessWidget {
       elevation: 0,
       floating: false,
       pinned: true,
-      toolbarHeight: kToolbarHeight,
-      expandedHeight: orientation == Orientation.landscape ? 70 : 80,
+      toolbarHeight: 80,
       actions: [SizedBox.shrink()],
       flexibleSpace: Container(
         decoration: BoxDecoration(
@@ -37,7 +36,7 @@ class HomeAppBar extends StatelessWidget {
         ),
         child: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            padding: EdgeInsets.symmetric(horizontal: 22),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -61,47 +60,74 @@ class HomeAppBar extends StatelessWidget {
                         builder: (context, constraints) {
                           if (constraints.maxWidth < 600) {
                             return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               spacing: 8,
                               children: [
-                                CachedNetworkImage(
-                                  imageUrl:
-                                      branchData?.business?.businessLogoUrl ??
-                                      '',
-                                  height: 50,
-                                  placeholder: (context, url) =>
-                                      const SizedBox.shrink(),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                ),
-                                Flexible(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          branchData?.business?.businessName ??
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  spacing: 4,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 2,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(6),
+                                        child: CachedNetworkImage(
+                                          imageUrl:
+                                              branchData
+                                                  ?.business
+                                                  ?.businessLogoUrl ??
                                               '',
-                                          style: TextStyle(
-                                            color: AppColors.background,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          height: 50,
+                                          placeholder: (context, url) =>
+                                              const SizedBox.shrink(),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
                                         ),
                                       ),
-                                      FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          branchData?.branchName ?? '',
-                                          style: TextStyle(
-                                            color: AppColors.backgroundLight,
-                                            fontWeight: FontWeight.w900,
+                                    ),
+                                    Flexible(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              branchData
+                                                      ?.business
+                                                      ?.businessName ??
+                                                  '',
+                                              style: TextStyle(
+                                                color: AppColors.background,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              branchData?.branchName ?? '',
+                                              style: TextStyle(
+                                                color:
+                                                    AppColors.backgroundLight,
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                                 IconButton(
                                   icon: Icon(
@@ -117,14 +143,27 @@ class HomeAppBar extends StatelessWidget {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              CachedNetworkImage(
-                                imageUrl:
-                                    branchData?.business?.businessLogoUrl ?? '',
-                                height: 50,
-                                placeholder: (context, url) =>
-                                    const SizedBox.shrink(),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: CachedNetworkImage(
+                                    imageUrl:
+                                        branchData?.business?.businessLogoUrl ??
+                                        '',
+                                    height: 50,
+                                    placeholder: (context, url) =>
+                                        const SizedBox.shrink(),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
+                                ),
                               ),
                               SizedBox(width: 12),
                               Column(
@@ -150,12 +189,12 @@ class HomeAppBar extends StatelessWidget {
                                 ],
                               ),
                               Spacer(),
-                              Container(
-                                height: 33,
-                                color: Colors.white,
-                                width: 1,
-                              ),
-                              SizedBox(width: 24),
+                              // Container(
+                              //   height: 33,
+                              //   color: Colors.white,
+                              //   width: 1,
+                              // ),
+                              // SizedBox(width: 24),
                               IconButton(
                                 icon: Icon(
                                   Icons.menu,

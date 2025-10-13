@@ -1,12 +1,13 @@
 import 'dart:developer';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:lottie/lottie.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_appbar.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/mapping.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/option_drawer.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
@@ -54,17 +55,9 @@ class _HistoryViewState extends State<HistoryView> {
 
   double _getHorizontalPadding(BuildContext context) {
     final width = _getScreenWidth(context);
-    if (width > 1200) return 80.0;
-    if (width > 900) return 60.0;
-    return 40.0;
-  }
-
-  double _getChildAspectRatio(BuildContext context) {
-    if (_isLandscape(context)) {
-      return _isLargeTablet(context) ? 8 / 3 : 8 / 3.5;
-    } else {
-      return 8 / 4.6;
-    }
+    if (width > 1200) return 80;
+    if (width > 900) return 60;
+    return 40;
   }
 
   double _getSearchWidth(BuildContext context) {
@@ -123,6 +116,19 @@ class _HistoryViewState extends State<HistoryView> {
 
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  void _handleMenuPressed() {
+    if (_selectedOrder == null) {
+      _scaffoldKey.currentState?.openEndDrawer();
+    } else {
+      setState(() {
+        _selectedOrder = null;
+      });
+      Future.delayed(Duration(milliseconds: 100), () {
+        _scaffoldKey.currentState?.openEndDrawer();
+      });
     }
   }
 
@@ -206,13 +212,13 @@ class _HistoryViewState extends State<HistoryView> {
 
             return CustomScrollView(
               slivers: [
-                _buildResponsiveAppBar(context, horizontalPadding),
+                HomeAppBar(onMenuPressed: _handleMenuPressed),
                 _buildOrdersHeader(context, horizontalPadding),
                 // Show loading indicator or orders grid based on loading state
                 if (state.getOrdersListStatus == ResponseStatus.loading)
                   SliverToBoxAdapter(
                     child: SizedBox(
-                      height: 300, // Adjust height as needed
+                      height: 300,
                       child: Center(
                         child: Lottie.asset('assets/loading.json', width: 150),
                       ),
@@ -226,129 +232,6 @@ class _HistoryViewState extends State<HistoryView> {
           },
         ),
       ),
-    );
-  }
-
-  Widget _buildResponsiveAppBar(
-    BuildContext context,
-    double horizontalPadding,
-  ) {
-    return SliverAppBar(
-      automaticallyImplyLeading: false,
-      leading: const SizedBox.shrink(),
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      floating: false,
-      pinned: true,
-      toolbarHeight: kToolbarHeight,
-      expandedHeight: _isLandscape(context) ? 70 : 80,
-      actions: [SizedBox.shrink()],
-      flexibleSpace: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: [AppColors.primary, AppColors.primaryDark],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Flexible(
-                  flex: 1,
-                  child: Image.asset(
-                    'assets/ryze-logo.png',
-                    height: _isLandscape(context) ? 30 : 35,
-                  ),
-                ),
-                Flexible(flex: 2, child: _buildBranchInfo(context)),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBranchInfo(BuildContext context) {
-    return BlocConsumer<HomeBloc, HomeState>(
-      listener: (context, state) {
-        if (state.getBranchesDataStatus == ResponseStatus.success) {}
-        if (state.getBranchesDataStatus == ResponseStatus.failure) {}
-      },
-      builder: (context, state) {
-        var branchData = state.getBranchesData;
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            CachedNetworkImage(
-              height: _isLandscape(context) ? 25 : 30,
-              imageUrl: branchData?.business?.businessLogoUrl ?? '',
-              placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
-            SizedBox(width: 8),
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    branchData?.business?.businessName ?? '',
-                    style: TextStyle(
-                      color: AppColors.background,
-                      fontSize: _isLandscape(context) ? 11 : 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    branchData?.branchName ?? '',
-                    style: TextStyle(
-                      color: AppColors.backgroundLight,
-                      fontSize: _isLandscape(context) ? 9 : 10,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 16),
-            Container(
-              height: _isLandscape(context) ? 25 : 33,
-              color: Colors.white,
-              width: 1,
-            ),
-            SizedBox(width: 16),
-            IconButton(
-              icon: Icon(
-                Icons.menu,
-                color: AppColors.background,
-                size: _isLandscape(context) ? 28 : 32,
-              ),
-              onPressed: () {
-                if (_selectedOrder == null) {
-                  _scaffoldKey.currentState?.openEndDrawer();
-                } else {
-                  setState(() {
-                    _selectedOrder = null;
-                  });
-                  Future.delayed(Duration(milliseconds: 100), () {
-                    _scaffoldKey.currentState?.openEndDrawer();
-                  });
-                }
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -476,22 +359,29 @@ class _HistoryViewState extends State<HistoryView> {
     List<OrderCardModel> orders,
     double horizontalPadding,
   ) {
-    return SliverPadding(
-      padding: EdgeInsets.only(
-        left: horizontalPadding,
-        right: horizontalPadding,
-        top: _isLandscape(context) ? 24 : 32,
-      ),
-      sliver: SliverGrid(
-        delegate: SliverChildBuilderDelegate(
-          (_, index) => _buildOrderCard(orders[index], context),
-          childCount: orders.length,
+    final screenWidth = _getScreenWidth(context);
+
+    return SliverToBoxAdapter(
+      child: Container(
+        padding: EdgeInsets.only(
+          left: horizontalPadding,
+          right: horizontalPadding,
+          top: _isLandscape(context) ? 24 : 32,
         ),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: _isLargeTablet(context) ? 32 : 24,
-          mainAxisSpacing: _isLargeTablet(context) ? 32 : 24,
-          childAspectRatio: _getChildAspectRatio(context),
+        child: ListView.builder(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: orders.length,
+          itemBuilder: (_, index) {
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: screenWidth > 900 ? 16 : 10,
+                horizontal: 0,
+              ),
+              child: _buildOrderCard(orders[index], context),
+            );
+          },
         ),
       ),
     );

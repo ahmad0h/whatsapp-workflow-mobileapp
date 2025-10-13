@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
@@ -207,25 +208,22 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
           child: Column(
             children: [
               _buildHeader(context),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Expanded(
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildOrderHeader(),
-                      const SizedBox(height: 32),
+                      SizedBox(height: 32),
                       _buildRejectionReasonSection(),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       _buildCustomReasonSection(),
-                      const SizedBox(height: 40),
+                      SizedBox(height: 40),
                       _buildSendButton(),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -239,21 +237,21 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(top: 24, left: 24, right: 24, bottom: 16),
+      padding: EdgeInsets.only(top: 24, left: 24, right: 24, bottom: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
             onTap: () => Navigator.of(context).pop(),
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: _secondaryTextColor.withValues(alpha: 0.5),
                 ),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.arrow_back_ios_new_rounded,
                 size: 16,
                 color: _textColor,
@@ -268,7 +266,7 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
           //     color: _textColor,
           //   ),
           // ),
-          const SizedBox(width: 40), // For balance
+          SizedBox(width: 40), // For balance
         ],
       ),
     );
@@ -280,10 +278,10 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
       children: [
         Text(
           'Order #${widget.orderNumber}',
-          style: const TextStyle(fontSize: 25.33, fontWeight: FontWeight.w500),
+          style: TextStyle(fontSize: 25.33, fontWeight: FontWeight.w500),
         ),
-        const SizedBox(height: 8),
-        const Text(
+        SizedBox(height: 8),
+        Text(
           'Reject order',
           style: TextStyle(fontSize: 40, fontWeight: FontWeight.w400),
         ),
@@ -306,7 +304,7 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
         const SizedBox(height: 12),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(50),
             border: Border.all(color: AppColors.borderLight),
@@ -314,21 +312,18 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: selectedReason,
-              hint: const Text(
+              hint: Text(
                 'Select Reason',
                 style: TextStyle(color: _secondaryTextColor, fontSize: 16),
               ),
               isExpanded: true,
-              icon: const Icon(
-                Icons.keyboard_arrow_down,
-                color: _secondaryTextColor,
-              ),
+              icon: Icon(Icons.keyboard_arrow_down, color: _secondaryTextColor),
               items: rejectionReasons.map((String reason) {
                 return DropdownMenuItem<String>(
                   value: reason,
                   child: Text(
                     reason,
-                    style: const TextStyle(fontSize: 16, color: _textColor),
+                    style: TextStyle(fontSize: 16, color: _textColor),
                   ),
                 );
               }).toList(),
@@ -368,13 +363,13 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
             maxLines: null,
             expands: true,
             textAlignVertical: TextAlignVertical.top,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'Write The Reason',
               hintStyle: TextStyle(color: _secondaryTextColor, fontSize: 16),
               border: InputBorder.none,
               contentPadding: EdgeInsets.all(16),
             ),
-            style: const TextStyle(fontSize: 16, color: _textColor),
+            style: TextStyle(fontSize: 16, color: _textColor),
           ),
         ),
       ],
@@ -400,7 +395,7 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
                 height: 24,
                 child: Lottie.asset('assets/loading.json', width: 24),
               )
-            : const Text(
+            : Text(
                 'Send',
                 style: TextStyle(
                   fontSize: 16,

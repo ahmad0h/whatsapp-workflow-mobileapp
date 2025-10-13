@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 
 class HomeStatusToggle extends StatelessWidget {
@@ -19,7 +20,7 @@ class HomeStatusToggle extends StatelessWidget {
     final isToggleEnabled = onChanged != null && !isLoading;
 
     return Container(
-      padding: EdgeInsets.all(screenWidth > 1200 ? 16 : 12.5),
+      padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
@@ -36,11 +37,11 @@ class HomeStatusToggle extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: screenWidth > 1200 ? 80 : 67,
-            height: screenWidth > 1200 ? 60 : 49,
+            width: 67,
+            height: 49,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: isEnabled ? AppColors.primary : AppColors.error,
+              color: isEnabled ? Colors.green : AppColors.error,
               borderRadius: BorderRadius.circular(11),
             ),
             child: Text(
@@ -52,7 +53,7 @@ class HomeStatusToggle extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: screenWidth > 1200 ? 20 : 16),
+          SizedBox(width: 16),
           Expanded(
             child: Text(
               isEnabled
@@ -69,7 +70,7 @@ class HomeStatusToggle extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               Transform.scale(
-                scale: screenWidth > 1200 ? 1.4 : 1.2,
+                scale: 1.2,
                 child: GestureDetector(
                   onTap: isToggleEnabled ? () => onChanged!(!isEnabled) : null,
                   child: Container(

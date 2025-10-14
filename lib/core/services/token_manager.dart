@@ -4,6 +4,7 @@ class TokenManager {
   static const String _accessTokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
   static const String _branchIdKey = 'branch_id';
+  static const String _deviceTokenKey = 'device_token';
   static final TokenManager _instance = TokenManager._internal();
   late SharedPreferences _prefs;
 
@@ -41,11 +42,20 @@ class TokenManager {
   // Get branch id
   String? get branchId => _prefs.getString(_branchIdKey);
 
+  // Save device token
+  Future<void> saveDeviceToken(String deviceToken) async {
+    await _prefs.setString(_deviceTokenKey, deviceToken);
+  }
+
+  // Get device token
+  String? get deviceToken => _prefs.getString(_deviceTokenKey);
+
   // Clear all tokens (logout)
   Future<void> clearTokens() async {
     await _prefs.remove(_accessTokenKey);
     await _prefs.remove(_refreshTokenKey);
     await _prefs.remove(_branchIdKey);
+    await _prefs.remove(_deviceTokenKey);
   }
 
   // Check if user is logged in

@@ -5,6 +5,8 @@ import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:whatsapp_workflow_mobileapp/core/api/api_constants.dart';
 import 'package:whatsapp_workflow_mobileapp/core/api/dio_helper.dart';
+import 'package:whatsapp_workflow_mobileapp/core/services/device_sync_service.dart';
+import 'package:whatsapp_workflow_mobileapp/core/services/notification_service.dart';
 import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/data_source/home_datasource.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/device_init_response_model.dart';
@@ -201,6 +203,13 @@ class HomeDatasourceImpl implements HomeDatasource {
           refreshToken: response.data['refreshToken'] as String? ?? '',
           branchId: response.data['branchId'] as String? ?? '',
         );
+
+        final deviceSyncService = DeviceSyncService(
+          notificationService: NotificationService(),
+          tokenManager: tokenManager,
+          homeRepo: this,
+        );
+        await deviceSyncService.syncDeviceToken();
         // log('Device status response: ${response.data}');
         return IsLinkedReponseModel.fromJson(response.data);
       }
@@ -310,6 +319,59 @@ class HomeDatasourceImpl implements HomeDatasource {
       return UpdateBranchOrderingStatusResponseModel.fromJson(response.data);
     } catch (e) {
       throw Exception('Failed to process response: $e');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getDeviceByDeviceId(String deviceId) async {
+    try {
+      final token = TokenManager().accessToken;
+      if (token == null || token.isEmpty) {
+        throw Exception('No access token available');
+      }
+
+      final response = await DioHelper.getData(
+        url: '${ApiConstants.baseUrl}/device/by-device-id/$deviceId',
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        if (data.containsKey('device_token')) {
+          data['deviceToken'] = data['device_token'];
+        }
+        return data;
+      } else {
+        throw Exception('Failed to get device info: ${response.statusCode}');
+      }
+    } catch (e) {
+      log('Error getting device info: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateDeviceToken({
+    required String deviceId,
+    required String deviceToken,
+  }) async {
+    try {
+      final response = await DioHelper.postData(
+        url: '${ApiConstants.baseUrl}/device/update-token',
+        data: {'deviceId': deviceId, 'deviceToken': deviceToken},
+        headers: {'Authorization': ApiConstants.token},
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        log('Device token updated successfully');
+      } else {
+        throw Exception(
+          'Failed to update device token: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      log('Error updating device token: $e');
+      rethrow;
     }
   }
 }

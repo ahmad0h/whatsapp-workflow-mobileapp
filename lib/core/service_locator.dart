@@ -1,18 +1,26 @@
+// lib/core/service_locator.dart
 import 'dart:developer';
-
 import 'package:get_it/get_it.dart';
+import 'package:whatsapp_workflow_mobileapp/core/services/device_sync_service.dart';
 import 'package:whatsapp_workflow_mobileapp/core/services/notification_service.dart';
+import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/data/data_source/home_datasource.dart';
 
 final GetIt locator = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
-  // Register services as singleton
+  // Register TokenManager first
+  final tokenManager = TokenManager();
+  await tokenManager.init();
+  locator.registerSingleton<TokenManager>(tokenManager);
+
+  // Register other services
   locator.registerLazySingleton<NotificationService>(
     () => NotificationService(),
   );
 
   try {
-    // Initialize services
+    // Initialize notification service
     await locator<NotificationService>().initialize();
 
     // Get and log the FCM token
@@ -31,4 +39,12 @@ Future<void> setupServiceLocator() async {
     log('Error initializing services: $e');
     rethrow;
   }
+
+  locator.registerLazySingleton<DeviceSyncService>(
+    () => DeviceSyncService(
+      notificationService: locator<NotificationService>(),
+      tokenManager: locator<TokenManager>(),
+      homeRepo: locator<HomeDatasource>(),
+    ),
+  );
 }

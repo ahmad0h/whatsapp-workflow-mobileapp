@@ -23,4 +23,9 @@ abstract class HomeDatasource {
     String branchId,
     String status,
   );
+  Future<Map<String, dynamic>> getDeviceByDeviceId(String deviceId);
+  Future<void> updateDeviceToken({
+    required String deviceId,
+    required String deviceToken,
+  });
 }

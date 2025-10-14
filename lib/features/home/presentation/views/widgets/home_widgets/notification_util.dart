@@ -5,74 +5,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class NotificationUtils {
-  static Future<void> _playSound(
-    AudioPlayer audioPlayer,
-    bool isInitialized,
-    String soundFile,
-    Function(bool) setInitialized, {
-    int repeatCount = 1,
-  }) async {
-    try {
-      if (!isInitialized) {
-        await audioPlayer.setReleaseMode(ReleaseMode.release);
-        setInitialized(true);
-      }
-
-      // Create a new audio player instance for each notification
-      final player = AudioPlayer();
-      
-      try {
-        // Configure player
-        await player.setReleaseMode(ReleaseMode.release);
-        await player.setVolume(1.0);
-        
-        // Load the sound file first
-        final source = AssetSource('sounds/$soundFile');
-        await player.setSource(source);
-        
-        // Play the sound for the specified number of times
-        for (int i = 0; i < repeatCount; i++) {
-          try {
-            // Play the sound
-            await player.resume();
-            
-            // Wait for the sound to complete with a maximum duration
-            await player.onPlayerComplete.first.timeout(
-              const Duration(seconds: 3),
-              onTimeout: () {
-                log('Sound play timed out, moving to next iteration');
-                return Future.value();
-              },
-            );
-            
-            // Add a small delay between plays, except after the last one
-            if (i < repeatCount - 1) {
-              await Future.delayed(const Duration(milliseconds: 300));
-            }
-            
-            log('Played sound ${i + 1}/$repeatCount');
-          } catch (e) {
-            log('Error in play iteration $i: $e');
-            // Continue to next iteration even if one fails
-            await Future.delayed(const Duration(milliseconds: 300));
-          }
-        }
-      } finally {
-        // Always stop and dispose the player when done
-        try {
-          await player.stop();
-          await player.dispose();
-        } catch (e) {
-          log('Error cleaning up player: $e');
-        }
-      }
-    } catch (e) {
-      log('Error in _playSound: $e');
-    } finally {
-      log('Finished playing sound: $soundFile ($repeatCount times)');
-    }
-  }
-
   static Future<StreamSubscription<RemoteMessage>> setupNotificationListener(
     BuildContext context,
     AudioPlayer audioPlayer,
@@ -87,16 +19,19 @@ class NotificationUtils {
       final title = message.notification?.title?.toLowerCase() ?? '';
       final dataTitle = message.data['title']?.toString().toLowerCase() ?? '';
 
-      // Play sound based on notification type
+      // Process the message immediately for order refresh
+      onMessageReceived(message);
+
+      // Play sound asynchronously in the background using microtask
       if (title.contains('new order') || dataTitle.contains('new order')) {
-        await _playSound(
+        _playSoundInBackground(
           audioPlayer,
           isInitialized,
           'received.mp3',
           setInitialized,
         );
       } else if (title.contains('arrived') || dataTitle.contains('arrived')) {
-        await _playSound(
+        _playSoundInBackground(
           audioPlayer,
           isInitialized,
           'arrived.mp3',
@@ -105,7 +40,7 @@ class NotificationUtils {
         );
       } else if (title.contains('Branch Pickup') ||
           title.contains('branch pickup')) {
-        await _playSound(
+        _playSoundInBackground(
           audioPlayer,
           isInitialized,
           'bell.mp3',
@@ -113,9 +48,60 @@ class NotificationUtils {
           repeatCount: 4,
         );
       }
+    });
+  }
 
-      // Call the callback to handle message
-      onMessageReceived(message);
+  static void _playSoundInBackground(
+    AudioPlayer audioPlayer,
+    bool isInitialized,
+    String soundFile,
+    Function(bool) setInitialized, {
+    int repeatCount = 1,
+  }) {
+    // Use microtask to truly run on next event loop iteration
+    Future.microtask(() async {
+      try {
+        if (!isInitialized) {
+          await audioPlayer.setReleaseMode(ReleaseMode.release);
+          setInitialized(true);
+        }
+
+        final source = AssetSource('sounds/$soundFile');
+
+        for (int i = 0; i < repeatCount; i++) {
+          try {
+            await audioPlayer.play(source);
+
+            try {
+              await audioPlayer.onPlayerComplete.first.timeout(
+                const Duration(seconds: 3),
+              );
+            } catch (timeoutError) {
+              log(
+                'Timeout or error waiting for sound completion: $timeoutError',
+              );
+              try {
+                await audioPlayer.stop();
+              } catch (stopError) {
+                log('Error stopping player: $stopError');
+              }
+            }
+
+            if (i < repeatCount - 1) {
+              await Future.delayed(const Duration(milliseconds: 200));
+            }
+
+            log('Played sound ${i + 1}/$repeatCount');
+          } catch (e) {
+            log('Error in play iteration $i: $e');
+            await Future.delayed(const Duration(milliseconds: 200));
+          }
+        }
+      } catch (e) {
+        log('Error in _playSoundInBackground: $e');
+      } finally {
+        log('Finished playing sound: $soundFile ($repeatCount times)');
+      }
     });
   }
 }

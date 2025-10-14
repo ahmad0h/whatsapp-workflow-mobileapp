@@ -1,0 +1,99 @@
+{
+  "auth": {
+    "tapToGenerate": "اضغط بالأسفل للإنشاء",
+    "instruction": "لتفعيل متجرك، أدخل هذا الرقم في لوحة التحكم الخاصة بك.",
+    "generateCode": "إنشاء الرمز",
+    "deviceLinked": "تم ربط الجهاز"
+  },
+  "history": {
+    "today": "اليوم",
+    "custom": "مخصص",
+    "orders": "الطلبات",
+    "searchByOrderNumber": "البحث برقم الطلب"
+  },
+  "home": {
+    "allOrders": "كل الطلبات",
+    "orders": "الطلبات",
+    "newOrders": "طلبات جديدة",
+    "inProgress": "قيد التنفيذ",
+    "arrived": "وصل",
+    "open": "مفتوح",
+    "closed": "مغلق",
+    "acceptingOrders": "أنت تقبل حاليا جميع الطلبات",
+    "notAcceptingOrders": "أنت لا تقبل الطلبات"
+  },
+  "drawer": {
+    "orders": "الطلبات",
+    "history": "السجل"
+  },
+  "order": {
+    "ready": "جاهز",
+    "delivered": "تم التوصيل",
+    "pickedUp": "تم الاستلام",
+    "newOrder": "طلب جديد",
+    "inProgress": "قيد التنفيذ",
+    "arrived": "وصل",
+    "completed": "مكتمل",
+    "isFinished": "انتهى",
+    "branch": "فرع",
+    "delivery": "توصيل",
+    "curbside": "على الرصيف"
+  },
+  "orderDetails": {
+    "rejected": "مرفوض",
+    "completed": "مكتمل",
+    "finished": "منتهي",
+    "inProgress": "قيد التنفيذ",
+    "pending": "قيد الانتظار",
+    "orderTime": "وقت الطلب",
+    "plateNo": "رقم اللوحة",
+    "carDetails": "تفاصيل السيارة",
+    "carColor": "لون السيارة",
+    "notAvailable": "غير متاح",
+    "branch": "الفرع",
+    "address": "العنوان",
+    "pickedUpFromBranch": "تم الاستلام من هذا الفرع.",
+    "orderDetails": "تفاصيل الطلب",
+    "subtotal": "المجموع الفرعي",
+    "vat": "ضريبة القيمة المضافة",
+    "deliveryFee": "رسوم التوصيل",
+    "total": "المجموع",
+    "orderRejected": "تم رفض الطلب",
+    "orderMarkedAsFinished": "تم تحديد الطلب على أنه منتهي في ({time})",
+    "orderIsReady": "هل الطلب جاهز؟",
+    "markAsCompleted": "تحديد كمكتمل",
+    "accept": "قبول",
+    "acceptedAt": "تم القبول في ({time})",
+    "rejectOrder": "رفض الطلب"
+  },
+  "tracking": {
+    "newOrder": "طلب جديد",
+    "orderInProgress": "الطلب قيد التنفيذ",
+    "customerArrived": "وصل العميل",
+    "orderIsReady": "الطلب جاهز",
+    "orderCompleted": "اكتمل الطلب"
+  },
+  "reject": {
+    "branchClosed": "الفرع مغلق",
+    "wrongAddress": "عنوان خاطئ",
+    "customerCancelled": "ألغى العميل",
+    "paymentIssue": "مشكلة في الدفع",
+    "maintenancePeriod": "فترة صيانة",
+    "other": "آخر",
+    "pleaseSelectReason": "يرجى تحديد سبب الرفض",
+    "pleaseProvideReason": "يرجى تقديم سبب للرفض",
+    "orderRejectedSuccessfully": "تم رفض الطلب بنجاح",
+    "failedToReject": "فشل رفض الطلب",
+    "errorOccurred": "حدث خطأ أثناء معالجة طلبك",
+    "rejectOrderTitle": "رفض الطلب",
+    "rejectOrder": "رفض الطلب",
+    "rejectionReason": "سبب الرفض",
+    "selectReason": "اختر السبب",
+    "reason": "السبب",
+    "writeTheReason": "اكتب السبب",
+    "send": "إرسال"
+  },
+  "footer": {
+    "poweredBy": "بواسطة"
+  }
+}

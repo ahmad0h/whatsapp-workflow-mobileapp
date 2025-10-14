@@ -1,0 +1,99 @@
+{
+  "auth": {
+    "tapToGenerate": "Tap below to generate",
+    "instruction": "To activate your store, enter this number in your dashboard.",
+    "generateCode": "Generate code",
+    "deviceLinked": "Device Linked"
+  },
+  "history": {
+    "today": "Today",
+    "custom": "Custom",
+    "orders": "Orders",
+    "searchByOrderNumber": "Search by Order Number"
+  },
+  "home": {
+    "allOrders": "All Orders",
+    "orders": "Orders",
+    "newOrders": "New Orders",
+    "inProgress": "In Progress",
+    "arrived": "Arrived",
+    "open": "OPEN",
+    "closed": "CLOSED",
+    "acceptingOrders": "You are currently accepting all orders",
+    "notAcceptingOrders": "You are not accepting orders"
+  },
+  "drawer": {
+    "orders": "Orders",
+    "history": "History"
+  },
+  "order": {
+    "ready": "Ready",
+    "delivered": "Delivered",
+    "pickedUp": "Picked Up",
+    "newOrder": "New Order",
+    "inProgress": "In Progress",
+    "arrived": "Arrived",
+    "completed": "Completed",
+    "isFinished": "Is Finished",
+    "branch": "Branch",
+    "delivery": "Delivery",
+    "curbside": "Curbside"
+  },
+  "orderDetails": {
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "finished": "Finished",
+    "inProgress": "In Progress",
+    "pending": "Pending",
+    "orderTime": "Order Time",
+    "plateNo": "Plate No.",
+    "carDetails": "Car Details",
+    "carColor": "Car Color",
+    "notAvailable": "N/A",
+    "branch": "Branch",
+    "address": "Address",
+    "pickedUpFromBranch": "Picked up from this branch.",
+    "orderDetails": "Order details",
+    "subtotal": "Subtotal",
+    "vat": "VAT",
+    "deliveryFee": "Delivery Fee",
+    "total": "Total",
+    "orderRejected": "Order Rejected",
+    "orderMarkedAsFinished": "Order Marked as Finished at ({time})",
+    "orderIsReady": "Order is ready?",
+    "markAsCompleted": "Mark as Completed",
+    "accept": "Accept",
+    "acceptedAt": "Accepted at ({time})",
+    "rejectOrder": "Reject Order"
+  },
+  "tracking": {
+    "newOrder": "New Order",
+    "orderInProgress": "Order In Progress",
+    "customerArrived": "Customer Arrived",
+    "orderIsReady": "Order is ready",
+    "orderCompleted": "Order Completed"
+  },
+  "reject": {
+    "branchClosed": "Branch closed",
+    "wrongAddress": "Wrong address",
+    "customerCancelled": "Customer cancelled",
+    "paymentIssue": "Payment issue",
+    "maintenancePeriod": "Maintenance period",
+    "other": "Other",
+    "pleaseSelectReason": "Please select a rejection reason",
+    "pleaseProvideReason": "Please provide a reason for rejection",
+    "orderRejectedSuccessfully": "Order rejected successfully",
+    "failedToReject": "Failed to reject order",
+    "errorOccurred": "An error occurred while processing your request",
+    "rejectOrderTitle": "Reject Order",
+    "rejectOrder": "Reject order",
+    "rejectionReason": "Rejection Reason",
+    "selectReason": "Select Reason",
+    "reason": "Reason",
+    "writeTheReason": "Write The Reason",
+    "send": "Send"
+  },
+  "footer": {
+    "poweredBy": "Powered By"
+  }
+}

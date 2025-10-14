@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -33,12 +34,12 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
   bool _isLoading = false;
 
   final List<String> rejectionReasons = [
-    'Branch closed',
-    'Wrong address',
-    'Customer cancelled',
-    'Payment issue',
-    'Maintenance period',
-    'Other',
+    'reject.branchClosed'.tr(),
+    'reject.wrongAddress'.tr(),
+    'reject.customerCancelled'.tr(),
+    'reject.paymentIssue'.tr(),
+    'reject.maintenancePeriod'.tr(),
+    'reject.other'.tr(),
   ];
 
   // Colors matching OrderDetailsDrawer
@@ -56,8 +57,8 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
     if (selectedReason == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select a rejection reason'),
+          SnackBar(
+            content: Text('reject.pleaseSelectReason'.tr()),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             margin: EdgeInsets.all(16),
@@ -75,12 +76,12 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
     String writtenNote = _reasonController.text.trim();
 
     // If 'Other' is selected, use the custom note if provided
-    if (selectedReason == 'Other') {
+    if (selectedReason == 'reject.other'.tr()) {
       if (writtenNote.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Please provide a reason for rejection'),
+            SnackBar(
+              content: Text('reject.pleaseProvideReason'.tr()),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
               margin: EdgeInsets.all(16),
@@ -128,8 +129,8 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
         // Show success message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Order rejected successfully'),
+            SnackBar(
+              content: Text('reject.orderRejectedSuccessfully'.tr()),
               backgroundColor: AppColors.success,
               duration: Duration(seconds: 2),
               behavior: SnackBarBehavior.floating,
@@ -171,7 +172,7 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
             SnackBar(
               content: Text(
                 currentState.rejectOrderFailures?.message ??
-                    'Failed to reject order',
+                    'reject.failedToReject'.tr(),
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -189,8 +190,8 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
           _isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('An error occurred while processing your request'),
+          SnackBar(
+            content: Text('reject.errorOccurred'.tr()),
             backgroundColor: AppColors.error,
           ),
         );
@@ -281,8 +282,8 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
             ),
           ),
         ),
-        // const Text(
-        //   'Reject Order',
+        // Text(
+        //   'reject.rejectOrderTitle'.tr(),
         //   style: TextStyle(
         //     fontSize: 18,
         //     fontWeight: FontWeight.bold,
@@ -304,7 +305,7 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
         ),
 
         Text(
-          'Reject order',
+          'reject.rejectOrder'.tr(),
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
         ),
       ],
@@ -315,8 +316,8 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Rejection Reason',
+        Text(
+          'reject.rejectionReason'.tr(),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -335,7 +336,7 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
             child: DropdownButton<String>(
               value: selectedReason,
               hint: Text(
-                'Select Reason',
+                'reject.selectReason'.tr(),
                 style: TextStyle(color: _secondaryTextColor, fontSize: 16),
               ),
               isExpanded: true,
@@ -365,8 +366,8 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Reason',
+        Text(
+          'reject.reason'.tr(),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -386,7 +387,7 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
             expands: true,
             textAlignVertical: TextAlignVertical.top,
             decoration: InputDecoration(
-              hintText: 'Write The Reason',
+              hintText: 'reject.writeTheReason'.tr(),
               hintStyle: TextStyle(color: _secondaryTextColor, fontSize: 16),
               border: InputBorder.none,
               contentPadding: EdgeInsets.all(16),
@@ -418,7 +419,7 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
                 child: Lottie.asset('assets/loading.json', width: 24),
               )
             : Text(
-                'Send',
+                'reject.send'.tr(),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,

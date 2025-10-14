@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -19,7 +20,7 @@ class HomeFooter extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Powered By',
+            'footer.poweredBy'.tr(),
             style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
           ),
           Image.asset('assets/footer-logo.png', height: 50),

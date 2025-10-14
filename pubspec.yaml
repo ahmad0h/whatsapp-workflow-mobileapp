@@ -48,7 +48,7 @@ dependencies:
   dio:
   bloc:
   flutter_bloc:
-  intl: ^0.19.0
+  intl:
   injectable:
   flutter_neumorphic_ui: ^0.0.1
   audioplayers: ^5.2.1
@@ -61,6 +61,7 @@ dependencies:
   connectivity_plus: ^6.1.2
   fluttertoast: ^8.2.8
   flutter_screenutil: ^5.9.0
+  easy_localization: ^3.0.8
 
 dev_dependencies:
   flutter_test:
@@ -91,6 +92,7 @@ flutter:
     - assets/
     - assets/icons/
     - assets/sounds/
+    - assets/translations/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

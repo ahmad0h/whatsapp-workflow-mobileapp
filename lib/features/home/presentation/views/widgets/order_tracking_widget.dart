@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/format_time.dart';
@@ -19,16 +20,16 @@ class OrderTrackingTimeline extends StatelessWidget {
     switch (normalizedStatus) {
       case 'new order':
       case 'active':
-        return 'New Order';
+        return 'tracking.newOrder'.tr();
       case 'in_progress':
       case 'in progress':
-        return 'Order In Progress';
+        return 'tracking.orderInProgress'.tr();
       case 'arrived':
-        return 'Customer Arrived';
+        return 'tracking.customerArrived'.tr();
       case 'is_finished':
-        return 'Order is ready';
+        return 'tracking.orderIsReady'.tr();
       case 'completed':
-        return 'Order Completed';
+        return 'tracking.orderCompleted'.tr();
       default:
         // Handle any other status formats
         return status

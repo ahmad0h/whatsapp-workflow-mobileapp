@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -255,7 +256,7 @@ class OrderCard extends StatelessWidget {
   //           ),
   //           SizedBox(width: config.infoSpacing),
   //           Text(
-  //             "Picked Up",
+  //             "order.pickedUp".tr(),
   //             style: TextStyle(
   //               fontSize: config.infoFontSize,
   //               fontWeight: FontWeight.bold,
@@ -392,10 +393,10 @@ class OrderCard extends StatelessWidget {
 
   String _getStatusText(OrderCardModel model) {
     if (model.status == "Is Finished") {
-      return "Ready";
+      return "order.ready".tr();
     } else if (model.orderType == "delivery" &&
         model.status.toLowerCase() == "arrived") {
-      return "Delivered";
+      return "order.delivered".tr();
     }
     return model.status;
   }

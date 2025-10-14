@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
@@ -45,7 +46,7 @@ class HomeStatusToggle extends StatelessWidget {
               borderRadius: BorderRadius.circular(11),
             ),
             child: Text(
-              isEnabled ? 'OPEN' : 'CLOSED',
+              isEnabled ? 'home.open'.tr() : 'home.closed'.tr(),
               style: TextStyle(
                 color: AppColors.background,
                 fontSize: screenWidth > 1200 ? 18 : 16,
@@ -57,8 +58,8 @@ class HomeStatusToggle extends StatelessWidget {
           Expanded(
             child: Text(
               isEnabled
-                  ? 'You are currently accepting all orders'
-                  : 'You are not accepting orders',
+                  ? 'home.acceptingOrders'.tr()
+                  : 'home.notAcceptingOrders'.tr(),
               style: TextStyle(
                 fontSize: screenWidth > 1200 ? 18 : 16,
                 color: Color(0xFF343330),

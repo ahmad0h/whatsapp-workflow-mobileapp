@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic_ui/flutter_neumorphic_ui.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -160,7 +161,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                         orderNumber: widget.order.orderNumber,
                         customerName: widget.order.customerName,
                         time: widget.order.time,
-                        status: 'Rejected',
+                        status: 'orderDetails.rejected'.tr(),
                         statusColor: AppColors.statusRejected,
                         carBrand: widget.order.carBrand,
                         carColor: widget.order.carColor,
@@ -239,7 +240,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           time: updatedOrder.orderDate != null
               ? formatTime(updatedOrder.orderDate!)
               : widget.order.time,
-          status: 'Completed',
+          status: 'orderDetails.completed'.tr(),
           statusColor: _getStatusColor('completed'),
           carBrand: updatedOrder.vehicle?.brand ?? widget.order.carBrand,
           carColor: updatedOrder.vehicle?.color?.toLowerCase() ?? 'grey',
@@ -255,7 +256,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
         // Update the widget's order reference
         if (mounted) {
           setState(() {
-            widget.order.status = 'Completed';
+            widget.order.status = 'orderDetails.completed'.tr();
             // Notify parent widget about the update
             if (widget.onOrderUpdated != null) {
               widget.onOrderUpdated!(updatedCardModel);
@@ -325,7 +326,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           time: updatedOrder.orderDate != null
               ? formatTime(updatedOrder.orderDate!)
               : widget.order.time,
-          status: 'Finished',
+          status: 'orderDetails.finished'.tr(),
           statusColor: _getStatusColor('is_finished'),
           carBrand: updatedOrder.vehicle?.brand ?? widget.order.carBrand,
           carColor: updatedOrder.vehicle?.color?.toLowerCase() ?? 'grey',
@@ -369,7 +370,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
 
     setState(() {
       _isOrderAccepted = true;
-      widget.order.status = 'In Progress';
+      widget.order.status = 'orderDetails.inProgress'.tr();
     });
 
     try {
@@ -466,7 +467,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
 
       setState(() {
         _isOrderAccepted = false;
-        widget.order.status = 'Pending';
+        widget.order.status = 'orderDetails.pending'.tr();
       });
 
       log('Failed to update order status: $e');
@@ -511,7 +512,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     final borderColor = _getColorFromName(value);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       height: _cardHeight,
       decoration: BoxDecoration(
         color: Color(0xFFF2F5F9),
@@ -579,7 +580,10 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   const SizedBox(height: 16),
                   _buildOrderHeader(),
                   const SizedBox(height: 20),
-                  _buildInfoCard(title: 'Order Time', value: widget.order.time),
+                  _buildInfoCard(
+                    title: 'orderDetails.orderTime'.tr(),
+                    value: widget.order.time,
+                  ),
                   if (widget.order.orderType == "curbside") ...[
                     ...buildCurbsideInfo(),
                   ],
@@ -648,7 +652,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                             ),
                           ),
                           child: SlideAction(
-                            text: 'Reject Order',
+                            text: 'orderDetails.rejectOrder'.tr(),
                             textStyle: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
@@ -841,14 +845,14 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   //           children: [
   //             Expanded(
   //               child: _buildInfoCard(
-  //                 title: 'Order Time',
+  //                 title: 'orderDetails.orderTime'.tr(),
   //                 value: widget.order.time,
   //               ),
   //             ),
   //             const SizedBox(width: _elementSpacing),
   //             Expanded(
   //               child: _buildInfoCard(
-  //                 title: 'Plate No.',
+  //                 title: 'orderDetails.plateNo'.tr(),
   //                 value: widget.order.plateNumber,
   //               ),
   //             ),
@@ -864,18 +868,18 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   //           children: [
   //             Expanded(
   //               child: _buildInfoCard(
-  //                 title: 'Car Details',
+  //                 title: 'orderDetails.carDetails'.tr(),
   //                 value: widget.order.carDetails.split('(')[0],
   //               ),
   //             ),
   //             const SizedBox(width: _elementSpacing),
   //             Expanded(
   //               child: _buildInfoCard(
-  //                 title: 'Car Color',
+  //                 title: 'orderDetails.carColor'.tr(),
   //                 value:
   //                     widget.order.orderData.vehicle?.color?.isNotEmpty == true
   //                     ? widget.order.orderData.vehicle!.color!
-  //                     : 'N/A',
+  //                     : 'orderDetails.notAvailable'.tr(),
   //                 isCarColor: true,
   //               ),
   //             ),
@@ -895,7 +899,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   //           SizedBox(
   //             height: _cardHeight,
   //             child: _buildInfoCard(
-  //               title: 'Order Time',
+  //               title: 'orderDetails.orderTime'.tr(),
   //               value: widget.order.time,
   //             ),
   //           ),
@@ -905,10 +909,10 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   //             height: _cardHeight,
   //             child: _buildInfoCard(
   //               title: widget.order.orderType == 'branch'
-  //                   ? 'Branch'
-  //                   : 'Address',
+  //                   ? 'orderDetails.branch'.tr()
+  //                   : 'orderDetails.address'.tr(),
   //               value: widget.order.orderType == 'branch'
-  //                   ? 'Picked up from this branch.'
+  //                   ? 'orderDetails.pickedUpFromBranch'.tr()
   //                   : widget.order.customerAddress,
   //             ),
   //           ),
@@ -929,7 +933,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Order details',
+          'orderDetails.orderDetails'.tr(),
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -1120,7 +1124,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Subtotal',
+                'orderDetails.subtotal'.tr(),
                 style: TextStyle(
                   fontSize: 16,
                   color: Color(0xFF3E4069),
@@ -1157,7 +1161,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'VAT',
+                  'orderDetails.vat'.tr(),
                   style: TextStyle(
                     fontSize: 16,
                     color: Color(0xFF3E4069),
@@ -1193,7 +1197,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Delivery Fee',
+                  'orderDetails.deliveryFee'.tr(),
                   style: TextStyle(
                     fontSize: 16,
                     color: Color(0xFF3E4069),
@@ -1230,7 +1234,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total',
+                'orderDetails.total'.tr(),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -1301,7 +1305,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
             elevation: 0,
           ),
           child: Text(
-            'Order Rejected',
+            'orderDetails.orderRejected'.tr(),
             style: TextStyle(
               color: Colors.white,
               fontSize: 16,
@@ -1373,8 +1377,14 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   currentStatus == 'is_finished' ||
                           currentStatus == 'completed' ||
                           currentStatus == 'arrived'
-                      ? 'Order Marked as Finished${finishedTime != null ? ' at (${_formatTimeOnly(finishedTime)})' : ''}'
-                      : 'Order is ready?',
+                      ? 'orderDetails.orderMarkedAsFinished'.tr(
+                          namedArgs: {
+                            'time': finishedTime != null
+                                ? _formatTimeOnly(finishedTime)
+                                : '',
+                          },
+                        )
+                      : 'orderDetails.orderIsReady'.tr(),
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -1404,7 +1414,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   elevation: 0,
                 ),
                 child: Text(
-                  'Mark as Completed',
+                  'orderDetails.markAsCompleted'.tr(),
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -1431,7 +1441,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           elevation: 0,
         ),
         child: Text(
-          'Accept',
+          'orderDetails.accept'.tr(),
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -1462,7 +1472,9 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
   String _getAcceptanceStatusText() {
     final logs = widget.order.orderData.logs;
     if (logs == null || logs.isEmpty) {
-      return 'Accepted at (${_formatTimeOnly(DateTime.now().toIso8601String())})';
+      return 'orderDetails.acceptedAt'.tr(
+        namedArgs: {'time': _formatTimeOnly(DateTime.now().toIso8601String())},
+      );
     }
 
     // Find the in_progress log
@@ -1471,7 +1483,13 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       orElse: () => logs.first,
     );
 
-    return 'Accepted at (${_formatTimeOnly(inProgressLog.logTimestamp ?? DateTime.now().toIso8601String())})';
+    return 'orderDetails.acceptedAt'.tr(
+      namedArgs: {
+        'time': _formatTimeOnly(
+          inProgressLog.logTimestamp ?? DateTime.now().toIso8601String(),
+        ),
+      },
+    );
   }
 
   Widget _buildOrderItem(String itemName, int quantity, double price) {

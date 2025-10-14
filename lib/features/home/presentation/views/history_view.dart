@@ -1,8 +1,8 @@
 import 'dart:developer';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart' show DateFormat;
 import 'package:lottie/lottie.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
@@ -24,7 +24,7 @@ class HistoryView extends StatefulWidget {
 
 class _HistoryViewState extends State<HistoryView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  String selectedTab = 'Today';
+  String selectedTab = 'history.today'.tr();
   OrderCardModel? _selectedOrder;
   DateTime? _selectedDate;
   final TextEditingController _dateController = TextEditingController();
@@ -97,14 +97,14 @@ class _HistoryViewState extends State<HistoryView> {
       setState(() {
         _selectedDate = picked;
         _dateController.text = DateFormat('yyyy-MM-dd').format(picked);
-        selectedTab = 'Custom';
+        selectedTab = 'history.custom'.tr();
       });
       _loadOrdersForSelectedTab();
     }
   }
 
   void _loadOrdersForSelectedTab() {
-    if (selectedTab == 'Today') {
+    if (selectedTab == 'history.today'.tr()) {
       _selectedDate = DateTime.now();
       _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
     }
@@ -248,7 +248,7 @@ class _HistoryViewState extends State<HistoryView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Orders',
+                    'history.orders'.tr(),
                     style: TextStyle(
                       fontSize: _isLargeTablet(context) ? 28 : 24,
                       fontWeight: FontWeight.w400,
@@ -258,8 +258,8 @@ class _HistoryViewState extends State<HistoryView> {
                   Row(
                     children: [
                       _buildSearchField(context),
-                      _buildTab('Today'),
-                      _buildTab('Custom'),
+                      _buildTab('history.today'.tr()),
+                      _buildTab('history.custom'.tr()),
                     ],
                   ),
                 ],
@@ -268,7 +268,7 @@ class _HistoryViewState extends State<HistoryView> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Orders',
+                    'history.orders'.tr(),
                     style: TextStyle(
                       fontSize: _isLargeTablet(context) ? 36 : 32,
                       fontWeight: FontWeight.w400,
@@ -276,8 +276,8 @@ class _HistoryViewState extends State<HistoryView> {
                   ),
                   Spacer(),
                   _buildSearchField(context),
-                  _buildTab('Today'),
-                  _buildTab('Custom'),
+                  _buildTab('history.today'.tr()),
+                  _buildTab('history.custom'.tr()),
                 ],
               ),
       ),
@@ -338,7 +338,7 @@ class _HistoryViewState extends State<HistoryView> {
             minWidth: _isLandscape(context) ? 30 : 35,
             minHeight: _isLandscape(context) ? 18 : 20,
           ),
-          hintText: 'Search by Order Number',
+          hintText: 'history.searchByOrderNumber'.tr(),
           hintStyle: TextStyle(
             color: Color(0xFF9A9E99),
             fontSize: _isLandscape(context) ? 14 : 16,
@@ -406,7 +406,7 @@ class _HistoryViewState extends State<HistoryView> {
         setState(() {
           selectedTab = text;
         });
-        if (text == 'Custom') {
+        if (text == 'history.custom'.tr()) {
           _selectDate(context);
         } else {
           _loadOrdersForSelectedTab();
@@ -433,14 +433,14 @@ class _HistoryViewState extends State<HistoryView> {
           ],
         ),
         margin: EdgeInsets.only(left: isSmallTab ? 12 : 16),
-        child: text == 'Custom'
+        child: text == 'history.custom'.tr()
             ? Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     isSelected
                         ? DateFormat('MMM d').format(_selectedDate!)
-                        : 'Custom',
+                        : 'history.custom'.tr(),
                     style: TextStyle(
                       fontSize: isSmallTab ? 14 : 17.5,
                       color: isSelected ? Colors.black : Color(0xFF09090B),

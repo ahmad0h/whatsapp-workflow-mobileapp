@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
         builder: FToastBuilder(),
         routerConfig: _goRouter,
         debugShowCheckedModeBanner: false,
+        locale: context.locale,
+        supportedLocales: context.supportedLocales,
+        localizationsDelegates: context.localizationDelegates,
         theme: ThemeData().copyWith(
           textTheme: GoogleFonts.poppinsTextTheme(),
           scaffoldBackgroundColor: Color(0xFFF3F3F3),

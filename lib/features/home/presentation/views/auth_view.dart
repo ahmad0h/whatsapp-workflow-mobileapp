@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -155,224 +156,314 @@ class _AuthViewState extends State<AuthView> {
         builder: (context, constraints) {
           final isLandscape = _isLandscape(context);
           final isTablet = constraints.maxWidth > 600;
+          final isArabic = context.locale == const Locale('ar');
+          return Stack(
+            children: [
+              Scaffold(
+                body: SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 100),
+                        child: Stack(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // Header Section
+                                // Container(
+                                //   padding: EdgeInsets.only(
+                                //     left: 24,
+                                //     right: 24,
+                                //     top: MediaQuery.of(context).padding.top + 16,
+                                //     bottom: 16,
+                                //   ),
+                                //   decoration: BoxDecoration(
+                                //     gradient: LinearGradient(
+                                //       begin: Alignment.centerLeft,
+                                //       end: Alignment.centerRight,
+                                //       colors: [AppColors.primary, AppColors.primaryDark],
+                                //     ),
+                                // Main Content
+                                Expanded(
+                                  child: Padding(
+                                    padding: _getResponsivePadding(context),
+                                    child: BlocConsumer<HomeBloc, HomeState>(
+                                      listener: (context, state) {
+                                        if (state.initDeviceStatus ==
+                                            ResponseStatus.failure) {
+                                          // Handle error state if needed
+                                        }
+                                      },
+                                      builder: (context, state) {
+                                        if (state.initDeviceStatus ==
+                                            ResponseStatus.loading) {
+                                          return Center(
+                                            child: Lottie.asset(
+                                              'assets/loading.json',
+                                              width: isTablet ? 200 : 150,
+                                            ),
+                                          );
+                                        }
 
-          return Scaffold(
-            body: SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 100),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Header Section
-                        // Container(
-                        //   padding: EdgeInsets.only(
-                        //     left: 24,
-                        //     right: 24,
-                        //     top: MediaQuery.of(context).padding.top + 16,
-                        //     bottom: 16,
-                        //   ),
-                        //   decoration: BoxDecoration(
-                        //     gradient: LinearGradient(
-                        //       begin: Alignment.centerLeft,
-                        //       end: Alignment.centerRight,
-                        //       colors: [AppColors.primary, AppColors.primaryDark],
-                        //     ),
-                        // Main Content
-                        Expanded(
-                          child: Padding(
-                            padding: _getResponsivePadding(context),
-                            child: BlocConsumer<HomeBloc, HomeState>(
-                              listener: (context, state) {
-                                if (state.initDeviceStatus ==
-                                    ResponseStatus.failure) {
-                                  // Handle error state if needed
-                                }
-                              },
-                              builder: (context, state) {
-                                if (state.initDeviceStatus ==
-                                    ResponseStatus.loading) {
-                                  return Center(
-                                    child: Lottie.asset(
-                                      'assets/loading.json',
-                                      width: isTablet ? 200 : 150,
-                                    ),
-                                  );
-                                }
+                                        final model = state.deviceInit;
+                                        final code =
+                                            model?.verificationCode?.replaceAll(
+                                              ' ',
+                                              '',
+                                            ) ??
+                                            '';
+                                        final formattedCode = code.length > 3
+                                            ? '${code.substring(0, 3)}-${code.substring(3)}'
+                                            : 'auth.tapToGenerate'.tr();
 
-                                final model = state.deviceInit;
-                                final code =
-                                    model?.verificationCode?.replaceAll(
-                                      ' ',
-                                      '',
-                                    ) ??
-                                    '';
-                                final formattedCode = code.length > 3
-                                    ? '${code.substring(0, 3)}-${code.substring(3)}'
-                                    : 'Tap below to generate';
-
-                                final content = [
-                                  // Image
-                                  Padding(
-                                    padding: EdgeInsets.only(bottom: 32.0),
-                                    child: Image.asset(
-                                      'assets/auth-ic.png',
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-
-                                  // Instruction Text
-                                  Container(
-                                    padding: EdgeInsets.only(bottom: 32.0),
-                                    child: Text(
-                                      'To activate your store, enter this number in your dashboard.',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: _getResponsiveFontSize(
-                                          context,
-                                          baseSize: 26,
-                                        ),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-
-                                  // Code Display
-                                  Padding(
-                                    padding: EdgeInsets.only(bottom: 32.0),
-                                    child: Text(
-                                      formattedCode,
-                                      style: TextStyle(
-                                        fontSize: _getResponsiveFontSize(
-                                          context,
-                                          baseSize:
-                                              formattedCode ==
-                                                  'Tap below to generate'
-                                              ? 20.0
-                                              : 61.42,
-                                        ),
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-
-                                  // Generate Button
-                                  Padding(
-                                    padding: EdgeInsets.only(bottom: 32.0),
-                                    child: SizedBox(
-                                      width: isTablet ? 400 : double.infinity,
-                                      height: isTablet ? 70 : 60,
-                                      child: ElevatedButton(
-                                        onPressed: () async {
-                                          final deviceId =
-                                              await DeviceUtils.getDeviceId();
-                                          if (context.mounted) {
-                                            context.read<HomeBloc>().add(
-                                              HomeEvent.initDevice(
-                                                deviceId,
-                                                deviceToken!,
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primary,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              50,
+                                        final content = [
+                                          // Image
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              bottom: 32.0,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/auth-ic.png',
+                                              fit: BoxFit.contain,
                                             ),
                                           ),
-                                          elevation: 0,
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Generate code',
+
+                                          // Instruction Text
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                              bottom: 32.0,
+                                            ),
+                                            child: Text(
+                                              'auth.instruction'.tr(),
+                                              textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 fontSize:
                                                     _getResponsiveFontSize(
                                                       context,
-                                                      baseSize: 24,
+                                                      baseSize: 26,
                                                     ),
-                                                color: Colors.white,
+                                                fontWeight: FontWeight.w700,
                                               ),
                                             ),
-                                            SizedBox(width: 8),
-                                            SvgPicture.asset(
-                                              'assets/icons/arrcounter-ic.svg',
-                                              width: 24,
-                                              height: 24,
+                                          ),
+
+                                          // Code Display
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              bottom: 32.0,
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ];
+                                            child: Text(
+                                              formattedCode,
+                                              style: TextStyle(
+                                                fontSize: _getResponsiveFontSize(
+                                                  context,
+                                                  baseSize:
+                                                      formattedCode ==
+                                                          'auth.tapToGenerate'
+                                                              .tr()
+                                                      ? 20.0
+                                                      : 61.42,
+                                                ),
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
 
-                                // For landscape mode on tablets, show content side by side
-                                if (isLandscape && isTablet) {
-                                  return Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      // Left side - Image
-                                      Expanded(flex: 2, child: content[0]),
+                                          // Generate Button
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              bottom: 32.0,
+                                            ),
+                                            child: SizedBox(
+                                              width: isTablet
+                                                  ? 400
+                                                  : double.infinity,
+                                              height: isTablet ? 70 : 60,
+                                              child: ElevatedButton(
+                                                onPressed: () async {
+                                                  final deviceId =
+                                                      await DeviceUtils.getDeviceId();
+                                                  if (context.mounted) {
+                                                    context
+                                                        .read<HomeBloc>()
+                                                        .add(
+                                                          HomeEvent.initDevice(
+                                                            deviceId,
+                                                            deviceToken!,
+                                                          ),
+                                                        );
+                                                  }
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      AppColors.primary,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          50,
+                                                        ),
+                                                  ),
+                                                  elevation: 0,
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      'auth.generateCode'.tr(),
+                                                      style: TextStyle(
+                                                        fontSize:
+                                                            _getResponsiveFontSize(
+                                                              context,
+                                                              baseSize: 24,
+                                                            ),
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 8),
+                                                    SvgPicture.asset(
+                                                      'assets/icons/arrcounter-ic.svg',
+                                                      width: 24,
+                                                      height: 24,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ];
 
-                                      // Right side - Text and Button
-                                      Expanded(
-                                        flex: 3,
-                                        child: Column(
+                                        // For landscape mode on tablets, show content side by side
+                                        if (isLandscape && isTablet) {
+                                          return Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              // Left side - Image
+                                              Expanded(
+                                                flex: 2,
+                                                child: content[0],
+                                              ),
+
+                                              // Right side - Text and Button
+                                              Expanded(
+                                                flex: 3,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: content.sublist(1),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }
+
+                                        // For portrait mode or phones
+                                        return Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
-                                          children: content.sublist(1),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }
-
-                                // For portrait mode or phones
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: content,
-                                );
-                              },
+                                          children: content,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                //         'Powered By ',
+                                //         style: TextStyle(
+                                //           fontWeight: FontWeight.w500,
+                                //           fontSize: _getResponsiveFontSize(
+                                //             context,
+                                //             baseSize: 12,
+                                //           ),
+                                //         ),
+                                //       ),
+                                //       Image.asset(
+                                //         'assets/footer-logo.png',
+                                //         width: isTablet ? 100 : 80,
+                                //         fit: BoxFit.contain,
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
+                              ],
                             ),
-                          ),
+                            Positioned(
+                              top: 50,
+                              right: 20,
+                              child: LangSwitch(isArabic: isArabic),
+                            ),
+                          ],
                         ),
-                        //         'Powered By ',
-                        //         style: TextStyle(
-                        //           fontWeight: FontWeight.w500,
-                        //           fontSize: _getResponsiveFontSize(
-                        //             context,
-                        //             baseSize: 12,
-                        //           ),
-                        //         ),
-                        //       ),
-                        //       Image.asset(
-                        //         'assets/footer-logo.png',
-                        //         width: isTablet ? 100 : 80,
-                        //         fit: BoxFit.contain,
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+              // Positioned(
+              //   top: 16.0,
+              //   right: 16.0,
+              //   child: LanguageToggle(scale: 0.7), // Adjust scale as needed
+              // ),
+            ],
           );
         },
+      ),
+    );
+  }
+}
+
+class LangSwitch extends StatelessWidget {
+  const LangSwitch({super.key, required this.isArabic});
+
+  final bool isArabic;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (isArabic) {
+          context.setLocale(const Locale('en'));
+        } else {
+          context.setLocale(const Locale('ar'));
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Color(0xFFE4E4E7), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x0F000000),
+              offset: Offset(1, 3),
+              blurRadius: 1,
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isArabic ? 'English' : 'العربية',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF343330),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(width: 8),
+            Icon(Icons.language),
+          ],
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -59,7 +60,7 @@ class HomeOrdersSection extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              text,
+              text.tr(),
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             if (count != null) ...[
@@ -117,7 +118,7 @@ class HomeOrdersSection extends StatelessWidget {
         //         : CrossAxisAlignment.start,
         //     children: [
         //       Text(
-        //         'Orders',
+        //         'home.orders'.tr(),
         //         style: TextStyle(
         //           fontSize: headerFontSize,
         //           fontWeight: FontWeight.w600,
@@ -133,25 +134,25 @@ class HomeOrdersSection extends StatelessWidget {
         //         children: [
         //           _buildTab(
         //             context,
-        //             'All Orders',
+        //             'home.allOrders',
         //             isSelected: selectedTab == 'All Orders',
         //             onTap: () => onTabChanged('All Orders'),
         //           ),
         //           _buildTab(
         //             context,
-        //             'New Orders',
+        //             'home.newOrders',
         //             isSelected: selectedTab == 'New Orders',
         //             onTap: () => onTabChanged('New Orders'),
         //           ),
         //           _buildTab(
         //             context,
-        //             'In Progress',
+        //             'home.inProgress',
         //             isSelected: selectedTab == 'In Progress',
         //             onTap: () => onTabChanged('In Progress'),
         //           ),
         //           _buildTab(
         //             context,
-        //             'Arrived',
+        //             'home.arrived',
         //             isSelected: selectedTab == 'Arrived',
         //             onTap: () => onTabChanged('Arrived'),
         //           ),
@@ -186,7 +187,7 @@ class HomeOrdersSection extends StatelessWidget {
 
                           children: [
                             Text(
-                              'Orders',
+                              'home.orders'.tr(),
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w600,
@@ -196,28 +197,28 @@ class HomeOrdersSection extends StatelessWidget {
                               children: [
                                 _buildTab(
                                   context,
-                                  'All Orders',
+                                  'home.allOrders',
                                   isSelected: selectedTab == 'All Orders',
                                   onTap: () => onTabChanged('All Orders'),
                                   // count: stats?.totalOrders,
                                 ),
                                 _buildTab(
                                   context,
-                                  'New Orders',
+                                  'home.newOrders',
                                   isSelected: selectedTab == 'New Orders',
                                   onTap: () => onTabChanged('New Orders'),
                                   count: stats?.newOrders,
                                 ),
                                 _buildTab(
                                   context,
-                                  'In Progress',
+                                  'home.inProgress',
                                   isSelected: selectedTab == 'In Progress',
                                   onTap: () => onTabChanged('In Progress'),
                                   count: stats?.preparingOrders,
                                 ),
                                 _buildTab(
                                   context,
-                                  'Arrived',
+                                  'home.arrived',
                                   isSelected: selectedTab == 'Arrived',
                                   onTap: () => onTabChanged('Arrived'),
                                   count: stats?.arrivedCustomers,

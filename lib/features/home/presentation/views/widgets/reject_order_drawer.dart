@@ -201,7 +201,11 @@ class _RejectOrderDrawerState extends State<RejectOrderDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    // Force rebuild when locale changes by using locale as part of the key
+    final localeKey = context.locale.toString();
+
     return Drawer(
+      key: ValueKey(localeKey), // Add key to force rebuild on locale change
       width: MediaQuery.of(context).size.width * 0.7,
       child: Container(
         color: _backgroundColor,

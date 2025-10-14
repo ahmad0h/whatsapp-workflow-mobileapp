@@ -11,7 +11,11 @@ class OptionDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Force rebuild when locale changes by using locale as part of the key
+    final localeKey = context.locale.toString();
+
     return Drawer(
+      key: ValueKey(localeKey), // Add key to force rebuild on locale change
       width: MediaQuery.of(context).size.width * 0.5,
       backgroundColor: AppColors.background,
       child: Padding(

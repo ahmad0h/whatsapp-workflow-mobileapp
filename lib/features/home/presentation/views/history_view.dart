@@ -29,6 +29,7 @@ class _HistoryViewState extends State<HistoryView> {
   DateTime? _selectedDate;
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
+  String? _currentLocale; // Track current locale for rebuilds
 
   @override
   void initState() {
@@ -134,11 +135,13 @@ class _HistoryViewState extends State<HistoryView> {
 
   @override
   Widget build(BuildContext context) {
+    // Update locale if it has changed to trigger rebuilds
+    _updateLocaleIfNeeded();
     final horizontalPadding = _getHorizontalPadding(context);
 
     return ConnectivityWrapper(
       child: Scaffold(
-        key: _scaffoldKey,
+        key: _scaffoldKey, // Keep the original scaffold key
         endDrawer: _selectedOrder != null
             ? OrderDetailsDrawer(order: _selectedOrder!)
             : OptionDrawer(),
@@ -465,6 +468,15 @@ class _HistoryViewState extends State<HistoryView> {
               ),
       ),
     );
+  }
+
+  void _updateLocaleIfNeeded() {
+    final currentLocale = context.locale.toString();
+    if (_currentLocale != currentLocale) {
+      setState(() {
+        _currentLocale = currentLocale;
+      });
+    }
   }
 
   void _showOrderDetails(OrderCardModel model) {

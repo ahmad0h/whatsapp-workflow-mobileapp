@@ -555,11 +555,15 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    // Force rebuild when locale changes by using locale as part of the key
+    final localeKey = context.locale.toString();
+
     final currentStatus = _getCurrentStatus().toLowerCase();
     final isRejected =
         currentStatus == 'rejected' || currentStatus == 'cancelled';
 
     return Drawer(
+      key: ValueKey(localeKey), // Add key to force rebuild on locale change
       width: MediaQuery.of(context).size.width * 0.7,
       child: Container(
         color: _backgroundColor,

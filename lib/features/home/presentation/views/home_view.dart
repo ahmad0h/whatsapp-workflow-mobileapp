@@ -1,5 +1,6 @@
 import 'dart:developer';
 // import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
@@ -39,6 +40,7 @@ class HomeViewState extends State<HomeView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   OrderCardModel? _selectedOrder;
   bool _showRejectDrawer = false;
+  String? _currentLocale; // Track current locale for rebuilds
 
   @override
   void initState() {
@@ -189,6 +191,15 @@ class HomeViewState extends State<HomeView> {
     }
   }
 
+  void _updateLocaleIfNeeded() {
+    final currentLocale = context.locale.toString();
+    if (_currentLocale != currentLocale) {
+      setState(() {
+        _currentLocale = currentLocale;
+      });
+    }
+  }
+
   void _handleTabChanged(String tab) {
     setState(() {
       selectedTab = tab;
@@ -197,6 +208,9 @@ class HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    // Update locale if it has changed to trigger rebuilds
+    _updateLocaleIfNeeded();
+
     // final horizontalPadding = ResponsiveUtils.getHorizontalPadding(context);
     // final headerFontSize = ResponsiveUtils.getHeaderFontSize(context);
     // final screenWidth = MediaQuery.of(context).size.width;
@@ -204,7 +218,7 @@ class HomeViewState extends State<HomeView> {
 
     return ConnectivityWrapper(
       child: Scaffold(
-        key: _scaffoldKey,
+        key: _scaffoldKey, // Keep the original scaffold key
         endDrawer: _showRejectDrawer && _selectedOrder != null
             ? RejectOrderDrawer(
                 orderNumber: _selectedOrder!.orderNumber,

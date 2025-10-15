@@ -27,11 +27,11 @@
     "history": "السجل"
   },
   "order": {
-    "ready": "جاهز",
+    "ready": "الطلب جاهز",
     "delivered": "تم التوصيل",
     "pickedUp": "تم الاستلام",
     "newOrder": "طلب جديد",
-    "inProgress": "قيد التنفيذ",
+    "inProgress": "قيد التحضير",
     "arrived": "وصل",
     "completed": "مكتمل",
     "isFinished": "انتهى",

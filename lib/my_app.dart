@@ -25,7 +25,9 @@ class MyApp extends StatelessWidget {
         supportedLocales: context.supportedLocales,
         localizationsDelegates: context.localizationDelegates,
         theme: ThemeData().copyWith(
-          textTheme: GoogleFonts.poppinsTextTheme(),
+          textTheme: context.locale.languageCode == 'ar'
+              ? ThemeData().textTheme.apply(fontFamily: 'Cairo')
+              : ThemeData().textTheme.apply(fontFamily: 'Poppins'),
           scaffoldBackgroundColor: Color(0xFFF3F3F3),
         ),
       ),

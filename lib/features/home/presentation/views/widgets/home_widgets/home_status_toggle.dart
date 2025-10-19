@@ -19,6 +19,7 @@ class HomeStatusToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isToggleEnabled = onChanged != null && !isLoading;
+    final isArabic = context.locale == const Locale('ar');
 
     return Container(
       padding: EdgeInsets.all(10),
@@ -87,7 +88,8 @@ class HomeStatusToggle extends StatelessWidget {
                       children: [
                         AnimatedPositioned(
                           duration: Duration(milliseconds: 200),
-                          left: isEnabled ? 22 : 2,
+                          left: isArabic ? null : (isEnabled ? 22 : 2),
+                          right: isArabic ? (isEnabled ? 22 : 2) : null,
                           top: 2,
                           child: Container(
                             width: 28,

@@ -208,6 +208,7 @@ class OptionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isArabic = context.locale == const Locale('ar');
     return GestureDetector(
       onTap: onTap,
       child: Row(
@@ -217,7 +218,10 @@ class OptionWidget extends StatelessWidget {
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
           ),
           Spacer(),
-          SvgPicture.asset('assets/icons/arrow-right.svg'),
+          Transform.scale(
+            scaleX: isArabic ? -1.0 : 1.0,
+            child: SvgPicture.asset('assets/icons/arrow-right.svg'),
+          ),
         ],
       ),
     );

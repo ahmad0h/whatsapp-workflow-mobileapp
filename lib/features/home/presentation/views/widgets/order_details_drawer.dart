@@ -1196,42 +1196,45 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                 ),
               ],
             ),
-            if (widget.order.orderType == 'delivery') const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'orderDetails.deliveryFee'.tr(),
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF3E4069),
-                    fontWeight: FontWeight.w600,
+            if (widget.order.orderType == 'delivery') ...[
+              const SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'orderDetails.deliveryFee'.tr(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF3E4069),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/riyal.svg',
-                      width: 20,
-                      height: 20,
-                      colorFilter: ColorFilter.mode(
-                        Color(0xFF3E4069),
-                        BlendMode.srcIn,
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/riyal.svg',
+                        width: 20,
+                        height: 20,
+                        colorFilter: ColorFilter.mode(
+                          Color(0xFF3E4069),
+                          BlendMode.srcIn,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      deliveryFee.toStringAsFixed(2),
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Color(0xFF3E4069),
-                        fontWeight: FontWeight.w600,
+                      const SizedBox(width: 4),
+
+                      Text(
+                        deliveryFee.toStringAsFixed(2),
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xFF3E4069),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
           ],
           const Divider(height: 24, thickness: 2, color: _dividerColor),
           Row(

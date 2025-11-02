@@ -397,6 +397,12 @@ class OrderCard extends StatelessWidget {
     } else if (model.orderType == "delivery" &&
         model.status.toLowerCase() == "arrived") {
       return "order.delivered".tr();
+    } else if (model.status.toLowerCase() == "in progress") {
+      return "order.inProgress".tr();
+    } else if (model.status.toLowerCase() == "arrived") {
+      return "order.arrived".tr();
+    } else if (model.status.toLowerCase() == "new order") {
+      return "order.newOrder".tr();
     }
     return model.status;
   }
@@ -426,17 +432,29 @@ class OrderTypeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final orderType = model.orderType.toLowerCase();
+
+    // Map order types to their translation keys based on existing translations
+    final orderTypeMap = {
+      'branch': 'order.branch',
+      'delivery': 'order.delivery',
+      'curbside': 'order.curbside',
+    };
+
+    // Get the translation key, default to the original type if not found
+    final translationKey = orderTypeMap[orderType] ?? orderType;
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(141.18),
         border: Border.all(
-          color: model.orderType.toLowerCase() == "branch"
+          color: orderType == "branch"
               ? const Color(0xFFF2994A)
-              : model.orderType.toLowerCase() == "delivery"
+              : orderType == "delivery"
               ? const Color(0xFFC5FF00)
-              : model.orderType.toLowerCase() == "curbside"
+              : orderType == "curbside"
               ? const Color(0xFFBDD6FF)
               : model.statusColor,
           width: 1.41,
@@ -445,9 +463,10 @@ class OrderTypeBadge extends StatelessWidget {
       child: Row(
         spacing: 4,
         children: [
-          SvgPicture.asset("assets/icons/${model.orderType.toLowerCase()}.svg"),
+          SvgPicture.asset("assets/icons/$orderType.svg"),
+
           Text(
-            model.orderType.toLowerCase().capitalize(),
+            translationKey.tr(),
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ],

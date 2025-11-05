@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 // import 'package:google_fonts/google_fonts.dart';
 import 'package:whatsapp_workflow_mobileapp/config/router/go_router_config.dart';
+import 'package:whatsapp_workflow_mobileapp/core/services/notification_service.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/injectable.dart';
 
@@ -15,9 +16,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Set the navigator key for notification service
+    final navigatorKey = NotificationService.navigatorKey;
+
     return BlocProvider(
       create: (context) => getIt<HomeBloc>(),
       child: MaterialApp.router(
+        key: navigatorKey,
         builder: FToastBuilder(),
         routerConfig: _goRouter,
         debugShowCheckedModeBanner: false,

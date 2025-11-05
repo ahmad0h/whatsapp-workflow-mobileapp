@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:go_router/go_router.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
@@ -16,12 +17,13 @@ import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/wid
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_status_toggle.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_util.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/notification_util.dart';
+import 'package:whatsapp_workflow_mobileapp/config/router/go_router_config.dart';
+import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
 // import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/responsive_util.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_details_drawer.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/option_drawer.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/reject_order_drawer.dart';
-import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
 import 'package:whatsapp_workflow_mobileapp/core/widgets/connectivity_wrapper.dart';
 
 class HomeView extends StatefulWidget {
@@ -77,6 +79,33 @@ class HomeViewState extends State<HomeView> {
   void _handleNotificationReceived(RemoteMessage message) {
     final title = message.notification?.title?.toLowerCase() ?? '';
     final dataTitle = message.data['title']?.toString().toLowerCase() ?? '';
+
+    // Check for Device Unlinked notification
+    if (title.contains('device unlinked') ||
+        dataTitle.contains('device unlinked') ||
+        message.notification?.body?.toLowerCase().contains(
+              'device has been successfully unlinked',
+            ) ==
+            true ||
+        message.data['body']?.toString().toLowerCase().contains(
+              'device has been successfully unlinked',
+            ) ==
+            true) {
+      log('Device unlinked notification received, logging out...');
+      if (mounted) {
+        // Clear tokens and navigate to auth screen
+        final tokenManager = TokenManager();
+        tokenManager.clearTokens().then((_) {
+          if (mounted) {
+            // Navigate to auth screen
+            if (context.mounted) {
+              context.go(GoRouterConfig.authView);
+            }
+          }
+        });
+      }
+      return;
+    }
 
     // Refresh orders for relevant notifications
     if (title.contains('new order') ||

@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:whatsapp_workflow_mobileapp/config/router/go_router_config.dart';
+import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -13,6 +15,7 @@ class NotificationService {
   NotificationService._internal();
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  // static final NotificationService _instance = NotificationService._internal();
   final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -21,6 +24,17 @@ class NotificationService {
     await _requestNotificationPermission();
     await _initializeLocalNotifications();
     await _initializeFirebaseMessaging();
+
+    // Listen for messages when app is in foreground
+    FirebaseMessaging.onMessage.listen((message) {
+      final title = message.notification?.title ?? message.data['title'] ?? '';
+      final body = message.notification?.body ?? message.data['body'] ?? '';
+
+      if (title.contains('Device Unlinked') ||
+          body.contains('device has been successfully unlinked')) {
+        _handleDeviceUnlinked();
+      }
+    });
   }
 
   // Request notification permission
@@ -154,9 +168,36 @@ class NotificationService {
   void _handleNotificationTap(RemoteMessage message) {
     // Handle navigation based on the message data
     debugPrint('Notification tapped with data: ${message.data}');
-    // Example: Navigate to a specific screen
-    // GetIt.I<AppRouter>().push(NotificationDetailsRoute(data: message.data));
+
+    // Check for Device Unlinked notification
+    final title = message.notification?.title ?? message.data['title'] ?? '';
+    final body = message.notification?.body ?? message.data['body'] ?? '';
+
+    if (title.contains('Device Unlinked') ||
+        body.contains('device has been successfully unlinked')) {
+      _handleDeviceUnlinked();
+    }
   }
+
+  // Handle device unlinked notification
+  void _handleDeviceUnlinked() async {
+    debugPrint('Handling device unlinked notification');
+    // Get the TokenManager instance
+    final tokenManager = TokenManager();
+    await tokenManager.clearTokens();
+
+    // Navigate to auth screen using navigatorKey
+    if (navigatorKey.currentState?.mounted ?? false) {
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        GoRouterConfig.authView,
+        (route) => false, // Remove all previous routes
+      );
+    }
+  }
+
+  // Add a GlobalKey for navigation
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   // Subscribe to a topic
   Future<void> subscribeToTopic(String topic) async {

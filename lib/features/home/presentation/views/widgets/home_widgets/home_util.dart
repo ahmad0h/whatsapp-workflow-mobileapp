@@ -35,12 +35,15 @@ class HomeUtils {
         .map((order) => mapOrderToCardModel(order))
         .cast<OrderCardModel>()
         .where((order) {
-          // Filter out completed and rejected orders
+          // Filter out completed, rejected, cancelled and refunded orders
           final status = order.status.trim().toLowerCase();
+          final paymentStatus =
+              order.orderData.paymentStatus?.toLowerCase() ?? '';
           return status != 'completed' &&
               status != 'is_finished' &&
               status != 'rejected' &&
-              status != 'cancelled';
+              status != 'cancelled' &&
+              paymentStatus != 'refunded';
         })
         .toList()
       ..sort((a, b) {

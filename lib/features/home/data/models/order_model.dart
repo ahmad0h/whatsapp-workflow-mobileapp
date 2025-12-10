@@ -18,6 +18,7 @@ class OrderModel {
   List<OrderLog>? logs;
   String? type;
   String? customerAddress;
+  String? note;
 
   OrderModel({
     this.id,
@@ -37,6 +38,7 @@ class OrderModel {
     this.logs,
     this.type,
     this.customerAddress,
+    this.note,
   });
 
   OrderModel.fromJson(Map<String, dynamic> json) {
@@ -71,6 +73,7 @@ class OrderModel {
     }
     type = json['type'];
     customerAddress = json['customer_address'];
+    note = json['note'];
   }
 
   Map<String, dynamic> toJson() {
@@ -100,6 +103,7 @@ class OrderModel {
     }
     data['type'] = type;
     data['customer_address'] = customerAddress;
+    data['note'] = note;
     return data;
   }
 }

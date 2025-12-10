@@ -595,6 +595,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   _buildDivider(),
                   const SizedBox(height: 25),
                   _buildOrderDetailsSection(),
+                  _buildAdditionalNotes(),
                   const SizedBox(height: 25),
                   _buildTotalAmount(),
                   const SizedBox(height: 25),
@@ -965,6 +966,44 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildAdditionalNotes() {
+    final note = widget.order.orderData.note;
+
+    if (note == null || note.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+      decoration: BoxDecoration(
+        color: AppColors.statusPreparing.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            "Additional Notes",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF3E4069),
+            ),
+          ),
+
+          Text(
+            note,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF3E4069),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

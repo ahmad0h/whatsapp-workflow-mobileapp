@@ -29,6 +29,7 @@ class NotificationUtils {
           isInitialized,
           'received.mp3',
           setInitialized,
+          repeatCount: 4,
         );
       } else if (title.contains('arrived') || dataTitle.contains('arrived')) {
         _playSoundInBackground(

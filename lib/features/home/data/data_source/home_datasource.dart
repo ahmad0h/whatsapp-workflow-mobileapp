@@ -13,19 +13,15 @@ abstract class HomeDatasource {
   Future<DeviceInitReponseModel> initDevice({
     required String deviceId,
     required String deviceToken,
+    required String deviceName,
   });
   Future<IsLinkedReponseModel> isLinked({required String deviceId});
-  Future<List<OrderModel>> getOrdersDataByBranchIdAndDate({
-    required String date,
-  });
+  Future<List<OrderModel>> getOrdersDataByBranchIdAndDate({required String date});
   Future<GetBranchResponseModel> getBranchesData();
   Future<UpdateBranchOrderingStatusResponseModel> updateBranchOrderingStatus(
     String branchId,
     String status,
   );
   Future<Map<String, dynamic>> getDeviceByDeviceId(String deviceId);
-  Future<void> updateDeviceToken({
-    required String deviceId,
-    required String deviceToken,
-  });
+  Future<void> updateDeviceToken({required String deviceId, required String deviceToken});
 }

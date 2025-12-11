@@ -9,26 +9,19 @@ import 'package:whatsapp_workflow_mobileapp/features/home/data/models/update_bra
 
 abstract class HomeRepo {
   Future<Either<Failures, List<OrderModel>>> getOrdersData();
-  Future<Either<Failures, void>> updateOrderStatus(
-    String orderId,
-    String status,
-  );
-  Future<Either<Failures, void>> rejectOrder({
-    required String orderId,
-    required String reason,
-  });
+  Future<Either<Failures, void>> updateOrderStatus(String orderId, String status);
+  Future<Either<Failures, void>> rejectOrder({required String orderId, required String reason});
   Future<Either<Failures, OrderStatsReponseModel>> getOrderStats();
   Future<Either<Failures, DeviceInitReponseModel>> initDevice({
     required String deviceId,
     required String deviceToken,
+    required String deviceName,
   });
-  Future<Either<Failures, IsLinkedReponseModel>> isLinked({
-    required String deviceId,
-  });
-  Future<Either<Failures, List<OrderModel>>> getOrdersDataByBranchIdAndDate({
-    required String date,
-  });
+  Future<Either<Failures, IsLinkedReponseModel>> isLinked({required String deviceId});
+  Future<Either<Failures, List<OrderModel>>> getOrdersDataByBranchIdAndDate({required String date});
   Future<Either<Failures, GetBranchResponseModel>> getBranchesData();
-  Future<Either<Failures, UpdateBranchOrderingStatusResponseModel>>
-  updateBranchOrderingStatus(String branchId, String status);
+  Future<Either<Failures, UpdateBranchOrderingStatusResponseModel>> updateBranchOrderingStatus(
+    String branchId,
+    String status,
+  );
 }

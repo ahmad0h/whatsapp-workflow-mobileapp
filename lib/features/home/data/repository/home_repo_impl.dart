@@ -1,4 +1,5 @@
 import 'dart:developer' show log;
+
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:whatsapp_workflow_mobileapp/core/error/failures.dart';
@@ -28,10 +29,7 @@ class HomeRepoImpl implements HomeRepo {
   }
 
   @override
-  Future<Either<Failures, void>> updateOrderStatus(
-    String orderId,
-    String status,
-  ) async {
+  Future<Either<Failures, void>> updateOrderStatus(String orderId, String status) async {
     try {
       final result = await homeDS.updateOrderStatus(orderId, status);
       return Right(result);
@@ -70,11 +68,13 @@ class HomeRepoImpl implements HomeRepo {
   Future<Either<Failures, DeviceInitReponseModel>> initDevice({
     required String deviceId,
     required String deviceToken,
+    required String deviceName,
   }) async {
     try {
       final result = await homeDS.initDevice(
         deviceId: deviceId,
         deviceToken: deviceToken,
+        deviceName: deviceName,
       );
       return Right(result);
     } catch (e) {
@@ -84,9 +84,7 @@ class HomeRepoImpl implements HomeRepo {
   }
 
   @override
-  Future<Either<Failures, IsLinkedReponseModel>> isLinked({
-    required String deviceId,
-  }) async {
+  Future<Either<Failures, IsLinkedReponseModel>> isLinked({required String deviceId}) async {
     try {
       final result = await homeDS.isLinked(deviceId: deviceId);
       return Right(result);
@@ -121,8 +119,10 @@ class HomeRepoImpl implements HomeRepo {
   }
 
   @override
-  Future<Either<Failures, UpdateBranchOrderingStatusResponseModel>>
-  updateBranchOrderingStatus(String branchId, String status) async {
+  Future<Either<Failures, UpdateBranchOrderingStatusResponseModel>> updateBranchOrderingStatus(
+    String branchId,
+    String status,
+  ) async {
     try {
       final result = await homeDS.updateBranchOrderingStatus(branchId, status);
       return Right(result);

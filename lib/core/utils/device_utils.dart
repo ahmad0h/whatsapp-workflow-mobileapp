@@ -1,11 +1,32 @@
 import 'dart:developer';
-// import 'package:device_info_plus/device_info_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:persistent_device_id/persistent_device_id.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DeviceUtils {
   static const String _deviceIdKey = 'device_id';
-  // static final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+  static final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+
+  /// Gets the device name (brand + model on Android, device name on iOS)
+  static Future<String> getDeviceName() async {
+    try {
+      if (Platform.isAndroid) {
+        final androidInfo = await _deviceInfoPlugin.androidInfo;
+        final brand = androidInfo.brand;
+        final model = androidInfo.model;
+        return '$brand $model';
+      } else if (Platform.isIOS) {
+        final iosInfo = await _deviceInfoPlugin.iosInfo;
+        return iosInfo.name;
+      }
+      return 'Unknown Device';
+    } catch (e) {
+      log('Error getting device name: $e');
+      return 'Unknown Device';
+    }
+  }
 
   /// Gets the actual device ID from device hardware and stores it
   static Future<String> getDeviceId() async {

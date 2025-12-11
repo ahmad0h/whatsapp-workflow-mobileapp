@@ -12,5 +12,6 @@ class InitDeviceUsecase {
   Future<Either<Failures, DeviceInitReponseModel>> call(
     String deviceId,
     String deviceToken,
-  ) => homeRepo.initDevice(deviceId: deviceId, deviceToken: deviceToken);
+    String deviceName,
+  ) => homeRepo.initDevice(deviceId: deviceId, deviceToken: deviceToken, deviceName: deviceName);
 }

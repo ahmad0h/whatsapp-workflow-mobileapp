@@ -143,14 +143,14 @@ return updateBranchOrderingStatus(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  getOrdersData,TResult Function( String orderId,  String status)?  updateOrderStatus,TResult Function( String orderId,  String reason)?  rejectOrder,TResult Function()?  getOrderStats,TResult Function( String deviceId,  String deviceToken)?  initDevice,TResult Function( String deviceId)?  isLinked,TResult Function( String date)?  getOrdersDataByBranchIdAndDate,TResult Function()?  getBranchData,TResult Function( String branchId,  String status)?  updateBranchOrderingStatus,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  getOrdersData,TResult Function( String orderId,  String status)?  updateOrderStatus,TResult Function( String orderId,  String reason)?  rejectOrder,TResult Function()?  getOrderStats,TResult Function( String deviceId,  String deviceToken,  String deviceName)?  initDevice,TResult Function( String deviceId)?  isLinked,TResult Function( String date)?  getOrdersDataByBranchIdAndDate,TResult Function()?  getBranchData,TResult Function( String branchId,  String status)?  updateBranchOrderingStatus,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GetOrdersData() when getOrdersData != null:
 return getOrdersData();case _UpdateOrderStatus() when updateOrderStatus != null:
 return updateOrderStatus(_that.orderId,_that.status);case _RejectOrder() when rejectOrder != null:
 return rejectOrder(_that.orderId,_that.reason);case _GetOrderStats() when getOrderStats != null:
 return getOrderStats();case _InitDevice() when initDevice != null:
-return initDevice(_that.deviceId,_that.deviceToken);case _IsLinked() when isLinked != null:
+return initDevice(_that.deviceId,_that.deviceToken,_that.deviceName);case _IsLinked() when isLinked != null:
 return isLinked(_that.deviceId);case _GetOrdersDataByBranchIdAndDate() when getOrdersDataByBranchIdAndDate != null:
 return getOrdersDataByBranchIdAndDate(_that.date);case _GetBranchData() when getBranchData != null:
 return getBranchData();case _UpdateBranchOrderingStatus() when updateBranchOrderingStatus != null:
@@ -172,14 +172,14 @@ return updateBranchOrderingStatus(_that.branchId,_that.status);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  getOrdersData,required TResult Function( String orderId,  String status)  updateOrderStatus,required TResult Function( String orderId,  String reason)  rejectOrder,required TResult Function()  getOrderStats,required TResult Function( String deviceId,  String deviceToken)  initDevice,required TResult Function( String deviceId)  isLinked,required TResult Function( String date)  getOrdersDataByBranchIdAndDate,required TResult Function()  getBranchData,required TResult Function( String branchId,  String status)  updateBranchOrderingStatus,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  getOrdersData,required TResult Function( String orderId,  String status)  updateOrderStatus,required TResult Function( String orderId,  String reason)  rejectOrder,required TResult Function()  getOrderStats,required TResult Function( String deviceId,  String deviceToken,  String deviceName)  initDevice,required TResult Function( String deviceId)  isLinked,required TResult Function( String date)  getOrdersDataByBranchIdAndDate,required TResult Function()  getBranchData,required TResult Function( String branchId,  String status)  updateBranchOrderingStatus,}) {final _that = this;
 switch (_that) {
 case _GetOrdersData():
 return getOrdersData();case _UpdateOrderStatus():
 return updateOrderStatus(_that.orderId,_that.status);case _RejectOrder():
 return rejectOrder(_that.orderId,_that.reason);case _GetOrderStats():
 return getOrderStats();case _InitDevice():
-return initDevice(_that.deviceId,_that.deviceToken);case _IsLinked():
+return initDevice(_that.deviceId,_that.deviceToken,_that.deviceName);case _IsLinked():
 return isLinked(_that.deviceId);case _GetOrdersDataByBranchIdAndDate():
 return getOrdersDataByBranchIdAndDate(_that.date);case _GetBranchData():
 return getBranchData();case _UpdateBranchOrderingStatus():
@@ -200,14 +200,14 @@ return updateBranchOrderingStatus(_that.branchId,_that.status);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  getOrdersData,TResult? Function( String orderId,  String status)?  updateOrderStatus,TResult? Function( String orderId,  String reason)?  rejectOrder,TResult? Function()?  getOrderStats,TResult? Function( String deviceId,  String deviceToken)?  initDevice,TResult? Function( String deviceId)?  isLinked,TResult? Function( String date)?  getOrdersDataByBranchIdAndDate,TResult? Function()?  getBranchData,TResult? Function( String branchId,  String status)?  updateBranchOrderingStatus,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  getOrdersData,TResult? Function( String orderId,  String status)?  updateOrderStatus,TResult? Function( String orderId,  String reason)?  rejectOrder,TResult? Function()?  getOrderStats,TResult? Function( String deviceId,  String deviceToken,  String deviceName)?  initDevice,TResult? Function( String deviceId)?  isLinked,TResult? Function( String date)?  getOrdersDataByBranchIdAndDate,TResult? Function()?  getBranchData,TResult? Function( String branchId,  String status)?  updateBranchOrderingStatus,}) {final _that = this;
 switch (_that) {
 case _GetOrdersData() when getOrdersData != null:
 return getOrdersData();case _UpdateOrderStatus() when updateOrderStatus != null:
 return updateOrderStatus(_that.orderId,_that.status);case _RejectOrder() when rejectOrder != null:
 return rejectOrder(_that.orderId,_that.reason);case _GetOrderStats() when getOrderStats != null:
 return getOrderStats();case _InitDevice() when initDevice != null:
-return initDevice(_that.deviceId,_that.deviceToken);case _IsLinked() when isLinked != null:
+return initDevice(_that.deviceId,_that.deviceToken,_that.deviceName);case _IsLinked() when isLinked != null:
 return isLinked(_that.deviceId);case _GetOrdersDataByBranchIdAndDate() when getOrdersDataByBranchIdAndDate != null:
 return getOrdersDataByBranchIdAndDate(_that.date);case _GetBranchData() when getBranchData != null:
 return getBranchData();case _UpdateBranchOrderingStatus() when updateBranchOrderingStatus != null:
@@ -423,11 +423,12 @@ String toString() {
 
 
 class _InitDevice implements HomeEvent {
-  const _InitDevice(this.deviceId, this.deviceToken);
+  const _InitDevice(this.deviceId, this.deviceToken, this.deviceName);
   
 
  final  String deviceId;
  final  String deviceToken;
+ final  String deviceName;
 
 /// Create a copy of HomeEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -439,16 +440,16 @@ _$InitDeviceCopyWith<_InitDevice> get copyWith => __$InitDeviceCopyWithImpl<_Ini
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InitDevice&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId)&&(identical(other.deviceToken, deviceToken) || other.deviceToken == deviceToken));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InitDevice&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId)&&(identical(other.deviceToken, deviceToken) || other.deviceToken == deviceToken)&&(identical(other.deviceName, deviceName) || other.deviceName == deviceName));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,deviceId,deviceToken);
+int get hashCode => Object.hash(runtimeType,deviceId,deviceToken,deviceName);
 
 @override
 String toString() {
-  return 'HomeEvent.initDevice(deviceId: $deviceId, deviceToken: $deviceToken)';
+  return 'HomeEvent.initDevice(deviceId: $deviceId, deviceToken: $deviceToken, deviceName: $deviceName)';
 }
 
 
@@ -459,7 +460,7 @@ abstract mixin class _$InitDeviceCopyWith<$Res> implements $HomeEventCopyWith<$R
   factory _$InitDeviceCopyWith(_InitDevice value, $Res Function(_InitDevice) _then) = __$InitDeviceCopyWithImpl;
 @useResult
 $Res call({
- String deviceId, String deviceToken
+ String deviceId, String deviceToken, String deviceName
 });
 
 
@@ -476,10 +477,11 @@ class __$InitDeviceCopyWithImpl<$Res>
 
 /// Create a copy of HomeEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? deviceId = null,Object? deviceToken = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? deviceId = null,Object? deviceToken = null,Object? deviceName = null,}) {
   return _then(_InitDevice(
 null == deviceId ? _self.deviceId : deviceId // ignore: cast_nullable_to_non_nullable
 as String,null == deviceToken ? _self.deviceToken : deviceToken // ignore: cast_nullable_to_non_nullable
+as String,null == deviceName ? _self.deviceName : deviceName // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

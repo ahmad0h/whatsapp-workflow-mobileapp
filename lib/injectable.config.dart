@@ -1,5 +1,5 @@
-// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -40,11 +40,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i47.HomeRepo>(
       () => _i1072.HomeRepoImpl(gh<_i887.HomeDatasource>()),
     );
-    gh.factory<_i362.GetOrderStatsUseCase>(
-      () => _i362.GetOrderStatsUseCase(gh<_i47.HomeRepo>()),
+    gh.factory<_i333.GetBranchDataUsecase>(
+      () => _i333.GetBranchDataUsecase(gh<_i47.HomeRepo>()),
     );
     gh.factory<_i385.GetOrdersDataByBranchIdAndDateUsecase>(
       () => _i385.GetOrdersDataByBranchIdAndDateUsecase(gh<_i47.HomeRepo>()),
+    );
+    gh.factory<_i362.GetOrderStatsUseCase>(
+      () => _i362.GetOrderStatsUseCase(gh<_i47.HomeRepo>()),
     );
     gh.factory<_i597.GetOrdersUseCase>(
       () => _i597.GetOrdersUseCase(gh<_i47.HomeRepo>()),
@@ -52,20 +55,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i492.InitDeviceUsecase>(
       () => _i492.InitDeviceUsecase(gh<_i47.HomeRepo>()),
     );
-    gh.factory<_i743.UpdateStatusUseCase>(
-      () => _i743.UpdateStatusUseCase(gh<_i47.HomeRepo>()),
-    );
-    gh.factory<_i333.GetBranchDataUsecase>(
-      () => _i333.GetBranchDataUsecase(gh<_i47.HomeRepo>()),
-    );
     gh.factory<_i1047.IsLinkedUsecase>(
       () => _i1047.IsLinkedUsecase(gh<_i47.HomeRepo>()),
+    );
+    gh.factory<_i956.RejectOrderUsecase>(
+      () => _i956.RejectOrderUsecase(gh<_i47.HomeRepo>()),
     );
     gh.factory<_i49.UpdateBranchOrderingStatusUsecase>(
       () => _i49.UpdateBranchOrderingStatusUsecase(gh<_i47.HomeRepo>()),
     );
-    gh.factory<_i956.RejectOrderUsecase>(
-      () => _i956.RejectOrderUsecase(gh<_i47.HomeRepo>()),
+    gh.factory<_i743.UpdateStatusUseCase>(
+      () => _i743.UpdateStatusUseCase(gh<_i47.HomeRepo>()),
     );
     gh.factory<_i123.HomeBloc>(
       () => _i123.HomeBloc(

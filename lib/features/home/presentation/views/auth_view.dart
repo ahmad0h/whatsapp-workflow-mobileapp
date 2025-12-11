@@ -1,5 +1,7 @@
 import 'dart:developer';
+
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,7 +11,6 @@ import 'package:lottie/lottie.dart';
 import 'package:whatsapp_workflow_mobileapp/config/router/go_router_config.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/device_utils.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
 
@@ -23,6 +24,7 @@ class AuthView extends StatefulWidget {
 class _AuthViewState extends State<AuthView> {
   String deviceId = '';
   String? deviceToken;
+  String deviceName = 'Unknown Device';
   @override
   void initState() {
     super.initState();
@@ -38,6 +40,10 @@ class _AuthViewState extends State<AuthView> {
       // First check if device is already linked
       _checkIfLinked();
 
+      // Get device name
+      deviceName = await DeviceUtils.getDeviceName();
+      log('Device Name: $deviceName');
+
       // Get FCM token and generate code
       try {
         deviceToken = await FirebaseMessaging.instance.getToken();
@@ -45,9 +51,7 @@ class _AuthViewState extends State<AuthView> {
 
         // Generate code automatically after getting device token
         if (mounted && deviceToken != null) {
-          context.read<HomeBloc>().add(
-            HomeEvent.initDevice(deviceId, deviceToken!),
-          );
+          context.read<HomeBloc>().add(HomeEvent.initDevice(deviceId, deviceToken!, deviceName));
         }
       } catch (e) {
         log('Error getting FCM token: $e');
@@ -75,9 +79,7 @@ class _AuthViewState extends State<AuthView> {
 
     // Handle notification when app is opened from terminated state
     FirebaseMessaging.instance.getInitialMessage().then((message) {
-      if (message != null &&
-          message.data['title'] == 'Device Linked' &&
-          mounted) {
+      if (message != null && message.data['title'] == 'Device Linked' && mounted) {
         log('Initial message indicates device was linked');
         _checkIfLinked();
       }
@@ -119,10 +121,7 @@ class _AuthViewState extends State<AuthView> {
   }
 
   // Helper method to get responsive font size
-  double _getResponsiveFontSize(
-    BuildContext context, {
-    required double baseSize,
-  }) {
+  double _getResponsiveFontSize(BuildContext context, {required double baseSize}) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final shortestSide = width < height ? width : height;
@@ -144,10 +143,8 @@ class _AuthViewState extends State<AuthView> {
     return BlocListener<HomeBloc, HomeState>(
       listener: (context, state) {
         // Handle isLinked status changes
-        if (state.isLinkedStatus == ResponseStatus.success &&
-            state.isLinked != null) {
-          if (state.isLinked!.status == 'LINKED' &&
-              state.isLinked!.accessToken != null) {
+        if (state.isLinkedStatus == ResponseStatus.success && state.isLinked != null) {
+          if (state.isLinked!.status == 'LINKED' && state.isLinked!.accessToken != null) {
             GoRouter.of(context).go(GoRouterConfig.homeView);
           }
         }
@@ -162,9 +159,7 @@ class _AuthViewState extends State<AuthView> {
               Scaffold(
                 body: SingleChildScrollView(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
                     child: IntrinsicHeight(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 100),
@@ -193,14 +188,12 @@ class _AuthViewState extends State<AuthView> {
                                     padding: _getResponsivePadding(context),
                                     child: BlocConsumer<HomeBloc, HomeState>(
                                       listener: (context, state) {
-                                        if (state.initDeviceStatus ==
-                                            ResponseStatus.failure) {
+                                        if (state.initDeviceStatus == ResponseStatus.failure) {
                                           // Handle error state if needed
                                         }
                                       },
                                       builder: (context, state) {
-                                        if (state.initDeviceStatus ==
-                                            ResponseStatus.loading) {
+                                        if (state.initDeviceStatus == ResponseStatus.loading) {
                                           return Center(
                                             child: Lottie.asset(
                                               'assets/loading.json',
@@ -211,11 +204,7 @@ class _AuthViewState extends State<AuthView> {
 
                                         final model = state.deviceInit;
                                         final code =
-                                            model?.verificationCode?.replaceAll(
-                                              ' ',
-                                              '',
-                                            ) ??
-                                            '';
+                                            model?.verificationCode?.replaceAll(' ', '') ?? '';
                                         final formattedCode = code.length > 3
                                             ? '${code.substring(0, 3)}-${code.substring(3)}'
                                             : 'auth.tapToGenerate'.tr();
@@ -223,9 +212,7 @@ class _AuthViewState extends State<AuthView> {
                                         final content = [
                                           // Image
                                           Padding(
-                                            padding: EdgeInsets.only(
-                                              bottom: 32.0,
-                                            ),
+                                            padding: EdgeInsets.only(bottom: 32.0),
                                             child: Image.asset(
                                               'assets/auth-ic.png',
                                               fit: BoxFit.contain,
@@ -234,18 +221,15 @@ class _AuthViewState extends State<AuthView> {
 
                                           // Instruction Text
                                           Container(
-                                            padding: EdgeInsets.only(
-                                              bottom: 32.0,
-                                            ),
+                                            padding: EdgeInsets.only(bottom: 32.0),
                                             child: Text(
                                               'auth.instruction'.tr(),
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
-                                                fontSize:
-                                                    _getResponsiveFontSize(
-                                                      context,
-                                                      baseSize: 26,
-                                                    ),
+                                                fontSize: _getResponsiveFontSize(
+                                                  context,
+                                                  baseSize: 26,
+                                                ),
                                                 fontWeight: FontWeight.w700,
                                               ),
                                             ),
@@ -253,18 +237,14 @@ class _AuthViewState extends State<AuthView> {
 
                                           // Code Display
                                           Padding(
-                                            padding: EdgeInsets.only(
-                                              bottom: 32.0,
-                                            ),
+                                            padding: EdgeInsets.only(bottom: 32.0),
                                             child: Text(
                                               formattedCode,
                                               style: TextStyle(
                                                 fontSize: _getResponsiveFontSize(
                                                   context,
                                                   baseSize:
-                                                      formattedCode ==
-                                                          'auth.tapToGenerate'
-                                                              .tr()
+                                                      formattedCode == 'auth.tapToGenerate'.tr()
                                                       ? 20.0
                                                       : 61.42,
                                                 ),
@@ -276,52 +256,40 @@ class _AuthViewState extends State<AuthView> {
 
                                           // Generate Button
                                           Padding(
-                                            padding: EdgeInsets.only(
-                                              bottom: 32.0,
-                                            ),
+                                            padding: EdgeInsets.only(bottom: 32.0),
                                             child: SizedBox(
-                                              width: isTablet
-                                                  ? 400
-                                                  : double.infinity,
+                                              width: isTablet ? 400 : double.infinity,
                                               height: isTablet ? 70 : 60,
                                               child: ElevatedButton(
                                                 onPressed: () async {
-                                                  final deviceId =
-                                                      await DeviceUtils.getDeviceId();
+                                                  final deviceId = await DeviceUtils.getDeviceId();
                                                   if (context.mounted) {
-                                                    context
-                                                        .read<HomeBloc>()
-                                                        .add(
-                                                          HomeEvent.initDevice(
-                                                            deviceId,
-                                                            deviceToken!,
-                                                          ),
-                                                        );
+                                                    context.read<HomeBloc>().add(
+                                                      HomeEvent.initDevice(
+                                                        deviceId,
+                                                        deviceToken!,
+                                                        deviceName,
+                                                      ),
+                                                    );
                                                   }
                                                 },
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      AppColors.primary,
+                                                  backgroundColor: AppColors.primary,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          50,
-                                                        ),
+                                                    borderRadius: BorderRadius.circular(50),
                                                   ),
                                                   elevation: 0,
                                                 ),
                                                 child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
+                                                  mainAxisAlignment: MainAxisAlignment.center,
                                                   children: [
                                                     Text(
                                                       'auth.generateCode'.tr(),
                                                       style: TextStyle(
-                                                        fontSize:
-                                                            _getResponsiveFontSize(
-                                                              context,
-                                                              baseSize: 24,
-                                                            ),
+                                                        fontSize: _getResponsiveFontSize(
+                                                          context,
+                                                          baseSize: 24,
+                                                        ),
                                                         color: Colors.white,
                                                       ),
                                                     ),
@@ -341,23 +309,17 @@ class _AuthViewState extends State<AuthView> {
                                         // For landscape mode on tablets, show content side by side
                                         if (isLandscape && isTablet) {
                                           return Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
                                               // Left side - Image
-                                              Expanded(
-                                                flex: 2,
-                                                child: content[0],
-                                              ),
+                                              Expanded(flex: 2, child: content[0]),
 
                                               // Right side - Text and Button
                                               Expanded(
                                                 flex: 3,
                                                 child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
+                                                  mainAxisAlignment: MainAxisAlignment.center,
                                                   children: content.sublist(1),
                                                 ),
                                               ),
@@ -367,8 +329,7 @@ class _AuthViewState extends State<AuthView> {
 
                                         // For portrait mode or phones
                                         return Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: content,
                                         );
                                       },
@@ -394,11 +355,7 @@ class _AuthViewState extends State<AuthView> {
                                 // ),
                               ],
                             ),
-                            Positioned(
-                              top: 50,
-                              right: 20,
-                              child: LangSwitch(isArabic: isArabic),
-                            ),
+                            Positioned(top: 50, right: 20, child: LangSwitch(isArabic: isArabic)),
                           ],
                         ),
                       ),
@@ -454,11 +411,7 @@ class LangSwitch extends StatelessWidget {
           children: [
             Text(
               isArabic ? 'English' : 'العربية',
-              style: TextStyle(
-                fontSize: 16,
-                color: Color(0xFF343330),
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(fontSize: 16, color: Color(0xFF343330), fontWeight: FontWeight.w500),
             ),
             SizedBox(width: 8),
             Icon(Icons.language),

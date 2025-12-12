@@ -7,7 +7,7 @@ import 'package:whatsapp_workflow_mobileapp/core/api/api_constants.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 
-class OrderCard extends StatelessWidget {
+class OrderCard extends StatefulWidget {
   final OrderCardModel model;
   final bool isSmallCard;
   final VoidCallback? onTap;
@@ -22,51 +22,94 @@ class OrderCard extends StatelessWidget {
   });
 
   @override
+  State<OrderCard> createState() => _OrderCardState();
+}
+
+class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  bool get _isNewOrder => widget.model.status.toLowerCase() == 'new order';
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
+
+    if (_isNewOrder) {
+      _animationController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(OrderCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update animation when status changes
+    if (_isNewOrder && !_animationController.isAnimating) {
+      _animationController.repeat(reverse: true);
+    } else if (!_isNewOrder && _animationController.isAnimating) {
+      _animationController.stop();
+      _animationController.reset();
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // final screenWidth = MediaQuery.of(context).size.width;
-    // final _ = MediaQuery.of(context).size.height;
-    // final orientation = MediaQuery.of(context).orientation;
-
-    // // Tablet-specific breakpoints and responsive values
-    // final isLargeTablet = screenWidth >= 1024; // iPad Pro and similar
-    // final isMediumTablet =
-    //     screenWidth >= 768 && screenWidth < 1024; // Standard iPad
-    // final isSmallTablet =
-    //     screenWidth >= 600 && screenWidth < 768; // Small tablets
-    // final isPortrait = orientation == Orientation.portrait;
-
-    // Responsive sizing for tablets
-    // final responsiveConfig = _getTabletResponsiveConfig(
-    //   isLargeTablet: isLargeTablet,
-    //   isMediumTablet: isMediumTablet,
-    //   isSmallTablet: isSmallTablet,
-    //   isPortrait: isPortrait,
-    //   screenWidth: screenWidth,
-    // );
-
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border(left: BorderSide(color: model.statusColor, width: 18)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              spreadRadius: 1,
-              blurRadius: 1,
-              offset: Offset(0, 1),
+      onTap: widget.onTap,
+      child: AnimatedBuilder(
+        animation: _animation,
+        builder: (context, child) {
+          // Calculate the glow effect intensity for new orders
+          final glowOpacity = _isNewOrder ? 0.15 + (_animation.value * 0.25) : 0.0;
+          final glowSpread = _isNewOrder ? 2.0 + (_animation.value * 6.0) : 1.0;
+          final glowBlur = _isNewOrder ? 4.0 + (_animation.value * 12.0) : 1.0;
+
+          return Container(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border(left: BorderSide(color: widget.model.statusColor, width: 18)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  spreadRadius: 1,
+                  blurRadius: 1,
+                  offset: Offset(0, 1),
+                ),
+                // Blinking glow effect for new orders
+                if (_isNewOrder)
+                  BoxShadow(
+                    color: widget.model.statusColor.withValues(alpha: glowOpacity),
+                    spreadRadius: glowSpread,
+                    blurRadius: glowBlur,
+                    offset: Offset.zero,
+                  ),
+              ],
             ),
-          ],
-        ),
+            child: child,
+          );
+        },
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Order number and status row
-            if (showFullDetails) ..._buildFullDetails(context),
+            if (widget.showFullDetails) ..._buildFullDetails(context),
           ],
         ),
       ),
@@ -110,54 +153,6 @@ class OrderCard extends StatelessWidget {
 
   //     ],
   //   );
-  // }
-
-  Container statusBadge() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: BoxDecoration(
-        color: model.status.toLowerCase() == "new order"
-            ? const Color(0xFFEFF4FF)
-            : model.status.toLowerCase() == "in progress"
-            ? model.statusColor.withValues(alpha: 0.1)
-            : model.status.toLowerCase() == "is finished"
-            ? model.statusColor.withValues(alpha: 0.1)
-            : model.status.toLowerCase() == "arrived"
-            ? model.statusColor.withValues(alpha: 0.05)
-            : model.status.toLowerCase() == "completed"
-            ? model.statusColor.withValues(alpha: 0.05)
-            : model.statusColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(141.18),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(width: 4),
-          Text(
-            _getStatusText(model),
-            style: TextStyle(
-              color:
-                  model.status == "Is Finished" ||
-                      model.status.toLowerCase() == "in progress"
-                  ? const Color(0xFFEEB128)
-                  : model.statusColor.withValues(alpha: 0.7),
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          if (model.status == "Preparing")
-            Icon(Icons.wb_sunny_outlined, size: 15, color: model.statusColor)
-          else if (model.status.toLowerCase() == "arrived")
-            // Icon(
-            //   Icons.check_circle_outline,
-            //   size: config.iconSize,
-            //   color: model.statusColor,
-            // ),
-            SizedBox(width: 4),
-        ],
-      ),
-    );
-  }
 
   List<Widget> _buildFullDetails(BuildContext context) {
     return [
@@ -169,28 +164,21 @@ class OrderCard extends StatelessWidget {
             children: [
               SizedBox(height: 4),
               Text(
-                "#${model.orderNumber}",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.2,
-                ),
+                "#${widget.model.orderNumber}",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, letterSpacing: -0.2),
               ),
               SizedBox(height: 4),
 
               // Time
-              Text(
-                model.time,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-              ),
+              Text(widget.model.time, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
 
               SizedBox(height: 4),
 
               // Customer name
               Text(
-                model.customerName.length > 15
-                    ? "${model.customerName.substring(0, 15)}..."
-                    : model.customerName,
+                widget.model.customerName.length > 15
+                    ? "${widget.model.customerName.substring(0, 15)}..."
+                    : widget.model.customerName,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -206,11 +194,11 @@ class OrderCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 spacing: 8,
                 children: [
-                  OrderTypeBadge(model: model),
-                  statusBadge(),
+                  OrderTypeBadge(model: widget.model),
+                  StatusBadge(model: widget.model),
                 ],
               ),
-              if (model.orderType.toLowerCase() == "curbside") ...[
+              if (widget.model.orderType.toLowerCase() == "curbside") ...[
                 SizedBox(height: 10),
                 ...buildCurbsideInfo(),
               ],
@@ -315,30 +303,26 @@ class OrderCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             CachedNetworkImage(
-              imageUrl: model.orderData.vehicle?.image != null
-                  ? ApiConstants.getCarLogoUrl(model.orderData.vehicle!.image!)
+              imageUrl: widget.model.orderData.vehicle?.image != null
+                  ? ApiConstants.getCarLogoUrl(widget.model.orderData.vehicle!.image!)
                   : '',
               width: 25,
               height: fixedHeight,
               fit: BoxFit.cover,
-              errorWidget: (context, url, error) =>
-                  Icon(Icons.error, color: Colors.red),
+              errorWidget: (context, url, error) => Icon(Icons.error, color: Colors.red),
             ),
             SizedBox(width: 8),
 
             // Plate number
             Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: (12 * 0.2),
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: (12 * 0.2)),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
                 child: Text(
-                  model.plateNumber,
+                  widget.model.plateNumber,
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
               ),
@@ -348,17 +332,14 @@ class OrderCard extends StatelessWidget {
 
             // Car details
             Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: (12 * 0.2),
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: (12 * 0.2)),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
                 child: Text(
-                  _getCarDetailsText(model.carDetails.split('(')[0]),
+                  _getCarDetailsText(widget.model.carDetails.split('(')[0]),
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
               ),
@@ -370,7 +351,7 @@ class OrderCard extends StatelessWidget {
             Container(
               width: 25,
               decoration: BoxDecoration(
-                color: getColorFromString(model.carColor),
+                color: getColorFromString(widget.model.carColor),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.grey[300]!, width: 1),
               ),
@@ -389,22 +370,6 @@ class OrderCard extends StatelessWidget {
       return '${cleanText.substring(0, maxLength)}...';
     }
     return cleanText;
-  }
-
-  String _getStatusText(OrderCardModel model) {
-    if (model.status == "Is Finished") {
-      return "order.ready".tr();
-    } else if (model.orderType == "delivery" &&
-        model.status.toLowerCase() == "arrived") {
-      return "order.delivered".tr();
-    } else if (model.status.toLowerCase() == "in progress") {
-      return "order.inProgress".tr();
-    } else if (model.status.toLowerCase() == "arrived") {
-      return "order.arrived".tr();
-    } else if (model.status.toLowerCase() == "new order") {
-      return "order.newOrder".tr();
-    }
-    return model.status;
   }
 
   // TabletResponsiveConfig _getTabletResponsiveConfig({
@@ -465,10 +430,70 @@ class OrderTypeBadge extends StatelessWidget {
         children: [
           SvgPicture.asset("assets/icons/$orderType.svg"),
 
+          Text(translationKey.tr(), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Standalone status badge widget that can be used in OrderCard and OrderDetailsDrawer
+class StatusBadge extends StatelessWidget {
+  const StatusBadge({super.key, required this.model});
+
+  final OrderCardModel model;
+
+  String _getStatusText() {
+    if (model.status == "Is Finished") {
+      return "order.ready".tr();
+    } else if (model.orderType == "delivery" && model.status.toLowerCase() == "arrived") {
+      return "order.delivered".tr();
+    } else if (model.status.toLowerCase() == "in progress") {
+      return "order.inProgress".tr();
+    } else if (model.status.toLowerCase() == "arrived") {
+      return "order.arrived".tr();
+    } else if (model.status.toLowerCase() == "new order") {
+      return "order.newOrder".tr();
+    }
+    return model.status;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: model.status.toLowerCase() == "new order"
+            ? const Color(0xFFEFF4FF)
+            : model.status.toLowerCase() == "in progress"
+            ? model.statusColor.withValues(alpha: 0.1)
+            : model.status.toLowerCase() == "is finished"
+            ? model.statusColor.withValues(alpha: 0.1)
+            : model.status.toLowerCase() == "arrived"
+            ? model.statusColor.withValues(alpha: 0.05)
+            : model.status.toLowerCase() == "completed"
+            ? model.statusColor.withValues(alpha: 0.05)
+            : model.statusColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(141.18),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(width: 4),
           Text(
-            translationKey.tr(),
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            _getStatusText(),
+            style: TextStyle(
+              color: model.status == "Is Finished" || model.status.toLowerCase() == "in progress"
+                  ? const Color(0xFFEEB128)
+                  : model.statusColor.withValues(alpha: 0.7),
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
+          if (model.status == "Preparing")
+            Icon(Icons.wb_sunny_outlined, size: 15, color: model.statusColor)
+          else if (model.status.toLowerCase() == "arrived")
+            SizedBox(width: 4),
         ],
       ),
     );

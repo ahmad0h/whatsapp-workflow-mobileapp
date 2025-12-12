@@ -1,4 +1,5 @@
 import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,11 +10,11 @@ import 'package:go_router/go_router.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 import 'package:whatsapp_workflow_mobileapp/core/api/api_constants.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
+import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/format_time.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
-import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
-import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/order_model.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_tracking_widget.dart';
@@ -133,9 +134,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       showGeneralDialog(
         context: context,
         barrierDismissible: true,
-        barrierLabel: MaterialLocalizations.of(
-          context,
-        ).modalBarrierDismissLabel,
+        barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
         barrierColor: Colors.black54,
         transitionDuration: const Duration(milliseconds: 300),
         pageBuilder: (context, animation, secondaryAnimation) {
@@ -181,13 +180,10 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
         },
         transitionBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
-            position:
-                Tween<Offset>(
-                  begin: const Offset(1.0, 0.0),
-                  end: Offset.zero,
-                ).animate(
-                  CurvedAnimation(parent: animation, curve: Curves.easeInOut),
-                ),
+            position: Tween<Offset>(
+              begin: const Offset(1.0, 0.0),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut)),
             child: child,
           );
         },
@@ -235,8 +231,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       if (updatedOrder != null) {
         final updatedCardModel = OrderCardModel(
           orderNumber: updatedOrder.orderNumber ?? widget.order.orderNumber,
-          customerName:
-              updatedOrder.customer?.fullName ?? widget.order.customerName,
+          customerName: updatedOrder.customer?.fullName ?? widget.order.customerName,
           time: updatedOrder.orderDate != null
               ? formatTime(updatedOrder.orderDate!)
               : widget.order.time,
@@ -244,8 +239,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           statusColor: _getStatusColor('completed'),
           carBrand: updatedOrder.vehicle?.brand ?? widget.order.carBrand,
           carColor: updatedOrder.vehicle?.color?.toLowerCase() ?? 'grey',
-          plateNumber:
-              updatedOrder.vehicle?.plateNumber ?? widget.order.plateNumber,
+          plateNumber: updatedOrder.vehicle?.plateNumber ?? widget.order.plateNumber,
           carDetails:
               '${updatedOrder.vehicle?.brand ?? ''} ${updatedOrder.vehicle?.model ?? ''} (${updatedOrder.vehicle?.color ?? 'N/A'})',
           orderData: updatedOrder,
@@ -321,8 +315,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       if (updatedOrder != null) {
         final updatedCardModel = OrderCardModel(
           orderNumber: updatedOrder.orderNumber ?? widget.order.orderNumber,
-          customerName:
-              updatedOrder.customer?.fullName ?? widget.order.customerName,
+          customerName: updatedOrder.customer?.fullName ?? widget.order.customerName,
           time: updatedOrder.orderDate != null
               ? formatTime(updatedOrder.orderDate!)
               : widget.order.time,
@@ -330,8 +323,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           statusColor: _getStatusColor('is_finished'),
           carBrand: updatedOrder.vehicle?.brand ?? widget.order.carBrand,
           carColor: updatedOrder.vehicle?.color?.toLowerCase() ?? 'grey',
-          plateNumber:
-              updatedOrder.vehicle?.plateNumber ?? widget.order.plateNumber,
+          plateNumber: updatedOrder.vehicle?.plateNumber ?? widget.order.plateNumber,
           carDetails:
               '${updatedOrder.vehicle?.brand ?? ''} ${updatedOrder.vehicle?.model ?? ''} (${updatedOrder.vehicle?.color ?? 'N/A'})',
           orderData: updatedOrder,
@@ -400,8 +392,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       // Find the updated order in the state
       final updatedOrder = homeBloc.state.ordersList?.firstWhere(
         (order) => order.id == orderId,
-        orElse: () =>
-            widget.order.orderData, // Fallback to current order if not found
+        orElse: () => widget.order.orderData, // Fallback to current order if not found
       );
 
       // Update the local order data with the latest from the server
@@ -411,17 +402,12 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
         final statusText = status
             .replaceAll('_', ' ')
             .split(' ')
-            .map(
-              (s) => s.isNotEmpty
-                  ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}'
-                  : '',
-            )
+            .map((s) => s.isNotEmpty ? '${s[0].toUpperCase()}${s.substring(1).toLowerCase()}' : '')
             .join(' ');
 
         final updatedCardModel = OrderCardModel(
           orderNumber: updatedOrder.orderNumber ?? widget.order.orderNumber,
-          customerName:
-              updatedOrder.customer?.fullName ?? widget.order.customerName,
+          customerName: updatedOrder.customer?.fullName ?? widget.order.customerName,
           time: updatedOrder.orderDate != null
               ? formatTime(updatedOrder.orderDate!)
               : widget.order.time,
@@ -429,8 +415,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           statusColor: _getStatusColor(status),
           carBrand: updatedOrder.vehicle?.brand ?? widget.order.carBrand,
           carColor: updatedOrder.vehicle?.color?.toLowerCase() ?? 'grey',
-          plateNumber:
-              updatedOrder.vehicle?.plateNumber ?? widget.order.plateNumber,
+          plateNumber: updatedOrder.vehicle?.plateNumber ?? widget.order.plateNumber,
           carDetails:
               '${updatedOrder.vehicle?.brand ?? ''} ${updatedOrder.vehicle?.model ?? ''} (${updatedOrder.vehicle?.color ?? 'N/A'})',
           orderData: updatedOrder,
@@ -503,11 +488,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     return colorMap[name] ?? AppColors.success;
   }
 
-  Widget _buildInfoCard({
-    required String title,
-    required String value,
-    bool isCarColor = false,
-  }) {
+  Widget _buildInfoCard({required String title, required String value, bool isCarColor = false}) {
     // Get the car color if this is the car color card
     final borderColor = _getColorFromName(value);
 
@@ -517,9 +498,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       decoration: BoxDecoration(
         color: Color(0xFFF2F5F9),
         borderRadius: BorderRadius.circular(_cardBorderRadius),
-        border: isCarColor
-            ? Border(right: BorderSide(color: borderColor, width: 25))
-            : null,
+        border: isCarColor ? Border(right: BorderSide(color: borderColor, width: 25)) : null,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -559,8 +538,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     final localeKey = context.locale.toString();
 
     final currentStatus = _getCurrentStatus().toLowerCase();
-    final isRejected =
-        currentStatus == 'rejected' || currentStatus == 'cancelled';
+    final isRejected = currentStatus == 'rejected' || currentStatus == 'cancelled';
 
     return Drawer(
       key: ValueKey(localeKey), // Add key to force rebuild on locale change
@@ -584,13 +562,8 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   const SizedBox(height: 16),
                   _buildOrderHeader(),
                   const SizedBox(height: 20),
-                  _buildInfoCard(
-                    title: 'orderDetails.orderTime'.tr(),
-                    value: widget.order.time,
-                  ),
-                  if (widget.order.orderType == "curbside") ...[
-                    ...buildCurbsideInfo(),
-                  ],
+                  _buildInfoCard(title: 'orderDetails.orderTime'.tr(), value: widget.order.time),
+                  if (widget.order.orderType == "curbside") ...[...buildCurbsideInfo()],
                   const SizedBox(height: 25),
                   _buildDivider(),
                   const SizedBox(height: 25),
@@ -628,17 +601,12 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 26,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 26),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildAcceptButton(context),
-                    if (!_isOrderAccepted &&
-                        !isRejected &&
-                        currentStatus != 'is_finished') ...[
+                    if (!_isOrderAccepted && !isRejected && currentStatus != 'is_finished') ...[
                       const SizedBox(height: 16),
                       SizedBox(
                         height: 60,
@@ -649,12 +617,8 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                             lightSource: LightSource(0, 0),
                             oppositeShadowLightSource: false,
                             color: const Color.fromARGB(255, 240, 238, 238),
-                            border: NeumorphicBorder(
-                              color: Colors.black.withValues(alpha: 0.07),
-                            ),
-                            boxShape: NeumorphicBoxShape.roundRect(
-                              BorderRadius.circular(50),
-                            ),
+                            border: NeumorphicBorder(color: Colors.black.withValues(alpha: 0.07)),
+                            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(50)),
                           ),
                           child: SlideAction(
                             text: 'orderDetails.rejectOrder'.tr(),
@@ -670,11 +634,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                             ),
                             submittedIcon: CircleAvatar(
                               backgroundColor: Colors.white,
-                              child: const Icon(
-                                Icons.check,
-                                color: AppColors.success,
-                                size: 15,
-                              ),
+                              child: const Icon(Icons.check, color: AppColors.success, size: 15),
                             ),
                             elevation: 0.0,
                             onSubmit: () {
@@ -705,9 +665,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     if (!_isOrderAccepted && !isRejected && currentStatus != 'is_finished') {
       // Accept button + Reject button + padding
       return 180;
-    } else if (_isOrderAccepted ||
-        isRejected ||
-        currentStatus == 'is_finished') {
+    } else if (_isOrderAccepted || isRejected || currentStatus == 'is_finished') {
       // Just the accept/status button(s) + padding
       final isArrived = currentStatus == 'arrived';
       final showFinishButton =
@@ -745,12 +703,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
-                Icons.close,
-                size: 24,
-                color: Color(0xFF3E4069),
-                weight: 2.5,
-              ),
+              child: const Icon(Icons.close, size: 24, color: Color(0xFF3E4069), weight: 2.5),
             ),
           ),
         ],
@@ -832,7 +785,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                 ),
               ],
             ),
-            OrderCard(model: widget.order).statusBadge(),
+            StatusBadge(model: widget.order),
           ],
         ),
       ],
@@ -939,11 +892,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
       children: [
         Text(
           'orderDetails.orderDetails'.tr(),
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF3E4069),
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF3E4069)),
         ),
 
         ListView.separated(
@@ -987,20 +936,12 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
         children: [
           Text(
             "Additional Notes",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF3E4069),
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF3E4069)),
           ),
 
           Text(
             note,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF3E4069),
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, color: Color(0xFF3E4069)),
           ),
         ],
       ),
@@ -1065,15 +1006,12 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
             children: [
               CachedNetworkImage(
                 imageUrl: widget.order.orderData.vehicle?.image != null
-                    ? ApiConstants.getCarLogoUrl(
-                        widget.order.orderData.vehicle!.image!,
-                      )
+                    ? ApiConstants.getCarLogoUrl(widget.order.orderData.vehicle!.image!)
                     : '',
                 width: 60,
                 height: fixedHeight,
                 fit: BoxFit.cover,
-                errorWidget: (context, url, error) =>
-                    Icon(Icons.error, color: Colors.red),
+                errorWidget: (context, url, error) => Icon(Icons.error, color: Colors.red),
               ),
               // Plate number
               Expanded(
@@ -1106,9 +1044,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                   ),
                   child: Center(
                     child: Text(
-                      _getCarDetailsText(
-                        widget.order.orderData.vehicle?.type ?? '',
-                      ),
+                      _getCarDetailsText(widget.order.orderData.vehicle?.type ?? ''),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -1124,9 +1060,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                 width: 60,
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: getColorFromString(
-                    widget.order.orderData.vehicle?.color ?? '',
-                  ),
+                  color: getColorFromString(widget.order.orderData.vehicle?.color ?? ''),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey[300]!, width: 1),
                 ),
@@ -1157,10 +1091,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
         : double.parse(netAmount) - double.parse(vatAmount);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
-      decoration: BoxDecoration(
-        color: Color(0xFFF2F5F9),
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: Color(0xFFF2F5F9), borderRadius: BorderRadius.circular(8)),
       child: Column(
         children: [
           Row(
@@ -1180,10 +1111,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                     'assets/icons/riyal.svg',
                     width: 20,
                     height: 20,
-                    colorFilter: ColorFilter.mode(
-                      Color(0xFF3E4069),
-                      BlendMode.srcIn,
-                    ),
+                    colorFilter: ColorFilter.mode(Color(0xFF3E4069), BlendMode.srcIn),
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -1217,10 +1145,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                       'assets/icons/riyal.svg',
                       width: 20,
                       height: 20,
-                      colorFilter: ColorFilter.mode(
-                        Color(0xFF3E4069),
-                        BlendMode.srcIn,
-                      ),
+                      colorFilter: ColorFilter.mode(Color(0xFF3E4069), BlendMode.srcIn),
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -1254,10 +1179,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                         'assets/icons/riyal.svg',
                         width: 20,
                         height: 20,
-                        colorFilter: ColorFilter.mode(
-                          Color(0xFF3E4069),
-                          BlendMode.srcIn,
-                        ),
+                        colorFilter: ColorFilter.mode(Color(0xFF3E4069), BlendMode.srcIn),
                       ),
                       const SizedBox(width: 4),
 
@@ -1293,10 +1215,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                     'assets/icons/riyal.svg',
                     width: 20,
                     height: 20,
-                    colorFilter: ColorFilter.mode(
-                      Color(0xFF3E4069),
-                      BlendMode.srcIn,
-                    ),
+                    colorFilter: ColorFilter.mode(Color(0xFF3E4069), BlendMode.srcIn),
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -1320,8 +1239,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     final currentStatus = _getCurrentStatus().toLowerCase();
     final isArrived = currentStatus == 'arrived';
     final isCompleted = currentStatus == 'completed';
-    final isRejected =
-        currentStatus == 'rejected' || currentStatus == 'cancelled';
+    final isRejected = currentStatus == 'rejected' || currentStatus == 'cancelled';
 
     // Safely get the finished log if it exists
     final logs = widget.order.orderData.logs ?? [];
@@ -1329,9 +1247,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
     String? finishedTime;
 
     try {
-      finishedLog = logs.firstWhere(
-        (log) => log.orderStatus?.toLowerCase() == 'is_finished',
-      );
+      finishedLog = logs.firstWhere((log) => log.orderStatus?.toLowerCase() == 'is_finished');
       finishedTime = finishedLog.logTimestamp;
     } catch (e) {
       // No finished log found, which is fine
@@ -1345,18 +1261,12 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           onPressed: null, // Disable the button
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey[300],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(_buttonBorderRadius),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_buttonBorderRadius)),
             elevation: 0,
           ),
           child: Text(
             'orderDetails.orderRejected'.tr(),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
       );
@@ -1425,9 +1335,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                           currentStatus == 'arrived'
                       ? 'orderDetails.orderMarkedAsFinished'.tr(
                           namedArgs: {
-                            'time': finishedTime != null
-                                ? _formatTimeOnly(finishedTime)
-                                : '',
+                            'time': finishedTime != null ? _formatTimeOnly(finishedTime) : '',
                           },
                         )
                       : 'orderDetails.orderIsReady'.tr(),
@@ -1461,11 +1369,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
                 ),
                 child: Text(
                   'orderDetails.markAsCompleted'.tr(),
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
                 ),
               ),
             ),
@@ -1481,18 +1385,12 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
         onPressed: _handleAcceptOrder,
         style: ElevatedButton.styleFrom(
           backgroundColor: _primaryColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(_buttonBorderRadius),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_buttonBorderRadius)),
           elevation: 0,
         ),
         child: Text(
           'orderDetails.accept'.tr(),
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
         ),
       ),
     );
@@ -1531,9 +1429,7 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
 
     return 'orderDetails.acceptedAt'.tr(
       namedArgs: {
-        'time': _formatTimeOnly(
-          inProgressLog.logTimestamp ?? DateTime.now().toIso8601String(),
-        ),
+        'time': _formatTimeOnly(inProgressLog.logTimestamp ?? DateTime.now().toIso8601String()),
       },
     );
   }
@@ -1555,18 +1451,11 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
               ),
             ),
 
-            Text(
-              '$quantity x',
-              style: TextStyle(fontSize: 18, color: Color(0xFF3E4069)),
-            ),
+            Text('$quantity x', style: TextStyle(fontSize: 18, color: Color(0xFF3E4069))),
             const SizedBox(width: 8),
             Text(
               '${price.toStringAsFixed(2)} SAR',
-              style: TextStyle(
-                fontSize: 18,
-                color: Color(0xFF3E4069),
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 18, color: Color(0xFF3E4069), fontWeight: FontWeight.w600),
             ),
           ],
         ),

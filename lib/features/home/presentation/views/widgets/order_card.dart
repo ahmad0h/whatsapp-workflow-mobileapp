@@ -6,6 +6,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:whatsapp_workflow_mobileapp/core/api/api_constants.dart';
 import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
+import 'dart:developer';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
+import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
 
 class OrderCard extends StatefulWidget {
   final OrderCardModel model;
@@ -25,11 +30,14 @@ class OrderCard extends StatefulWidget {
   State<OrderCard> createState() => _OrderCardState();
 }
 
-class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMixin {
+class _OrderCardState extends State<OrderCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
 
   bool get _isNewOrder => widget.model.status.toLowerCase() == 'new order';
+  bool get _isArrived => widget.model.status.toLowerCase() == 'arrived';
+  bool get _shouldBlink => _isNewOrder || _isArrived;
 
   @override
   void initState() {
@@ -38,12 +46,11 @@ class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMix
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _animation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
-    if (_isNewOrder) {
+    if (_shouldBlink) {
       _animationController.repeat(reverse: true);
     }
   }
@@ -52,9 +59,9 @@ class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMix
   void didUpdateWidget(OrderCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Update animation when status changes
-    if (_isNewOrder && !_animationController.isAnimating) {
+    if (_shouldBlink && !_animationController.isAnimating) {
       _animationController.repeat(reverse: true);
-    } else if (!_isNewOrder && _animationController.isAnimating) {
+    } else if (!_shouldBlink && _animationController.isAnimating) {
       _animationController.stop();
       _animationController.reset();
     }
@@ -66,6 +73,62 @@ class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMix
     super.dispose();
   }
 
+  Future<void> _handleFinishOrder() async {
+    if (!mounted) return;
+
+    final homeBloc = context.read<HomeBloc>();
+    final orderId = widget.model.orderData.id ?? '';
+
+    try {
+      homeBloc.add(HomeEvent.updateOrderStatus(orderId, 'is_finished'));
+
+      await homeBloc.stream
+          .where((state) => state.updateOrderStatus != ResponseStatus.loading)
+          .first;
+
+      if (!mounted) return;
+
+      homeBloc.add(const HomeEvent.getOrdersData());
+      homeBloc.add(const HomeEvent.getOrderStats());
+
+      if (mounted) {
+        setState(() {
+          widget.model.status = 'orderDetails.finished'.tr();
+        });
+      }
+    } catch (e) {
+      log('Failed to finish order: $e');
+    }
+  }
+
+  Future<void> _handleCompleteOrder() async {
+    if (!mounted) return;
+
+    final homeBloc = context.read<HomeBloc>();
+    final orderId = widget.model.orderData.id ?? '';
+
+    try {
+      homeBloc.add(HomeEvent.updateOrderStatus(orderId, 'completed'));
+
+      await homeBloc.stream
+          .where((state) => state.updateOrderStatus != ResponseStatus.loading)
+          .first;
+
+      if (!mounted) return;
+
+      homeBloc.add(const HomeEvent.getOrdersData());
+      homeBloc.add(const HomeEvent.getOrderStats());
+
+      if (mounted) {
+        setState(() {
+          widget.model.status = 'orderDetails.completed'.tr();
+        });
+      }
+    } catch (e) {
+      log('Failed to complete order: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -73,17 +136,23 @@ class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMix
       child: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
-          // Calculate the glow effect intensity for new orders
-          final glowOpacity = _isNewOrder ? 0.15 + (_animation.value * 0.25) : 0.0;
-          final glowSpread = _isNewOrder ? 2.0 + (_animation.value * 6.0) : 1.0;
-          final glowBlur = _isNewOrder ? 4.0 + (_animation.value * 12.0) : 1.0;
+          // Calculate the glow effect intensity for new/arrived orders
+          final glowOpacity = _shouldBlink
+              ? 0.03 + (_animation.value * 0.2)
+              : 0.0;
+          final glowSpread = _shouldBlink
+              ? 0.01 + (_animation.value * 2.5)
+              : 1.0;
+          final glowBlur = _shouldBlink ? 1 + (_animation.value * 8.0) : 1.0;
 
           return Container(
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border(left: BorderSide(color: widget.model.statusColor, width: 18)),
+              border: Border(
+                left: BorderSide(color: widget.model.statusColor, width: 18),
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
@@ -91,10 +160,12 @@ class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMix
                   blurRadius: 1,
                   offset: Offset(0, 1),
                 ),
-                // Blinking glow effect for new orders
-                if (_isNewOrder)
+                // Blinking glow effect for new/arrived orders
+                if (_shouldBlink)
                   BoxShadow(
-                    color: widget.model.statusColor.withValues(alpha: glowOpacity),
+                    color: widget.model.statusColor.withValues(
+                      alpha: glowOpacity,
+                    ),
                     spreadRadius: glowSpread,
                     blurRadius: glowBlur,
                     offset: Offset.zero,
@@ -165,12 +236,19 @@ class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMix
               SizedBox(height: 4),
               Text(
                 "#${widget.model.orderNumber}",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, letterSpacing: -0.2),
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
+                ),
               ),
               SizedBox(height: 4),
 
               // Time
-              Text(widget.model.time, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+              Text(
+                widget.model.time,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              ),
 
               SizedBox(height: 4),
 
@@ -187,20 +265,30 @@ class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMix
               SizedBox(height: 12),
             ],
           ),
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              Column(
                 spacing: 8,
                 children: [
-                  OrderTypeBadge(model: widget.model),
-                  StatusBadge(model: widget.model),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    spacing: 8,
+                    children: [
+                      OrderTypeBadge(model: widget.model),
+                      StatusBadge(model: widget.model),
+                    ],
+                  ),
+                  if (widget.model.orderType.toLowerCase() != "curbside")
+                    SizedBox(width: 200, child: _buildActionButtons()),
                 ],
               ),
               if (widget.model.orderType.toLowerCase() == "curbside") ...[
-                SizedBox(height: 10),
+                SizedBox(height: 5),
                 ...buildCurbsideInfo(),
+                SizedBox(height: 5),
+                SizedBox(width: 200, child: _buildActionButtons()),
               ],
             ],
           ),
@@ -304,18 +392,24 @@ class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMix
           children: [
             CachedNetworkImage(
               imageUrl: widget.model.orderData.vehicle?.image != null
-                  ? ApiConstants.getCarLogoUrl(widget.model.orderData.vehicle!.image!)
+                  ? ApiConstants.getCarLogoUrl(
+                      widget.model.orderData.vehicle!.image!,
+                    )
                   : '',
               width: 25,
               height: fixedHeight,
               fit: BoxFit.cover,
-              errorWidget: (context, url, error) => Icon(Icons.error, color: Colors.red),
+              errorWidget: (context, url, error) =>
+                  Icon(Icons.error, color: Colors.red),
             ),
             SizedBox(width: 8),
 
             // Plate number
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: (12 * 0.2)),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: (12 * 0.2),
+              ),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
@@ -332,7 +426,10 @@ class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMix
 
             // Car details
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: (12 * 0.2)),
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: (12 * 0.2),
+              ),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
@@ -370,6 +467,59 @@ class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMix
       return '${cleanText.substring(0, maxLength)}...';
     }
     return cleanText;
+  }
+
+  Widget _buildActionButtons() {
+    final status = widget.model.status.toLowerCase();
+
+    // "Order Is Ready" button for In Progress status
+    if (status == 'in progress' || status == 'in_progress') {
+      return ElevatedButton(
+        onPressed: _handleFinishOrder,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+          elevation: 0,
+        ),
+        child: Text(
+          'orderDetails.orderIsReady'.tr(),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+      );
+    }
+
+    // "Complete Order" button for Arrived or Delivered status
+    // EXCLUDING "is finished" / "ready" status based on user feedback
+    if (status == 'arrived' || status == 'delivered') {
+      return ElevatedButton(
+        onPressed: _handleCompleteOrder,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.statusCompleted,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+          elevation: 0,
+        ),
+        child: Text(
+          'orderDetails.markAsCompleted'.tr(),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+      );
+    }
+
+    return SizedBox.shrink();
   }
 
   // TabletResponsiveConfig _getTabletResponsiveConfig({
@@ -430,7 +580,10 @@ class OrderTypeBadge extends StatelessWidget {
         children: [
           SvgPicture.asset("assets/icons/$orderType.svg"),
 
-          Text(translationKey.tr(), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+          Text(
+            translationKey.tr(),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
         ],
       ),
     );
@@ -446,7 +599,8 @@ class StatusBadge extends StatelessWidget {
   String _getStatusText() {
     if (model.status == "Is Finished") {
       return "order.ready".tr();
-    } else if (model.orderType == "delivery" && model.status.toLowerCase() == "arrived") {
+    } else if (model.orderType == "delivery" &&
+        model.status.toLowerCase() == "arrived") {
       return "order.delivered".tr();
     } else if (model.status.toLowerCase() == "in progress") {
       return "order.inProgress".tr();
@@ -483,7 +637,9 @@ class StatusBadge extends StatelessWidget {
           Text(
             _getStatusText(),
             style: TextStyle(
-              color: model.status == "Is Finished" || model.status.toLowerCase() == "in progress"
+              color:
+                  model.status == "Is Finished" ||
+                      model.status.toLowerCase() == "in progress"
                   ? const Color(0xFFEEB128)
                   : model.statusColor.withValues(alpha: 0.7),
               fontSize: 14,

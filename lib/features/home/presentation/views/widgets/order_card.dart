@@ -138,11 +138,9 @@ class _OrderCardState extends State<OrderCard>
         builder: (context, child) {
           // Calculate the glow effect intensity for new/arrived orders
           final glowOpacity = _shouldBlink
-              ? 0.03 + (_animation.value * 0.2)
+              ? 0.1 + (_animation.value * 0.2)
               : 0.0;
-          final glowSpread = _shouldBlink
-              ? 0.01 + (_animation.value * 2.5)
-              : 1.0;
+          final glowSpread = _shouldBlink ? 0.1 + (_animation.value * 1) : 1.0;
           final glowBlur = _shouldBlink ? 1 + (_animation.value * 8.0) : 1.0;
 
           return Container(
@@ -150,8 +148,8 @@ class _OrderCardState extends State<OrderCard>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border(
-                left: BorderSide(color: widget.model.statusColor, width: 18),
+              border: BorderDirectional(
+                start: BorderSide(color: widget.model.statusColor, width: 18),
               ),
               boxShadow: [
                 BoxShadow(
@@ -477,7 +475,7 @@ class _OrderCardState extends State<OrderCard>
       return ElevatedButton(
         onPressed: _handleFinishOrder,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.statusPreparing,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),

@@ -50,7 +50,7 @@ dependencies:
   flutter_bloc:
   intl:
   injectable:
-  flutter_neumorphic_ui: ^0.0.1
+  flutter_neumorphic_plus: ^3.5.0
   audioplayers: ^6.5.1
   device_info_plus: ^12.3.0
   uuid: ^4.5.1
@@ -95,6 +95,7 @@ flutter:
     - assets/sounds/
     - assets/translations/
     - assets/fonts/
+    - shorebird.yaml
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

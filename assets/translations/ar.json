@@ -60,8 +60,8 @@
     "total": "المجموع",
     "orderRejected": "تم رفض الطلب",
     "orderMarkedAsFinished": "تم تحديد الطلب على أنه منتهي في ({time})",
-    "orderIsReady": "هل الطلب جاهز؟",
-    "markAsCompleted": "تحديد كمكتمل",
+    "orderIsReady": "الطلب جاهز",
+    "markAsCompleted": "اكتمل الطلب",
     "accept": "قبول",
     "acceptedAt": "تم القبول في ({time})",
     "rejectOrder": "رفض الطلب"

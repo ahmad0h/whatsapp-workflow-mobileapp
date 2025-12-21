@@ -35,9 +35,9 @@
     "arrived": "وصل",
     "completed": "مكتمل",
     "isFinished": "انتهى",
-    "branch": "فرع",
+    "branch": "استلام من الفرع",
     "delivery": "توصيل",
-    "curbside": "على الرصيف"
+    "curbside": "استلام من السيارة"
   },
   "orderDetails": {
     "rejected": "مرفوض",

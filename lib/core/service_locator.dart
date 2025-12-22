@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:whatsapp_workflow_mobileapp/core/services/device_sync_service.dart';
 import 'package:whatsapp_workflow_mobileapp/core/services/notification_service.dart';
 import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
+import 'package:whatsapp_workflow_mobileapp/core/services/shorebird_update_checker.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/data_source/home_datasource.dart';
 
 final GetIt locator = GetIt.instance;
@@ -46,5 +47,9 @@ Future<void> setupServiceLocator() async {
       tokenManager: locator<TokenManager>(),
       homeRepo: locator<HomeDatasource>(),
     ),
+  );
+
+  locator.registerLazySingleton<ShorebirdUpdateChecker>(
+    () => ShorebirdUpdateChecker(),
   );
 }

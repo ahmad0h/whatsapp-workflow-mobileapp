@@ -5,6 +5,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:whatsapp_workflow_mobileapp/config/router/go_router_config.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:whatsapp_workflow_mobileapp/core/service_locator.dart';
+import 'package:whatsapp_workflow_mobileapp/core/services/shorebird_update_checker.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 
 class OptionDrawer extends StatelessWidget {
   const OptionDrawer({super.key});
@@ -66,9 +70,117 @@ class OptionDrawer extends StatelessWidget {
             ),
             SizedBox(height: 22),
             LanguageToggle(),
+            SizedBox(height: 22),
+            Container(
+              height: 1,
+              width: double.infinity,
+              color: AppColors.borderLight,
+            ),
+            SizedBox(height: 22),
+            _buildVersionInfo(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildVersionInfo() {
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return SizedBox.shrink();
+
+        final version = snapshot.data?.version ?? '';
+        final buildNumber = snapshot.data?.buildNumber ?? '';
+
+        return FutureBuilder<int?>(
+          future: locator<ShorebirdUpdateChecker>().getCurrentPatchNumber(),
+          builder: (context, patchSnapshot) {
+            final patchNumber = patchSnapshot.data;
+
+            // Check if update is available to decide whether to show the button
+            // Check update status to decide button state
+            return FutureBuilder<UpdateStatus>(
+              future: locator<ShorebirdUpdateChecker>().getUpdateStatus(),
+              builder: (context, statusSnapshot) {
+                final status = statusSnapshot.data ?? UpdateStatus.unavailable;
+                final isOutdated = status == UpdateStatus.outdated;
+                final isRestartRequired =
+                    status == UpdateStatus.restartRequired;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Version: $version+$buildNumber',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    if (patchNumber != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          'Patch: $patchNumber',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+
+                    SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close drawer
+                          if (isOutdated) {
+                            locator<ShorebirdUpdateChecker>().downloadUpdate();
+                          } else if (isRestartRequired) {
+                            // Trigger check to show restart dialog
+                            locator<ShorebirdUpdateChecker>().checkForUpdates();
+                          } else {
+                            locator<ShorebirdUpdateChecker>().checkForUpdates(
+                              showUpToDateMessage: true,
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          isRestartRequired
+                              ? Icons.restart_alt
+                              : Icons.system_update,
+                          size: 18,
+                        ),
+                        label: Text(
+                          isOutdated
+                              ? 'Update Now'
+                              : isRestartRequired
+                              ? 'Restart to Apply'
+                              : 'Check for Updates',
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isRestartRequired
+                              ? Colors.green
+                              : AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -148,9 +260,7 @@ class _LanguageToggleState extends State<LanguageToggle> {
                     width: 52 * widget.scale,
                     height: 32 * widget.scale,
                     decoration: BoxDecoration(
-                      color: isArabic
-                          ? AppColors.primary
-                          : AppColors.success,
+                      color: isArabic ? AppColors.primary : AppColors.success,
                       borderRadius: BorderRadius.circular(16 * widget.scale),
                     ),
                     child: Stack(
@@ -198,7 +308,6 @@ class _LanguageToggleState extends State<LanguageToggle> {
     );
   }
 }
-
 
 class OptionWidget extends StatelessWidget {
   const OptionWidget({super.key, required this.text, this.onTap});

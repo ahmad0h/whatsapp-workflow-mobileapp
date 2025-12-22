@@ -254,15 +254,9 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           customerAddress: updatedOrder.customerAddress ?? '',
         );
 
-        // Update the widget's order reference
-        if (mounted) {
-          setState(() {
-            widget.order.status = 'orderDetails.completed'.tr();
-            // Notify parent widget about the update
-            if (widget.onOrderUpdated != null) {
-              widget.onOrderUpdated!(updatedCardModel);
-            }
-          });
+        // Notify parent widget about the update
+        if (mounted && widget.onOrderUpdated != null) {
+          widget.onOrderUpdated!(updatedCardModel);
         }
       }
 
@@ -371,7 +365,6 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
 
     setState(() {
       _isOrderAccepted = true;
-      widget.order.status = 'orderDetails.inProgress'.tr();
     });
 
     try {
@@ -439,17 +432,11 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
           customerAddress: updatedOrder.customerAddress ?? '',
         );
 
-        // Update the widget's order reference
+        // Notify parent widget about the update and close drawer
         if (mounted) {
-          setState(() {
-            _isOrderAccepted = true;
-            // Update the order reference to trigger UI refresh
-            widget.order.status = updatedCardModel.status;
-            // Notify parent widget about the update
-            if (widget.onOrderUpdated != null) {
-              widget.onOrderUpdated!(updatedCardModel);
-            }
-          });
+          if (widget.onOrderUpdated != null) {
+            widget.onOrderUpdated!(updatedCardModel);
+          }
           GoRouter.of(context).pop();
         }
       }
@@ -468,7 +455,6 @@ class _OrderDetailsDrawerState extends State<OrderDetailsDrawer> {
 
       setState(() {
         _isOrderAccepted = false;
-        widget.order.status = 'orderDetails.pending'.tr();
       });
 
       log('Failed to update order status: $e');

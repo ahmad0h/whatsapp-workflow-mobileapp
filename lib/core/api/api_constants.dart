@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
 
 class ApiConstants {
@@ -11,7 +9,6 @@ class ApiConstants {
     if (accessToken == null || accessToken.isEmpty) {
       return '';
     }
-    log('Access token: $accessToken');
     return 'Bearer $accessToken';
   }
 

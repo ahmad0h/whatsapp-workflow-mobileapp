@@ -1,6 +1,4 @@
 import 'dart:developer';
-// import 'package:easy_localization/easy_localization.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
@@ -15,7 +13,6 @@ import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/wid
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_order_section.dart';
 // import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_stats_section.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_status_toggle.dart';
-import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_util.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/notification_util.dart';
 import 'package:whatsapp_workflow_mobileapp/config/router/go_router_config.dart';
 import 'package:whatsapp_workflow_mobileapp/core/services/token_manager.dart';
@@ -42,7 +39,6 @@ class HomeViewState extends State<HomeView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   OrderCardModel? _selectedOrder;
   bool _showRejectDrawer = false;
-  String? _currentLocale; // Track current locale for rebuilds
 
   @override
   void initState() {
@@ -220,15 +216,6 @@ class HomeViewState extends State<HomeView> {
     }
   }
 
-  void _updateLocaleIfNeeded() {
-    final currentLocale = context.locale.toString();
-    if (_currentLocale != currentLocale) {
-      setState(() {
-        _currentLocale = currentLocale;
-      });
-    }
-  }
-
   void _handleTabChanged(String tab) {
     setState(() {
       selectedTab = tab;
@@ -237,9 +224,6 @@ class HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    // Update locale if it has changed to trigger rebuilds
-    _updateLocaleIfNeeded();
-
     // final horizontalPadding = ResponsiveUtils.getHorizontalPadding(context);
     // final headerFontSize = ResponsiveUtils.getHeaderFontSize(context);
     // final screenWidth = MediaQuery.of(context).size.width;
@@ -279,17 +263,31 @@ class HomeViewState extends State<HomeView> {
                 state.getOrdersListStatus == ResponseStatus.loading;
             List<OrderCardModel> orders = [];
 
-            if (!isLoading && state.ordersList != null) {
-              orders = HomeUtils.processOrders(state.ordersList!);
+            if (!isLoading) {
+              orders = state.processedOrdersList ?? [];
             }
 
             // Function to handle refresh
+            // Function to handle refresh - waits for actual API completion
             Future<void> onRefresh() async {
-              context.read<HomeBloc>().add(const HomeEvent.getOrdersData());
-              context.read<HomeBloc>().add(const HomeEvent.getOrderStats());
-              context.read<HomeBloc>().add(const HomeEvent.getBranchData());
-              // Wait for a short delay to allow the refresh indicator to show
-              await Future.delayed(const Duration(seconds: 1));
+              final homeBloc = context.read<HomeBloc>();
+
+              // Add all refresh events
+              homeBloc.add(const HomeEvent.getOrdersData());
+              homeBloc.add(const HomeEvent.getOrderStats());
+              homeBloc.add(const HomeEvent.getBranchData());
+
+              // Wait for orders to complete (the main data)
+              await homeBloc.stream
+                  .where(
+                    (state) =>
+                        state.getOrdersListStatus != ResponseStatus.loading,
+                  )
+                  .first
+                  .timeout(
+                    const Duration(seconds: 10),
+                    onTimeout: () => homeBloc.state,
+                  );
             }
 
             return Column(

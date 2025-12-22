@@ -6,6 +6,7 @@ abstract class HomeState with _$HomeState {
     @Default(ResponseStatus.init) ResponseStatus getOrdersListStatus,
     Failures? getOrdersListFailures,
     List<OrderModel>? ordersList,
+    List<OrderCardModel>? processedOrdersList,
     @Default(ResponseStatus.init) ResponseStatus updateOrderStatus,
     Failures? updateOrderStatusFailures,
     @Default(ResponseStatus.init) ResponseStatus rejectOrderStatus,

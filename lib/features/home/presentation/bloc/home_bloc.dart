@@ -2,7 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
-import 'package:whatsapp_workflow_mobileapp/core/error/failures.dart' show Failures;
+import 'package:whatsapp_workflow_mobileapp/core/error/failures.dart'
+    show Failures;
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/device_init_response_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/get_branch_response_model.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/data/models/is_linked_response_model.dart';
@@ -18,6 +19,8 @@ import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/is_lin
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/reject_order_usecase.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/update_branch_ordering_status_usecase.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/domain/usecases/update_status_usecase.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/home_widgets/home_util.dart';
 
 part 'home_bloc.freezed.dart';
 part 'home_event.dart';
@@ -31,7 +34,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetOrderStatsUseCase getOrderStatsUseCase;
   final InitDeviceUsecase initDeviceUsecase;
   final IsLinkedUsecase isLinkedUsecase;
-  final GetOrdersDataByBranchIdAndDateUsecase getOrdersDataByBranchIdAndDateUsecase;
+  final GetOrdersDataByBranchIdAndDateUsecase
+  getOrdersDataByBranchIdAndDateUsecase;
   final GetBranchDataUsecase getBranchDataUsecase;
   final UpdateBranchOrderingStatusUsecase updateBranchOrderingStatusUsecase;
   HomeBloc(
@@ -58,7 +62,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           );
         },
         (orderModel) {
-          emit(state.copyWith(getOrdersListStatus: ResponseStatus.success, ordersList: orderModel));
+          final processed = HomeUtils.processOrders(orderModel);
+          emit(
+            state.copyWith(
+              getOrdersListStatus: ResponseStatus.success,
+              ordersList: orderModel,
+              processedOrdersList: processed,
+            ),
+          );
         },
       );
     });
@@ -86,7 +97,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       await result.fold(
         (failure) async {
           emit(
-            state.copyWith(rejectOrderStatus: ResponseStatus.failure, rejectOrderFailures: failure),
+            state.copyWith(
+              rejectOrderStatus: ResponseStatus.failure,
+              rejectOrderFailures: failure,
+            ),
           );
           // Reset status after a short delay to allow UI to show error
           await Future.delayed(const Duration(seconds: 2));
@@ -119,21 +133,38 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           );
         },
         (orderStats) {
-          emit(state.copyWith(getOrderStatsStatus: ResponseStatus.success, orderStats: orderStats));
+          emit(
+            state.copyWith(
+              getOrderStatsStatus: ResponseStatus.success,
+              orderStats: orderStats,
+            ),
+          );
         },
       );
     });
     on<_InitDevice>((event, emit) async {
       emit(state.copyWith(initDeviceStatus: ResponseStatus.loading));
-      var result = await initDeviceUsecase(event.deviceId, event.deviceToken, event.deviceName);
+      var result = await initDeviceUsecase(
+        event.deviceId,
+        event.deviceToken,
+        event.deviceName,
+      );
       result.fold(
         (failure) {
           emit(
-            state.copyWith(initDeviceStatus: ResponseStatus.failure, initDeviceFailures: failure),
+            state.copyWith(
+              initDeviceStatus: ResponseStatus.failure,
+              initDeviceFailures: failure,
+            ),
           );
         },
         (deviceInit) {
-          emit(state.copyWith(initDeviceStatus: ResponseStatus.success, deviceInit: deviceInit));
+          emit(
+            state.copyWith(
+              initDeviceStatus: ResponseStatus.success,
+              deviceInit: deviceInit,
+            ),
+          );
         },
       );
     });
@@ -142,15 +173,29 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       var result = await isLinkedUsecase(event.deviceId);
       result.fold(
         (failure) {
-          emit(state.copyWith(isLinkedStatus: ResponseStatus.failure, isLinkedFailures: failure));
+          emit(
+            state.copyWith(
+              isLinkedStatus: ResponseStatus.failure,
+              isLinkedFailures: failure,
+            ),
+          );
         },
         (isLinked) {
-          emit(state.copyWith(isLinkedStatus: ResponseStatus.success, isLinked: isLinked));
+          emit(
+            state.copyWith(
+              isLinkedStatus: ResponseStatus.success,
+              isLinked: isLinked,
+            ),
+          );
         },
       );
     });
     on<_GetOrdersDataByBranchIdAndDate>((event, emit) async {
-      emit(state.copyWith(getOrdersDataByBranchIdAndDateStatus: ResponseStatus.loading));
+      emit(
+        state.copyWith(
+          getOrdersDataByBranchIdAndDateStatus: ResponseStatus.loading,
+        ),
+      );
       var result = await getOrdersDataByBranchIdAndDateUsecase(event.date);
       result.fold(
         (failure) {
@@ -199,7 +244,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       // Update local state immediately for instant UI feedback
       final currentBranch = state.getBranchesData;
       if (currentBranch != null) {
-        final updatedBranch = currentBranch.copyWith(orderingStatus: event.status);
+        final updatedBranch = currentBranch.copyWith(
+          orderingStatus: event.status,
+        );
         emit(
           state.copyWith(
             getBranchesData: updatedBranch,
@@ -207,11 +254,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           ),
         );
       } else {
-        emit(state.copyWith(updateBranchOrderingStatusStatus: ResponseStatus.loading));
+        emit(
+          state.copyWith(
+            updateBranchOrderingStatusStatus: ResponseStatus.loading,
+          ),
+        );
       }
 
       // Make the API call
-      final result = await updateBranchOrderingStatusUsecase(event.branchId, event.status);
+      final result = await updateBranchOrderingStatusUsecase(
+        event.branchId,
+        event.status,
+      );
 
       // Handle the API response
       result.fold(

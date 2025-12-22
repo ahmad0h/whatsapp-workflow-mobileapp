@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
-// import 'package:google_fonts/google_fonts.dart';
 import 'package:whatsapp_workflow_mobileapp/config/router/go_router_config.dart';
 import 'package:whatsapp_workflow_mobileapp/core/services/notification_service.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
@@ -13,6 +12,17 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   final GoRouter _goRouter = router;
+
+  // Cache themes to avoid recreation on every build
+  static final ThemeData _arabicTheme = ThemeData().copyWith(
+    textTheme: ThemeData().textTheme.apply(fontFamily: 'Cairo'),
+    scaffoldBackgroundColor: const Color(0xFFF3F3F3),
+  );
+
+  static final ThemeData _englishTheme = ThemeData().copyWith(
+    textTheme: ThemeData().textTheme.apply(fontFamily: 'Poppins'),
+    scaffoldBackgroundColor: const Color(0xFFF3F3F3),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +39,9 @@ class MyApp extends StatelessWidget {
         locale: context.locale,
         supportedLocales: context.supportedLocales,
         localizationsDelegates: context.localizationDelegates,
-        theme: ThemeData().copyWith(
-          textTheme: context.locale.languageCode == 'ar'
-              ? ThemeData().textTheme.apply(fontFamily: 'Cairo')
-              : ThemeData().textTheme.apply(fontFamily: 'Poppins'),
-          scaffoldBackgroundColor: Color(0xFFF3F3F3),
-        ),
+        theme: context.locale.languageCode == 'ar'
+            ? _arabicTheme
+            : _englishTheme,
       ),
     );
   }

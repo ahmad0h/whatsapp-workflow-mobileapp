@@ -12,7 +12,7 @@ class OrderCardModel {
   final String orderNumber;
   final String customerName;
   final String time;
-  String status;
+  final String status;
   final Color statusColor;
   final String carBrand;
   final String plateNumber;
@@ -22,7 +22,7 @@ class OrderCardModel {
   final String orderType;
   final String customerAddress;
 
-  OrderCardModel({
+  const OrderCardModel({
     required this.orderNumber,
     required this.customerName,
     required this.time,
@@ -48,6 +48,8 @@ class OrderCardModel {
     String? carDetails,
     String? carColor,
     OrderModel? orderData,
+    String? orderType,
+    String? customerAddress,
   }) {
     return OrderCardModel(
       orderNumber: orderNumber ?? this.orderNumber,
@@ -60,8 +62,8 @@ class OrderCardModel {
       carDetails: carDetails ?? this.carDetails,
       carColor: carColor ?? this.carColor,
       orderData: orderData ?? this.orderData,
-      orderType: orderType,
-      customerAddress: customerAddress,
+      orderType: orderType ?? this.orderType,
+      customerAddress: customerAddress ?? this.customerAddress,
     );
   }
 }

@@ -21,8 +21,7 @@ class HomeDatasourceImpl implements HomeDatasource {
   @override
   Future<List<OrderModel>> getOrdersData() async {
     var response = await DioHelper.getData(
-      url:
-          '${ApiConstants.baseUrl}${ApiConstants.order}/branch/${TokenManager().branchId}',
+      url: '${ApiConstants.baseUrl}${ApiConstants.order}/branch/${TokenManager().branchId}',
       headers: {'Authorization': ApiConstants.token},
     );
     if (response.statusCode == 401) {
@@ -34,9 +33,7 @@ class HomeDatasourceImpl implements HomeDatasource {
       if (response.data is String) {
         final decoded = jsonDecode(response.data);
         if (decoded is List) {
-          return decoded
-              .map<OrderModel>((item) => OrderModel.fromJson(item))
-              .toList();
+          return decoded.map<OrderModel>((item) => OrderModel.fromJson(item)).toList();
         } else if (decoded is Map<String, dynamic>) {
           if (decoded.containsKey('Status') && !decoded['Status']) {
             throw Exception(decoded['Message'] ?? 'Request failed');
@@ -84,10 +81,7 @@ class HomeDatasourceImpl implements HomeDatasource {
   }
 
   @override
-  Future<void> rejectOrder({
-    required String orderId,
-    required String reason,
-  }) async {
+  Future<void> rejectOrder({required String orderId, required String reason}) async {
     try {
       final response = await DioHelper.postData(
         url: '${ApiConstants.baseUrl}${ApiConstants.order}/$orderId/reject',
@@ -134,9 +128,7 @@ class HomeDatasourceImpl implements HomeDatasource {
 
       try {
         if (response.data is Map) {
-          final Map<String, dynamic> data = Map<String, dynamic>.from(
-            response.data,
-          );
+          final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
           // log('Response data: $data');
           final stats = OrderStatsReponseModel.fromJson(data);
           // log('Order stats response: ${stats.toJson()}');
@@ -162,11 +154,7 @@ class HomeDatasourceImpl implements HomeDatasource {
     required String deviceName,
   }) async {
     try {
-      final data = {
-        'deviceId': deviceId,
-        'deviceToken': deviceToken,
-        'deviceName': deviceName,
-      };
+      final data = {'deviceId': deviceId, 'deviceToken': deviceToken, 'deviceName': deviceName};
 
       final response = await DioHelper.postData(
         url: '${ApiConstants.baseUrl}/device/init',
@@ -189,8 +177,7 @@ class HomeDatasourceImpl implements HomeDatasource {
   Future<IsLinkedReponseModel> isLinked({required String deviceId}) async {
     try {
       final response = await DioHelper.getData(
-        url:
-            '${ApiConstants.baseUrl}/device/status/${Uri.encodeComponent(deviceId)}',
+        url: '${ApiConstants.baseUrl}/device/status/${Uri.encodeComponent(deviceId)}',
       );
 
       // If status is 404, device is not linked
@@ -245,12 +232,9 @@ class HomeDatasourceImpl implements HomeDatasource {
   }
 
   @override
-  Future<List<OrderModel>> getOrdersDataByBranchIdAndDate({
-    required String date,
-  }) async {
+  Future<List<OrderModel>> getOrdersDataByBranchIdAndDate({required String date}) async {
     final response = await DioHelper.getData(
-      url:
-          '${ApiConstants.baseUrl}${ApiConstants.order}/branch/${TokenManager().branchId}',
+      url: '${ApiConstants.baseUrl}${ApiConstants.order}/branch/${TokenManager().branchId}',
       headers: {'Authorization': ApiConstants.token},
       query: {'date': date},
     );
@@ -263,9 +247,7 @@ class HomeDatasourceImpl implements HomeDatasource {
       if (response.data is String) {
         final decoded = jsonDecode(response.data);
         if (decoded is List) {
-          return decoded
-              .map<OrderModel>((item) => OrderModel.fromJson(item))
-              .toList();
+          return decoded.map<OrderModel>((item) => OrderModel.fromJson(item)).toList();
         } else if (decoded is Map<String, dynamic>) {
           if (decoded.containsKey('Status') && !decoded['Status']) {
             throw Exception(decoded['Message'] ?? 'Request failed');
@@ -335,8 +317,7 @@ class HomeDatasourceImpl implements HomeDatasource {
       }
 
       final response = await DioHelper.getData(
-        url:
-            '${ApiConstants.baseUrl}/device/by-device-id/${Uri.encodeComponent(deviceId)}',
+        url: '${ApiConstants.baseUrl}/device/by-device-id/${Uri.encodeComponent(deviceId)}',
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -356,10 +337,7 @@ class HomeDatasourceImpl implements HomeDatasource {
   }
 
   @override
-  Future<void> updateDeviceToken({
-    required String deviceId,
-    required String deviceToken,
-  }) async {
+  Future<void> updateDeviceToken({required String deviceId, required String deviceToken}) async {
     try {
       final response = await DioHelper.postData(
         url: '${ApiConstants.baseUrl}/device/update-token',
@@ -370,9 +348,7 @@ class HomeDatasourceImpl implements HomeDatasource {
       if (response.statusCode == 201 || response.statusCode == 200) {
         log('Device token updated successfully');
       } else {
-        throw Exception(
-          'Failed to update device token: ${response.statusCode}',
-        );
+        throw Exception('Failed to update device token: ${response.statusCode}');
       }
     } catch (e) {
       log('Error updating device token: $e');

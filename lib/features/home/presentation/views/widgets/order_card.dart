@@ -1,16 +1,17 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:whatsapp_workflow_mobileapp/core/api/api_constants.dart';
-import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
-import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
-import 'dart:developer';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whatsapp_workflow_mobileapp/core/constants/app_colors.dart';
 import 'package:whatsapp_workflow_mobileapp/core/enums/response_status_enum.dart';
+import 'package:whatsapp_workflow_mobileapp/core/utils/get_color_from_string.dart';
 import 'package:whatsapp_workflow_mobileapp/features/home/presentation/bloc/home_bloc.dart';
+import 'package:whatsapp_workflow_mobileapp/features/home/presentation/views/widgets/order_card_model.dart';
 
 class OrderCard extends StatefulWidget {
   final OrderCardModel model;
@@ -30,8 +31,7 @@ class OrderCard extends StatefulWidget {
   State<OrderCard> createState() => _OrderCardState();
 }
 
-class _OrderCardState extends State<OrderCard>
-    with SingleTickerProviderStateMixin {
+class _OrderCardState extends State<OrderCard> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -46,9 +46,10 @@ class _OrderCardState extends State<OrderCard>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
 
     if (_shouldBlink) {
       _animationController.repeat(reverse: true);
@@ -127,9 +128,7 @@ class _OrderCardState extends State<OrderCard>
         animation: _animation,
         builder: (context, child) {
           // Calculate the glow effect intensity for new/arrived orders
-          final glowOpacity = _shouldBlink
-              ? 0.1 + (_animation.value * 0.2)
-              : 0.0;
+          final glowOpacity = _shouldBlink ? 0.1 + (_animation.value * 0.2) : 0.0;
           final glowSpread = _shouldBlink ? 0.1 + (_animation.value * 1) : 1.0;
           final glowBlur = _shouldBlink ? 1 + (_animation.value * 8.0) : 1.0;
 
@@ -151,9 +150,7 @@ class _OrderCardState extends State<OrderCard>
                 // Blinking glow effect for new/arrived orders
                 if (_shouldBlink)
                   BoxShadow(
-                    color: widget.model.statusColor.withValues(
-                      alpha: glowOpacity,
-                    ),
+                    color: widget.model.statusColor.withValues(alpha: glowOpacity),
                     spreadRadius: glowSpread,
                     blurRadius: glowBlur,
                     offset: Offset.zero,
@@ -186,19 +183,12 @@ class _OrderCardState extends State<OrderCard>
               SizedBox(height: 4),
               Text(
                 "#${widget.model.orderNumber}",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.2,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, letterSpacing: -0.2),
               ),
               SizedBox(height: 4),
 
               // Time
-              Text(
-                widget.model.time,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-              ),
+              Text(widget.model.time, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
 
               SizedBox(height: 4),
 
@@ -220,12 +210,14 @@ class _OrderCardState extends State<OrderCard>
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 spacing: 8,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     spacing: 8,
                     children: [
+                      SchedulingBadge(model: widget.model),
                       OrderTypeBadge(model: widget.model),
                       StatusBadge(model: widget.model),
                     ],
@@ -258,24 +250,18 @@ class _OrderCardState extends State<OrderCard>
           children: [
             CachedNetworkImage(
               imageUrl: widget.model.orderData.vehicle?.image != null
-                  ? ApiConstants.getCarLogoUrl(
-                      widget.model.orderData.vehicle!.image!,
-                    )
+                  ? ApiConstants.getCarLogoUrl(widget.model.orderData.vehicle!.image!)
                   : '',
               width: 25,
               height: fixedHeight,
               fit: BoxFit.cover,
-              errorWidget: (context, url, error) =>
-                  Icon(Icons.error, color: Colors.red),
+              errorWidget: (context, url, error) => Icon(Icons.error, color: Colors.red),
             ),
             SizedBox(width: 8),
 
             // Plate number
             Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: (12 * 0.2),
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: (12 * 0.2)),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
@@ -292,10 +278,7 @@ class _OrderCardState extends State<OrderCard>
 
             // Car details
             Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: (12 * 0.2),
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: (12 * 0.2)),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
@@ -345,18 +328,12 @@ class _OrderCardState extends State<OrderCard>
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.statusPreparing,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
           elevation: 0,
         ),
         child: Text(
           'orderDetails.orderIsReady'.tr(),
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
         ),
       );
     }
@@ -369,18 +346,12 @@ class _OrderCardState extends State<OrderCard>
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.statusCompleted,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
           elevation: 0,
         ),
         child: Text(
           'orderDetails.markAsCompleted'.tr(),
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
         ),
       );
     }
@@ -429,10 +400,7 @@ class OrderTypeBadge extends StatelessWidget {
         spacing: 4,
         children: [
           SvgPicture.asset("assets/icons/$orderType.svg"),
-          Text(
-            translationKey.tr(),
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
+          Text(translationKey.tr(), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -448,8 +416,7 @@ class StatusBadge extends StatelessWidget {
   String _getStatusText() {
     if (model.status == "Is Finished") {
       return "order.ready".tr();
-    } else if (model.orderType == "delivery" &&
-        model.status.toLowerCase() == "arrived") {
+    } else if (model.orderType == "delivery" && model.status.toLowerCase() == "arrived") {
       return "order.delivered".tr();
     } else if (model.status.toLowerCase() == "in progress") {
       return "order.inProgress".tr();
@@ -486,9 +453,7 @@ class StatusBadge extends StatelessWidget {
           Text(
             _getStatusText(),
             style: TextStyle(
-              color:
-                  model.status == "Is Finished" ||
-                      model.status.toLowerCase() == "in progress"
+              color: model.status == "Is Finished" || model.status.toLowerCase() == "in progress"
                   ? const Color(0xFFEEB128)
                   : model.statusColor.withValues(alpha: 0.7),
               fontSize: 14,
@@ -499,6 +464,48 @@ class StatusBadge extends StatelessWidget {
             Icon(Icons.wb_sunny_outlined, size: 15, color: model.statusColor)
           else if (model.status.toLowerCase() == "arrived")
             SizedBox(width: 4),
+        ],
+      ),
+    );
+  }
+}
+
+class SchedulingBadge extends StatelessWidget {
+  const SchedulingBadge({super.key, required this.model});
+
+  final OrderCardModel model;
+
+  @override
+  Widget build(BuildContext context) {
+    // Check if order has scheduled date or time
+    final isScheduled =
+        model.orderData.scheduledDate != null || model.orderData.scheduledTime != null;
+
+    final type = isScheduled ? 'Scheduled' : 'Instant';
+    final color = isScheduled ? const Color(0xFFF2C94C) : const Color(0xFF2D9CDB); // Purple vs Blue
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        // color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(141.18),
+        border: Border.all(color: color, width: 1.41),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+
+        children: [
+          Icon(
+            isScheduled ? Icons.calendar_today_outlined : Icons.flash_on_rounded,
+            size: 24,
+            color: color,
+          ),
+          if (isScheduled) SizedBox(width: 4),
+          Text(
+            type,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black),
+          ),
+          SizedBox(width: 4),
         ],
       ),
     );

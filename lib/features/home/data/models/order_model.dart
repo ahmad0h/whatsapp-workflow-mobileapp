@@ -19,6 +19,8 @@ class OrderModel {
   String? type;
   String? customerAddress;
   String? note;
+  String? scheduledDate;
+  String? scheduledTime;
 
   OrderModel({
     this.id,
@@ -39,19 +41,17 @@ class OrderModel {
     this.type,
     this.customerAddress,
     this.note,
+    this.scheduledDate,
+    this.scheduledTime,
   });
 
   OrderModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     orderNumber = json['order_number'];
     customerId = json['customer_id'];
-    customer = json['customer'] != null
-        ? Customer.fromJson(json['customer'])
-        : null;
+    customer = json['customer'] != null ? Customer.fromJson(json['customer']) : null;
     vehicleId = json['vehicle_id'];
-    vehicle = json['vehicle'] != null
-        ? Vehicle.fromJson(json['vehicle'])
-        : null;
+    vehicle = json['vehicle'] != null ? Vehicle.fromJson(json['vehicle']) : null;
     branchId = json['branch_id'];
     status = json['status'];
     netAmount = json['net_amount'];
@@ -74,6 +74,8 @@ class OrderModel {
     type = json['type'];
     customerAddress = json['customer_address'];
     note = json['note'];
+    scheduledDate = json['scheduled_date'];
+    scheduledTime = json['scheduled_time'];
   }
 
   Map<String, dynamic> toJson() {
@@ -104,6 +106,8 @@ class OrderModel {
     data['type'] = type;
     data['customer_address'] = customerAddress;
     data['note'] = note;
+    data['scheduled_date'] = scheduledDate;
+    data['scheduled_time'] = scheduledTime;
     return data;
   }
 }
@@ -116,14 +120,7 @@ class Customer {
   String? gender;
   String? dob;
 
-  Customer({
-    this.id,
-    this.fullName,
-    this.email,
-    this.phone,
-    this.gender,
-    this.dob,
-  });
+  Customer({this.id, this.fullName, this.email, this.phone, this.gender, this.dob});
 
   Customer.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -208,6 +205,7 @@ class OrderDetails {
   int? productQuantity;
   String? productPrice;
   String? total;
+  Product? product;
 
   OrderDetails({
     this.id,
@@ -216,6 +214,7 @@ class OrderDetails {
     this.productQuantity,
     this.productPrice,
     this.total,
+    this.product,
   });
 
   OrderDetails.fromJson(Map<String, dynamic> json) {
@@ -225,6 +224,7 @@ class OrderDetails {
     productQuantity = json['product_quantity'];
     productPrice = json['product_price'];
     total = json['total'];
+    product = json['product'] != null ? Product.fromJson(json['product']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -235,6 +235,28 @@ class OrderDetails {
     data['product_quantity'] = productQuantity;
     data['product_price'] = productPrice;
     data['total'] = total;
+    if (product != null) {
+      data['product'] = product!.toJson();
+    }
+    return data;
+  }
+}
+
+class Product {
+  String? orderingType;
+  String? sku;
+
+  Product({this.orderingType, this.sku});
+
+  Product.fromJson(Map<String, dynamic> json) {
+    orderingType = json['ordering_type'];
+    sku = json['sku'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['ordering_type'] = orderingType;
+    data['sku'] = sku;
     return data;
   }
 }
